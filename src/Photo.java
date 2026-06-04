@@ -1,4 +1,6 @@
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,27 +15,54 @@ public class Photo {
     private boolean commentAllowed;
     private List<Integer> albumIds;
     private List<Integer> commentIds;
-    private Map<Integer, Photo> photos;
+    private static Map<Integer, Photo> photos = new HashMap<>();
     private String route;
 
+    public Photo(int id, int ownerId, String name, LocalDate date, List<String> tags, String caption, boolean commentAllowed, String route) {
+        this.id = id;
+        this.ownerId = ownerId;
+        this.name = name;
+        this.date = date;
+        this.tags = (tags != null) ? tags : new ArrayList<>();
+        this.caption = caption;
+        this.commentAllowed = commentAllowed;
+        this.route = route;
+        this.albumIds = new ArrayList<>();
+        this.commentIds = new ArrayList<>();
+    }
 
-    public void like(User user, int id) {
-
-        // TO DO
-
+    public void like(User user) {
+        this.likes++;
+        user.getFavoritePhotoIds().add(this.id);
     }
 
     public void addComment(Comment comment) {
+        if (!commentAllowed) {
+            throw new IllegalStateException("Comments are not allowed for this photo.");
+        }
         this.commentIds.add(comment.getId());
+    }
+
+    public void deleteComment(Comment comment) {
+        this.commentIds.remove(Integer.valueOf(comment.getId()));
     }
 
     public void addTag(String tag) {
         this.tags.add(tag);
     }
 
+    public void removeTag(String tag) {
+        this.tags.remove(tag);
+    }
+
+    public void editPhoto(String newName) {
+        this.name = newName;
+    }
+
     public void editCaption(String newCaption) {
         this.caption = newCaption;
     }
+
 
     public static void sortPhotos() {
 
@@ -42,10 +71,32 @@ public class Photo {
     }
 
     public static Photo searchByName(String name) {
-        for (Map<Integer, Photo> photo : this.photos) {
-
+        for (Photo photo : photos.values()) {
+            if (photo.getName()!= null && photo.getName().equals(name)) {
+                return photo;
+            }
         }
+        return null;
     }
+
+    public static Photo searchByTag(String tag) {
+        for (Photo photo : photos.values()) {
+            if (photo.getTags() != null && photo.getTags().contains(tag)) {
+                return photo;
+            }
+        }
+        return null;
+    }
+
+    public static void uploadPhoto(int id, int ownerId, String name, LocalDate date, List<String> tags, String caption, boolean commentAllowed, String route) {
+        photos.put(id, new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route));
+    }
+
+    public static void deletePhoto(Photo photo) {
+        photos.remove(photo.getId());
+    }
+
+
 
 
 
@@ -122,20 +173,16 @@ public class Photo {
         this.commentAllowed = commentAllowed;
     }
 
-    public List<Album> getAlbumIds() {
+    public List<Integer> getAlbumIds() {
         return albumIds;
     }
 
-    public void setAlbumIds(List<Album> albumIds) {
+    public void setAlbumIds(List<Integer> albumIds) {
         this.albumIds = albumIds;
     }
 
-    public Map<Integer, Photo> getPhotos() {
+    public static Map<Integer, Photo> getPhotos() {
         return photos;
-    }
-
-    public void setPhotos(Map<Integer, Photo> photos) {
-        this.photos = photos;
     }
 
     public String getRoute() {
@@ -144,10 +191,6 @@ public class Photo {
 
     public void setRoute(String route) {
         this.route = route;
-    }
-
-    public void setAlbumIds(List<Integer> albumIds) {
-        this.albumIds = albumIds;
     }
 
     public List<Integer> getCommentIds() {
