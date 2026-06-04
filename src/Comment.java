@@ -1,13 +1,13 @@
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Comment {
     private int id;
     private int ownerId;
     private int photoId;
-    private LocalDate date;
+    private LocalDateTime date;
     private String text;
 
-    public Comment(int id, int ownerId, int photoId, LocalDate date, String text) {
+    public Comment(int id, int ownerId, int photoId, LocalDateTime date, String text) {
         this.id = id;
         this.ownerId = ownerId;
         this.photoId = photoId;
@@ -27,7 +27,7 @@ public class Comment {
         return photoId;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 

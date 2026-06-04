@@ -1,4 +1,4 @@
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +8,7 @@ public class Photo {
     private int id;
     private int ownerId;
     private String name;
-    private LocalDate date;
+    private LocalDateTime date;
     private List<String> tags;
     private String caption;
     private int likes;
@@ -18,7 +18,7 @@ public class Photo {
     private static Map<Integer, Photo> photos = new HashMap<>();
     private String route;
 
-    public Photo(int id, int ownerId, String name, LocalDate date, List<String> tags, String caption, boolean commentAllowed, String route) {
+    public Photo(int id, int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
         this.id = id;
         this.ownerId = ownerId;
         this.name = name;
@@ -88,7 +88,7 @@ public class Photo {
         return null;
     }
 
-    public static void uploadPhoto(int id, int ownerId, String name, LocalDate date, List<String> tags, String caption, boolean commentAllowed, String route) {
+    public static void uploadPhoto(int id, int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
         photos.put(id, new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route));
     }
 
@@ -133,11 +133,11 @@ public class Photo {
         this.name = name;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

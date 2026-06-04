@@ -1,14 +1,53 @@
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class Album {
     private int id;
     private int ownerId;
     private String name;
-    private LocalDate date;
-    List<Integer> photoIds;
-    private Map<Integer, Album> albums;
+    private LocalDateTime date;
+    private List<Integer> photoIds;
+    private static Map<Integer, Album> albums = new HashMap<>();
+
+    public Album(int id, int ownerId, String name, LocalDateTime date) {
+        this.id = id;
+        this.ownerId = ownerId;
+        this.name = name;
+        this.date = date;
+        this.photoIds = new ArrayList<>();
+    }
+
+    public void addPhoto(Photo photo) {
+        this.photoIds.add(photo.getId());
+    }
+
+    public void deletePhoto(Photo photo) {
+        this.photoIds.remove(Integer.valueOf(photo.getId()));
+    }
+
+    public void movePhoto(Photo photo, Album destAlbum) {
+        this.photoIds.remove(Integer.valueOf(photo.getId()));
+        destAlbum.photoIds.add(photo.getId());
+    }
+
+    public void sortPhotosByDate() {
+        this.photoIds = this.photoIds.stream()
+                .map(id -> Photo.getPhotos().get(id))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(Photo::getDate).reversed())
+                .map(Photo::getId)
+                .toList();
+    }
+
+    public void sortPhotosByName() {
+        this.photoIds = this.photoIds.stream()
+                .map(id -> Photo.getPhotos().get(id))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(photo -> photo.getName().toLowerCase()))
+                .map(Photo::getId)
+                .toList();
+    }
+
 
 
     public int getId() {
@@ -35,11 +74,11 @@ public class Album {
         this.name = name;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
