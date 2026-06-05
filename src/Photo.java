@@ -1,11 +1,8 @@
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Photo {
-    private int id;
+    private final int id;
     private int ownerId;
     private String name;
     private LocalDateTime date;
@@ -15,7 +12,7 @@ public class Photo {
     private boolean commentAllowed;
     private List<Integer> albumIds;
     private List<Integer> commentIds;
-    private static Map<Integer, Photo> photos = new HashMap<>();
+    private static final Map<Integer, Photo> photos = new LinkedHashMap<>();
     private String route;
 
     public Photo(int id, int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
@@ -32,10 +29,17 @@ public class Photo {
         this.userLikedIds = new ArrayList<>();
     }
 
+
     public void like(User user) {
-        userLikedIds.add(Integer.valueOf(user.getId()));
-        user.getFavoritePhotoIds().add(this.id);
+        if (!userLikedIds.contains(user.getId())) {
+            userLikedIds.add(user.getId());
+
+            if (!user.getFavoritePhotoIds().contains(this.id)) {
+                user.getFavoritePhotoIds().add(this.id);
+            }
+        }
     }
+
 
     public void addComment(Comment comment) {
         if (!commentAllowed) {
@@ -48,13 +52,24 @@ public class Photo {
         this.commentIds.remove(Integer.valueOf(comment.getId()));
     }
 
+
     public void addTag(String tag) {
-        this.tags.add(tag);
+        if (tag == null || tag.isBlank()) {
+            throw new IllegalArgumentException("Your tag can't be blank!");
+        }
+        if (tags.stream().noneMatch(a -> a.equalsIgnoreCase(tag))) {
+            this.tags.add(tag);
+        }
     }
 
+
     public void removeTag(String tag) {
-        this.tags.remove(tag);
+        if (tag == null) {
+            return;
+        }
+        this.tags.removeIf(a -> a.equalsIgnoreCase(tag));
     }
+
 
     public void editPhoto(String newName) {
         this.name = newName;
@@ -65,57 +80,70 @@ public class Photo {
     }
 
 
-    public static void sortPhotos() {
-
-        //TO DO
-
+    public static List<Photo> sortPhotosByName() {
+        return photos.values()
+                .stream()
+                .sorted(Comparator.comparing(Photo::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                .toList();
     }
 
-    public static Photo searchByName(String name) {
+
+    public static List<Photo> sortPhotosByDate() {
+        return photos.values()
+                .stream()
+                .sorted(Comparator.comparing(Photo::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+    }
+
+
+    public static List<Photo> searchByName(String name) {
+        if (name == null || name.isBlank()) {
+            return new ArrayList<>();
+        }
+        List<Photo> matchedPhotos = new ArrayList<>();
+        String word = name.toLowerCase();
+
         for (Photo photo : photos.values()) {
-            if (photo.getName()!= null && photo.getName().equals(name)) {
-                return photo;
+            if (photo.getName() != null && photo.getName().toLowerCase().contains(word)) {
+                matchedPhotos.add(photo);
             }
         }
-        return null;
+        return matchedPhotos;
     }
 
-    public static Photo searchByTag(String tag) {
+
+    public static List<Photo> searchByTag(String tag) {
+        if (tag == null || tag.isBlank()) {
+            return new ArrayList<>();
+        }
+        List<Photo> matchedPhotos = new ArrayList<>();
+        String word = tag.toLowerCase();
         for (Photo photo : photos.values()) {
-            if (photo.getTags() != null && photo.getTags().contains(tag)) {
-                return photo;
+            if (photo.getTags() != null && photo.getTags().stream().anyMatch(a -> a.equalsIgnoreCase(tag))) {
+                matchedPhotos.add(photo);
             }
         }
-        return null;
+        return matchedPhotos;
     }
 
-    public static void uploadPhoto(int id, int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
-        photos.put(id, new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route));
+
+    public static Photo uploadPhoto(int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
+        int id = IdGenerator.generateId();
+        Photo photo = new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route);
+        photos.put(id, photo);
+        return photo;
     }
 
     public static void deletePhoto(Photo photo) {
-        photos.remove(Integer.valueOf(photo.getId()));
+        if (photo == null) {
+            return;
+        }
+        photos.remove(photo.getId());
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getOwnerId() {
@@ -166,6 +194,10 @@ public class Photo {
         this.userLikedIds = userLikedIds;
     }
 
+    public int getLikes() {
+        return userLikedIds.size();
+    }
+
     public boolean isCommentAllowed() {
         return commentAllowed;
     }
@@ -183,7 +215,7 @@ public class Photo {
     }
 
     public static Map<Integer, Photo> getPhotos() {
-        return photos;
+        return new LinkedHashMap<>(photos);
     }
 
     public String getRoute() {
