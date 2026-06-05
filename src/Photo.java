@@ -11,7 +11,7 @@ public class Photo {
     private LocalDateTime date;
     private List<String> tags;
     private String caption;
-    private int likes;
+    private List<Integer> userLikedIds;
     private boolean commentAllowed;
     private List<Integer> albumIds;
     private List<Integer> commentIds;
@@ -29,10 +29,11 @@ public class Photo {
         this.route = route;
         this.albumIds = new ArrayList<>();
         this.commentIds = new ArrayList<>();
+        this.userLikedIds = new ArrayList<>();
     }
 
     public void like(User user) {
-        this.likes++;
+        userLikedIds.add(Integer.valueOf(user.getId()));
         user.getFavoritePhotoIds().add(this.id);
     }
 
@@ -157,12 +158,12 @@ public class Photo {
         this.caption = caption;
     }
 
-    public int getLikes() {
-        return likes;
+    public List<Integer> getUserLikedIds() {
+        return userLikedIds;
     }
 
-    public void setLikes(int likes) {
-        this.likes = likes;
+    public void setUserLikedIds(List<Integer> userLikedIds) {
+        this.userLikedIds = userLikedIds;
     }
 
     public boolean isCommentAllowed() {
