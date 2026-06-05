@@ -93,7 +93,7 @@ public class Photo {
     }
 
     public static void deletePhoto(Photo photo) {
-        photos.remove(photo.getId());
+        photos.remove(Integer.valueOf(photo.getId()));
     }
 
 

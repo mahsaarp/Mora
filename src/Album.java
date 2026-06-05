@@ -48,6 +48,14 @@ public class Album {
                 .toList();
     }
 
+    public static void createAlbum(int id, int ownerId, String name, LocalDateTime date) {
+        albums.put(id, new Album(id, ownerId, name, date));
+    }
+
+    public static void deleteAlbum(Album album) {
+        albums.remove(Integer.valueOf(album.getId()));
+    }
+
 
 
     public int getId() {
