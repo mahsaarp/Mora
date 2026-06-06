@@ -59,7 +59,7 @@ public class Album {
     }
 
     public static void deleteAlbum(Album album) {
-        albums.remove(Integer.valueOf(album.getId()));
+        albums.remove(album.getId());
     }
 
 
@@ -100,7 +100,7 @@ public class Album {
         this.photoIds = photoIds;
     }
 
-    public Map<Integer, Album> getAlbums() {
+    public static Map<Integer, Album> getAlbums() {
         return new LinkedHashMap<>(albums);
     }
 

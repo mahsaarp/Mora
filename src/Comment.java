@@ -1,10 +1,10 @@
 import java.time.LocalDateTime;
 
 public class Comment {
-    private int id;
-    private int ownerId;
-    private int photoId;
-    private LocalDateTime date;
+    private final int id;
+    private final int ownerId;
+    private final int photoId;
+    private final LocalDateTime date;
     private String text;
 
     public Comment(int id, int ownerId, int photoId, LocalDateTime date, String text) {
@@ -13,6 +13,11 @@ public class Comment {
         this.photoId = photoId;
         this.date = date;
         this.text = text;
+    }
+
+    public static Comment createComment(int ownerId, int photoId, LocalDateTime date, String text) {
+        int id = IdGenerator.generateId();
+        return new Comment(id, ownerId, photoId, date, text);
     }
 
     public int getId() {
