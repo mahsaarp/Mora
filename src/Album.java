@@ -2,12 +2,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Album {
-    private int id;
+    private final int id;
     private int ownerId;
     private String name;
     private LocalDateTime date;
     private List<Integer> photoIds;
-    private static Map<Integer, Album> albums = new HashMap<>();
+    private static final Map<Integer, Album> albums = new LinkedHashMap<>();
 
     public Album(int id, int ownerId, String name, LocalDateTime date) {
         this.id = id;
@@ -18,7 +18,9 @@ public class Album {
     }
 
     public void addPhoto(Photo photo) {
-        this.photoIds.add(photo.getId());
+        if (photo != null && !photoIds.contains(photo.getId())) {
+            this.photoIds.add(photo.getId());
+        }
     }
 
     public void deletePhoto(Photo photo) {
@@ -26,15 +28,16 @@ public class Album {
     }
 
     public void movePhoto(Photo photo, Album destAlbum) {
-        this.photoIds.remove(Integer.valueOf(photo.getId()));
-        destAlbum.photoIds.add(photo.getId());
+        if (photo == null || destAlbum == null) return;
+        this.deletePhoto(photo);
+        destAlbum.addPhoto(photo);
     }
 
     public void sortPhotosByDate() {
         this.photoIds = this.photoIds.stream()
                 .map(id -> Photo.getPhotos().get(id))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Photo::getDate).reversed())
+                .sorted(Comparator.comparing(Photo::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
                 .map(Photo::getId)
                 .toList();
     }
@@ -43,13 +46,16 @@ public class Album {
         this.photoIds = this.photoIds.stream()
                 .map(id -> Photo.getPhotos().get(id))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(photo -> photo.getName().toLowerCase()))
+                .sorted(Comparator.comparing(Photo::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
                 .map(Photo::getId)
                 .toList();
     }
 
-    public static void createAlbum(int id, int ownerId, String name, LocalDateTime date) {
-        albums.put(id, new Album(id, ownerId, name, date));
+    public static Album createAlbum(int ownerId, String name, LocalDateTime date) {
+        int id = IdGenerator.generateId();
+        Album album = new Album(id, ownerId, name, date);
+        albums.put(id, album);
+        return album;
     }
 
     public static void deleteAlbum(Album album) {
@@ -60,10 +66,6 @@ public class Album {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getOwnerId() {
@@ -99,10 +101,7 @@ public class Album {
     }
 
     public Map<Integer, Album> getAlbums() {
-        return albums;
+        return new LinkedHashMap<>(albums);
     }
 
-    public void setAlbums(Map<Integer, Album> albums) {
-        this.albums = albums;
-    }
 }
