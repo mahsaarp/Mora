@@ -71,7 +71,7 @@ public class Photo {
     }
 
 
-    public void editPhoto(String newName) {
+    public void editName(String newName) {
         this.name = newName;
     }
 
