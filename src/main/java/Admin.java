@@ -1,5 +1,4 @@
-public class Admin extends User
-{
+public class Admin extends User {
     private static final String AdminPassword = "Mora405Ap";
 
     public Admin(int id, String username, String password, EnterType enterType) {
