@@ -141,6 +141,11 @@ public class Photo {
         photos.remove(photo.getId());
     }
 
+    static void clearPhotosForTest() {
+        photos.clear();
+    }
+
+
 
     public int getId() {
         return id;

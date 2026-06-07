@@ -1,3 +1,4 @@
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -8,6 +9,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PhotoTest {
+
+    @BeforeEach
+    void setUp() {
+        Photo.clearPhotosForTest();
+    }
+
 
     @Test
     void likeTest() {
@@ -154,6 +161,55 @@ class PhotoTest {
 
         assertEquals(2, Photo.searchByTag("Umbrella").size());
         assertEquals(1, Photo.searchByTag("pouring").size());
+    }
+
+    @Test
+    void sortByNameTest() {
+
+        Photo photo1 = Photo.uploadPhoto(2,
+                "snow",
+                LocalDateTime.now(),
+                new ArrayList<>(List.of("umbrella", "pouring")),
+                "peace comes with rain...",
+                true,
+                "abcd");
+        Photo photo2 = Photo.uploadPhoto(3,
+                "rain",
+                LocalDateTime.now(),
+                new ArrayList<>(List.of("UMBRELLA", "water")),
+                "peace comes with snow...",
+                false,
+                "abcdefg");
+
+        List<Photo> sortedPhotos = Photo.sortPhotosByName();
+
+        assertEquals(photo2, sortedPhotos.get(0));
+        assertEquals(photo1, sortedPhotos.get(1));
+    }
+
+    @Test
+    void sortByDateTest() {
+
+        Photo photo1 = Photo.uploadPhoto(2,
+                "rain",
+                LocalDateTime.of(2020, 1, 1, 1, 1, 1),
+                new ArrayList<>(List.of("umbrella", "pouring")),
+                "peace comes with rain...",
+                true,
+                "abcd");
+        Photo photo2 = Photo.uploadPhoto(3,
+                "snow",
+                LocalDateTime.of(2019, 1, 1, 1, 1, 1),
+                new ArrayList<>(List.of("UMBRELLA", "water")),
+                "peace comes with snow...",
+                false,
+                "abcdefg");
+
+        List<Photo> sortedPhotos = Photo.sortPhotosByDate();
+
+        assertEquals(photo2, sortedPhotos.get(1));
+        assertEquals(photo1, sortedPhotos.get(0));
+
     }
 
 
