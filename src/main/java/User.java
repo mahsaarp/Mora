@@ -23,7 +23,7 @@ public class User {
 
     private List<Integer> photoIds;
     private List<Integer> albumIds;
-    private List<Integer> favoritePhotoIds;
+    private List<Integer> likedPhotoIds;
 
     private boolean isBanned;
     private boolean isLoggedIn;
@@ -50,6 +50,50 @@ public User(int id, String username, String password, userRank rank, EnterType e
 
     this.photoIds = new ArrayList<>();
     this.albumIds = new ArrayList<>();
-    this.favoritePhotoIds = new ArrayList<>();
+    this.likedPhotoIds = new ArrayList<>();
+    }
+//=============================================GETTERS
+    public int getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public List<Integer> getPhotoIds() {
+        return photoIds;
+    }
+
+    public List<Integer> getAlbumIds() {
+        return albumIds;
+    }
+
+    public boolean isBanned() {
+        return isBanned;
+    }
+
+    public boolean isLoggedIn() {
+        return isLoggedIn;
+    }
+
+    public int getCommentCount() {
+        return commentCount;
+    }
+
+    public userRank getRank() {
+        return rank;
+    }
+
+    public EnterType getEnterType() {
+        return enterType;
+    }
+
+    public List<Integer> getLikedPhotoIds() {
+        return likedPhotoIds;
     }
 }
