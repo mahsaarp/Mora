@@ -34,8 +34,8 @@ public class Photo {
         if (!userLikedIds.contains(user.getId())) {
             userLikedIds.add(user.getId());
 
-            if (!user.getFavoritePhotoIds().contains(this.id)) {
-                user.getFavoritePhotoIds().add(this.id);
+            if (!user.getLikedPhotoIds().contains(this.id)) {
+                user.getLikedPhotoIds().add(this.id);
             }
         }
     }
