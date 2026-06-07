@@ -131,6 +131,12 @@ public class Photo {
         int id = IdGenerator.nextPhotoId();
         Photo photo = new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route);
         photos.put(id, photo);
+
+        User owner = User.getUsers().get(ownerId);
+        if (owner != null) {
+            owner.getPhotoIds().add(id);
+        }
+
         return photo;
     }
 

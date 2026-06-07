@@ -55,6 +55,12 @@ public class Album {
         int id = IdGenerator.nextAlbumId();
         Album album = new Album(id, ownerId, name, date);
         albums.put(id, album);
+
+        User owner = User.getUsers().get(ownerId);
+        if (owner != null) {
+            owner.getAlbumIds().add(id);
+        }
+
         return album;
     }
 

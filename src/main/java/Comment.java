@@ -17,7 +17,14 @@ public class Comment {
 
     public static Comment createComment(int ownerId, int photoId, LocalDateTime date, String text) {
         int id = IdGenerator.nextCommentId();
-        return new Comment(id, ownerId, photoId, date, text);
+        Comment comment = new Comment(id, ownerId, photoId, date, text);
+
+        User owner = User.getUsers().get(ownerId);
+        if (owner != null) {
+            owner.incrementCommentCount();
+        }
+
+        return comment;
     }
 
     public int getId() {

@@ -1,3 +1,4 @@
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class User {
     private userRank rank;
     private EnterType enterType;
 
-    private static Map<Integer, User> users;
+    private static Map<Integer, User> users = new LinkedHashMap<>();
 //=============================================CONSTRUCTOR
 public User(int id, String username, String password, userRank rank, EnterType enterType) {
     this.id = id;
@@ -97,7 +98,11 @@ public User(int id, String username, String password, userRank rank, EnterType e
         return likedPhotoIds;
     }
 
-//=============================================SETTERS
+    public static Map<Integer, User> getUsers() {
+        return users;
+    }
+
+    //=============================================SETTERS
     public void ban() {
         isBanned = true;
     }
@@ -106,7 +111,12 @@ public User(int id, String username, String password, userRank rank, EnterType e
     public void unban() {
         isBanned = false;
     }
-//=============================================VALIDATONS
+
+    public void incrementCommentCount() {
+        commentCount++;
+    }
+
+    //=============================================VALIDATONS
     public static boolean isValidUsername(String username, EnterType enterType) {
         if(enterType == EnterType.email) {
             if (username.contains("@gmail.com")) {
