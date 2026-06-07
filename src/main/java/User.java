@@ -35,8 +35,7 @@ public class User {
 
     private static Map<Integer, User> users;
 //=============================================CONSTRUCTOR
-public User(int id, String username, String password, userRank rank, EnterType enterType)
-{
+public User(int id, String username, String password, userRank rank, EnterType enterType) {
     this.id = id;
     this.username = username;
     this.password = password;
@@ -52,5 +51,5 @@ public User(int id, String username, String password, userRank rank, EnterType e
     this.photoIds = new ArrayList<>();
     this.albumIds = new ArrayList<>();
     this.favoritePhotoIds = new ArrayList<>();
-}
+    }
 }
