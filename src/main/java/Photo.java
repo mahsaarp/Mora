@@ -128,7 +128,7 @@ public class Photo {
 
 
     public static Photo uploadPhoto(int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
-        int id = IdGenerator.generateId();
+        int id = IdGenerator.nextPhotoId();
         Photo photo = new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route);
         photos.put(id, photo);
         return photo;

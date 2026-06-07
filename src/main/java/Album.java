@@ -52,7 +52,7 @@ public class Album {
     }
 
     public static Album createAlbum(int ownerId, String name, LocalDateTime date) {
-        int id = IdGenerator.generateId();
+        int id = IdGenerator.nextAlbumId();
         Album album = new Album(id, ownerId, name, date);
         albums.put(id, album);
         return album;
