@@ -101,6 +101,7 @@ public User(int id, String username, String password, userRank rank, EnterType e
     public void ban() {
         isBanned = true;
     }
+
     
     public void unban() {
         isBanned = false;
@@ -162,6 +163,7 @@ public User(int id, String username, String password, userRank rank, EnterType e
         return user;
     }
 
+
     public static User login(String username, String password) {
         for(User user : users.values()) {
             if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
@@ -175,5 +177,12 @@ public User(int id, String username, String password, userRank rank, EnterType e
         return null;
     }
 //=============================================LOG OUT AND DELET ACCOUNT
+    public static void logout(User user) {
+        user.isLoggedIn = false;
+    }
 
+
+    public static void deleteAccount(User user) {
+        users.remove(user.getId());
+    }
 }
