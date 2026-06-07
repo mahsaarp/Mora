@@ -102,7 +102,7 @@ public User(int id, String username, String password, userRank rank, EnterType e
         isBanned = true;
     }
 
-    
+
     public void unban() {
         isBanned = false;
     }
@@ -185,4 +185,23 @@ public User(int id, String username, String password, userRank rank, EnterType e
     public static void deleteAccount(User user) {
         users.remove(user.getId());
     }
+//============================================UPDATE RANK
+    public void updateRank() {
+        if(rank == userRank.ADMIN) {
+            return;
+        }
+
+        if(photoIds.size() >= 100 && commentCount >= 200) {
+            rank = userRank.INFLUENCER;
+        }
+        else if(photoIds.size() >= 100) {
+            rank = userRank.PHOTOGRAPHER;
+        }
+        else if(commentCount >= 200) {
+            rank = userRank.COMMENTER;
+        }
+        else {
+            rank = userRank.NEWBIE;
+        }
+}
 }
