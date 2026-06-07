@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class User {
@@ -11,12 +12,12 @@ public class User {
         ADMIN
     }
 
-    public enum enterType {
+    public enum EnterType {
         phoneNumber,
         email
     }
 //=============================================PROPERTIES
-private int id;
+    private int id;
     private String username;
     private String password;
 
@@ -30,8 +31,26 @@ private int id;
     private int commentCount;
 
     private userRank rank;
-    private enterType enterType;
+    private EnterType enterType;
 
     private static Map<Integer, User> users;
-    
+//=============================================CONSTRUCTOR
+public User(int id, String username, String password, userRank rank, EnterType enterType)
+{
+    this.id = id;
+    this.username = username;
+    this.password = password;
+
+    this.rank = rank;
+    this.enterType = enterType;
+
+    this.isBanned = false;
+    this.isLoggedIn = false;
+
+    this.commentCount = 0;
+
+    this.photoIds = new ArrayList<>();
+    this.albumIds = new ArrayList<>();
+    this.favoritePhotoIds = new ArrayList<>();
+}
 }
