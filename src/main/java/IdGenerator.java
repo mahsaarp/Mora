@@ -17,7 +17,7 @@ public class IdGenerator {
         return albumId++;
     }
 
-    public static int nextcommentId() {
+    public static int nextCommentId() {
         return commentId++;
     }
 
