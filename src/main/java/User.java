@@ -96,6 +96,15 @@ public User(int id, String username, String password, userRank rank, EnterType e
     public List<Integer> getLikedPhotoIds() {
         return likedPhotoIds;
     }
+
+//=============================================SETTERS
+    public void ban() {
+        isBanned = true;
+    }
+    
+    public void unban() {
+        isBanned = false;
+    }
 //=============================================VALIDATONS
     public static boolean isValidUsername(String username, EnterType enterType) {
         if(enterType == EnterType.email) {
@@ -166,5 +175,5 @@ public User(int id, String username, String password, userRank rank, EnterType e
         return null;
     }
 //=============================================LOG OUT AND DELET ACCOUNT
-    
+
 }
