@@ -112,11 +112,24 @@ public User(int id, String username, String password, userRank rank, EnterType e
         isBanned = false;
     }
 
-    public void incrementCommentCount() {
-        commentCount++;
-    }
 
     //=============================================VALIDATONS
+
+
+    public void changeUsername(String newUsername) {
+        if(isValidUsername(newUsername, enterType)) {
+            username = newUsername;
+        }
+    }
+
+
+    public void changePassword(String newPassword) {
+        if(isValidPassword(username, newPassword)) {
+            password = newPassword;
+        }
+    }
+//=============================================VALIDATONS
+
     public static boolean isValidUsername(String username, EnterType enterType) {
         if(enterType == EnterType.email) {
             if (username.contains("@gmail.com")) {
@@ -128,7 +141,7 @@ public User(int id, String username, String password, userRank rank, EnterType e
                 return true;
             }
         }
-        return false;
+        return true;
     }
 
 
@@ -159,11 +172,11 @@ public User(int id, String username, String password, userRank rank, EnterType e
     }
 //=============================================SIGNUP AND LOGIN
     public static User signUp(EnterType enterType, String username, String password) {
-        if(isValidUsername(username , enterType)) {
+        if(!isValidUsername(username , enterType)) {
             return null;
         }
 
-        if(isValidPassword(username, password)) {
+        if(!isValidPassword(username, password)) {
             return null;
         }
 
@@ -213,5 +226,16 @@ public User(int id, String username, String password, userRank rank, EnterType e
         else {
             rank = userRank.NEWBIE;
         }
-}
+    }
+//============================================SEARCH USERS
+    public static List<User> searchByUsername(String name) {
+        List<User> result = new ArrayList<>();
+
+        for(User user : users.values()) {
+            if(user.getUsername().contains(name)) {
+                result.add(user);
+            }
+        }
+        return result;
+    }
 }
