@@ -112,6 +112,10 @@ public User(int id, String username, String password, userRank rank, EnterType e
         isBanned = false;
     }
 
+    public void incrementCommentCount() {
+        commentCount++;
+    }
+
 
     //=============================================VALIDATONS
 
