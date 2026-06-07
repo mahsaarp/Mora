@@ -52,7 +52,7 @@ public User(int id, String username, String password, userRank rank, EnterType e
     this.albumIds = new ArrayList<>();
     this.likedPhotoIds = new ArrayList<>();
     }
-//=============================================GETTERS
+    //=============================================GETTERS
     public int getId() {
         return id;
     }
@@ -96,4 +96,75 @@ public User(int id, String username, String password, userRank rank, EnterType e
     public List<Integer> getLikedPhotoIds() {
         return likedPhotoIds;
     }
+//=============================================VALIDATONS
+    public static boolean isValidUsername(String username, EnterType enterType) {
+        if(enterType == EnterType.email) {
+            if (username.contains("@gmail.com")) {
+                return true;
+            }
+        }
+        if(enterType == EnterType.phoneNumber) {
+            if (username.length() == 11 && username.startsWith("09")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public static boolean isValidPassword(String username, String password){
+        if(password.length() < 8){
+            return false;
+        }
+        if(password.contains(username)){
+            return false;
+        }
+        boolean hasUpper = false;
+        boolean hasLower = false;
+        boolean hasDigit = false;
+
+        for(int i = 0; i < password.length(); i++){
+            char c = password.charAt(i);
+            if(Character.isUpperCase(c)){
+                hasUpper = true;
+            }
+            if(Character.isLowerCase(c)){
+                hasLower = true;
+            }
+            if(Character.isDigit(c)){
+                hasDigit = true;
+            }
+        }
+        return hasUpper && hasLower && hasDigit;
+    }
+//=============================================SIGNUP AND LOGIN
+    public static User signUp(EnterType enterType, String username, String password) {
+        if(isValidUsername(username , enterType)) {
+            return null;
+        }
+
+        if(isValidPassword(username, password)) {
+            return null;
+        }
+
+        User user = new User(IdGenerator.nextUserId(), username, password, userRank.NEWBIE, enterType);
+        users.put(user.getId(), user);
+
+        return user;
+    }
+
+    public static User login(String username, String password) {
+        for(User user : users.values()) {
+            if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                if(user.isBanned()) {
+                    return null;
+                }
+                user.isLoggedIn = true;
+                return user;
+            }
+        }
+        return null;
+    }
+//=============================================LOG OUT AND DELET ACCOUNT
+    
 }
