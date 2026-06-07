@@ -3,7 +3,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,14 +10,44 @@ import static org.junit.jupiter.api.Assertions.*;
 class PhotoTest {
 
     @BeforeEach
-    void setUp() {
+    void start() {
         Photo.clearPhotosForTest();
     }
 
 
     @Test
     void likeTest() {
-        // need User class
+        User user = new User(1, "username", "password", User.userRank.COMMENTER, User.EnterType.phoneNumber);
+        Photo photo = Photo.uploadPhoto(2,
+                "snow",
+                LocalDateTime.now(),
+                new ArrayList<>(List.of("umbrella", "pouring")),
+                "peace comes with rain...",
+                true,
+                "abcd");
+
+        photo.like(user);
+
+        assertTrue(photo.getUserLikedIds().contains(user.getId()));
+        assertTrue(user.getLikedPhotoIds().contains(photo.getId()));
+    }
+
+    @Test
+    void alreadyLikedTest() {
+        User user = new User(1, "username", "password", User.userRank.COMMENTER, User.EnterType.phoneNumber);
+        Photo photo = Photo.uploadPhoto(2,
+                "snow",
+                LocalDateTime.now(),
+                new ArrayList<>(List.of("umbrella", "pouring")),
+                "peace comes with rain...",
+                true,
+                "abcd");
+
+        photo.like(user);
+        photo.like(user);
+
+        assertEquals(1, photo.getUserLikedIds().size());
+        assertEquals(1, user.getLikedPhotoIds().size());
     }
 
     @Test
