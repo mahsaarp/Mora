@@ -1,58 +1,60 @@
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
 public class User {
-//=============================================ENUM
-    public enum userRank {
+    public static void clearUsersForTest() {
+        users.clear();
+    }
+
+    //=============================================ENUM
+    public enum UserRank {
         NEWBIE,
         PHOTOGRAPHER,
         COMMENTER,
         INFLUENCER,
-        ADMIN
+        ADMIN;
     }
 
     public enum EnterType {
-        phoneNumber,
-        email
+        PHONE,
+        EMAIL;
     }
-//=============================================PROPERTIES
+
+    //=============================================PROPERTIES
     private int id;
     private String username;
     private String password;
-
     private List<Integer> photoIds;
     private List<Integer> albumIds;
     private List<Integer> likedPhotoIds;
-
     private boolean isBanned;
     private boolean isLoggedIn;
-
     private int commentCount;
-
-    private userRank rank;
+    private UserRank rank;
     private EnterType enterType;
 
-    private static Map<Integer, User> users = new LinkedHashMap<>();
-//=============================================CONSTRUCTOR
-public User(int id, String username, String password, userRank rank, EnterType enterType) {
-    this.id = id;
-    this.username = username;
-    this.password = password;
+    private static Map<Integer, User> users = new HashMap<>();
 
-    this.rank = rank;
-    this.enterType = enterType;
+    //=============================================CONSTRUCTOR
+    public User(int id, String username, String password, UserRank rank, EnterType enterType) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
 
-    this.isBanned = false;
-    this.isLoggedIn = false;
+        this.rank = rank;
+        this.enterType = enterType;
 
-    this.commentCount = 0;
+        this.isBanned = false;
+        this.isLoggedIn = false;
+        this.commentCount = 0;
 
-    this.photoIds = new ArrayList<>();
-    this.albumIds = new ArrayList<>();
-    this.likedPhotoIds = new ArrayList<>();
+        this.photoIds = new ArrayList<>();
+        this.albumIds = new ArrayList<>();
+        this.likedPhotoIds = new ArrayList<>();
     }
+
     //=============================================GETTERS
     public int getId() {
         return id;
@@ -86,7 +88,7 @@ public User(int id, String username, String password, userRank rank, EnterType e
         return commentCount;
     }
 
-    public userRank getRank() {
+    public UserRank getRank() {
         return rank;
     }
 
@@ -98,6 +100,10 @@ public User(int id, String username, String password, userRank rank, EnterType e
         return likedPhotoIds;
     }
 
+    public static Map<Integer, User> getAllUsers() {
+        return users;
+    }
+
     public static Map<Integer, User> getUsers() {
         return users;
     }
@@ -107,90 +113,122 @@ public User(int id, String username, String password, userRank rank, EnterType e
         isBanned = true;
     }
 
-
     public void unban() {
         isBanned = false;
     }
-    
 
-    //=============================================VALIDATONS
+    public void login() {
+        isLoggedIn = true;
+    }
 
+    public void logout() {
+        isLoggedIn = false;
+    }
 
     public void changeUsername(String newUsername) {
-        if(isValidUsername(newUsername, enterType)) {
+        if (isValidUsername(newUsername, enterType)) {
             username = newUsername;
         }
     }
 
-
     public void changePassword(String newPassword) {
-        if(isValidPassword(username, newPassword)) {
+        if (isValidPassword(username, newPassword)) {
             password = newPassword;
         }
     }
-//=============================================VALIDATONS
 
-    public static boolean isValidUsername(String username, EnterType enterType) {
-        if(enterType == EnterType.email) {
-            if (username.contains("@gmail.com")) {
-                return true;
-            }
-        }
-        if(enterType == EnterType.phoneNumber) {
-            if (username.length() == 11 && username.startsWith("09")) {
-                return true;
-            }
-        }
-        return true;
+    public void addPhoto(int photoId) {
+        photoIds.add(photoId);
+        updateRank();
     }
 
+    public void removePhoto(int photoId) {
+        photoIds.remove(Integer.valueOf(photoId));
+        updateRank();
+    }
 
-    public static boolean isValidPassword(String username, String password){
-        if(password.length() < 8){
+    public void addAlbum(int albumId) {
+        albumIds.add(albumId);
+    }
+
+    public void removeAlbum(int albumId) {
+        albumIds.remove(Integer.valueOf(albumId));
+    }
+
+    public void addFavoritePhoto(int photoId) {
+        likedPhotoIds.add(photoId);
+    }
+
+    public void removeFavoritePhoto(int photoId) {
+        likedPhotoIds.remove(Integer.valueOf(photoId));
+    }
+
+    public void incrementCommentCount() {
+        commentCount++;
+        updateRank();
+    }
+
+    //=============================================VALIDATIONS
+    public static boolean isValidUsername(String username, EnterType enterType) {
+        if (enterType == EnterType.EMAIL) {
+            return username.contains("@gmail.com");
+        }
+
+        if (enterType == EnterType.PHONE) {
+            return username.length() == 11 && username.startsWith("09");
+        }
+
+        return false;
+    }
+
+    public static boolean isValidPassword(String username, String password) {
+        if (password.length() < 8) {
             return false;
         }
-        if(password.contains(username)){
+        if (password.contains(username)) {
             return false;
         }
+
         boolean hasUpper = false;
         boolean hasLower = false;
         boolean hasDigit = false;
 
-        for(int i = 0; i < password.length(); i++){
+        for (int i = 0; i < password.length(); i++) {
             char c = password.charAt(i);
-            if(Character.isUpperCase(c)){
+            if (Character.isUpperCase(c)) {
                 hasUpper = true;
             }
-            if(Character.isLowerCase(c)){
+            if (Character.isLowerCase(c)) {
                 hasLower = true;
             }
-            if(Character.isDigit(c)){
+            if (Character.isDigit(c)) {
                 hasDigit = true;
             }
         }
+
         return hasUpper && hasLower && hasDigit;
     }
-//=============================================SIGNUP AND LOGIN
+
+    //=============================================SIGNUP AND LOGIN
     public static User signUp(EnterType enterType, String username, String password) {
-        if(!isValidUsername(username , enterType)) {
+        if (!isValidUsername(username, enterType)) {
             return null;
         }
 
-        if(!isValidPassword(username, password)) {
+        if (!isValidPassword(username, password)) {
             return null;
         }
 
-        User user = new User(IdGenerator.nextUserId(), username, password, userRank.NEWBIE, enterType);
+        User user = new User(IdGenerator.nextUserId(), username, password, UserRank.NEWBIE, enterType);
         users.put(user.getId(), user);
 
         return user;
     }
 
-
     public static User login(String username, String password) {
-        for(User user : users.values()) {
-            if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                if(user.isBanned()) {
+        for (User user : users.values()) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                if (user.isBanned()) {
                     return null;
                 }
                 user.isLoggedIn = true;
@@ -199,40 +237,39 @@ public User(int id, String username, String password, userRank rank, EnterType e
         }
         return null;
     }
-//=============================================LOG OUT AND DELET ACCOUNT
+
+    //=============================================LOG OUT AND DELETE ACCOUNT
     public static void logout(User user) {
         user.isLoggedIn = false;
     }
 
-
     public static void deleteAccount(User user) {
         users.remove(user.getId());
     }
-//============================================UPDATE RANK
+
+    //============================================UPDATE RANK
     public void updateRank() {
-        if(rank == userRank.ADMIN) {
+        if (rank == UserRank.ADMIN) {
             return;
         }
 
-        if(photoIds.size() >= 100 && commentCount >= 200) {
-            rank = userRank.INFLUENCER;
-        }
-        else if(photoIds.size() >= 100) {
-            rank = userRank.PHOTOGRAPHER;
-        }
-        else if(commentCount >= 200) {
-            rank = userRank.COMMENTER;
-        }
-        else {
-            rank = userRank.NEWBIE;
+        if (photoIds.size() >= 100 && commentCount >= 200) {
+            rank = UserRank.INFLUENCER;
+        } else if (photoIds.size() >= 100) {
+            rank = UserRank.PHOTOGRAPHER;
+        } else if (commentCount >= 200) {
+            rank = UserRank.COMMENTER;
+        } else {
+            rank = UserRank.NEWBIE;
         }
     }
-//============================================SEARCH USERS
+
+    //============================================SEARCH USERS
     public static List<User> searchByUsername(String name) {
         List<User> result = new ArrayList<>();
 
-        for(User user : users.values()) {
-            if(user.getUsername().contains(name)) {
+        for (User user : users.values()) {
+            if (user.getUsername().contains(name)) {
                 result.add(user);
             }
         }

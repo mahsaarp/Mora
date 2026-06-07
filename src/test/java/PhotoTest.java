@@ -17,7 +17,7 @@ class PhotoTest {
 
     @Test
     void likeTest() {
-        User user = new User(1, "username", "password", User.userRank.COMMENTER, User.EnterType.phoneNumber);
+        User user = new User(1, "username", "password", User.UserRank.COMMENTER, User.EnterType.PHONE);
         Photo photo = Photo.uploadPhoto(2,
                 "snow",
                 LocalDateTime.now(),
@@ -34,7 +34,7 @@ class PhotoTest {
 
     @Test
     void alreadyLikedTest() {
-        User user = new User(1, "username", "password", User.userRank.COMMENTER, User.EnterType.phoneNumber);
+        User user = new User(1, "username", "password", User.UserRank.COMMENTER, User.EnterType.PHONE);
         Photo photo = Photo.uploadPhoto(2,
                 "snow",
                 LocalDateTime.now(),
