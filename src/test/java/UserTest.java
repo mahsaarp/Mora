@@ -45,10 +45,13 @@ class UserTest {
 
     @Test
     void wrongPasswordLoginTest() {
-        User.signUp(User.EnterType.EMAIL, "test@gmail.com", "A123456a");
-        User user = User.login("test@gmail.com", "wrongpass");
+            User.clearUsersForTest();
 
-        assertNull(user);
+            User.signUp(User.EnterType.EMAIL, "test@gmail.com", "A123456a");
+
+            assertThrows(IllegalArgumentException.class, () -> {
+                User.login("test@gmail.com", "wrongpass");
+            }, "should throw IllegalArgumentException");
     }
 
     //==================================== LOGOUT TEST
