@@ -208,11 +208,11 @@ public class User {
     //=============================================SIGNUP AND LOGIN
     public static User signUp(EnterType enterType, String username, String password) {
         if (!isValidUsername(username, enterType)) {
-            return null;
+            throw new IllegalArgumentException("Invalid username");
         }
 
         if (!isValidPassword(username, password)) {
-            return null;
+           throw new IllegalArgumentException("Invalid password");
         }
 
         User user = new User(IdGenerator.nextUserId(), username, password, UserRank.NEWBIE, enterType);
@@ -225,13 +225,13 @@ public class User {
         for (User user : users.values()) {
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
                 if (user.isBanned()) {
-                    return null;
+                    throw new IllegalStateException("User is banned");
                 }
                 user.isLoggedIn = true;
                 return user;
             }
         }
-        return null;
+        throw new IllegalArgumentException("Login failed");
     }
 
     //=============================================LOG OUT AND DELETE ACCOUNT
@@ -242,7 +242,6 @@ public class User {
     public static void deleteAccount(User user) {
         users.remove(user.getId());
     }
-
     //============================================UPDATE RANK
     public void updateRank() {
         if (rank == UserRank.ADMIN) {
@@ -259,7 +258,6 @@ public class User {
             rank = UserRank.NEWBIE;
         }
     }
-
     //============================================SEARCH USERS
     public static List<User> searchByUsername(String name) {
         List<User> result = new ArrayList<>();
