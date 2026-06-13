@@ -16,8 +16,15 @@ public class Comment {
     }
 
     public static Comment createComment(int ownerId, int photoId, LocalDateTime date, String text) {
+        Photo photo = Photo.getPhotos().get(photoId);
+        if (photo == null) {
+            return null;
+        }
+
         int id = IdGenerator.nextCommentId();
         Comment comment = new Comment(id, ownerId, photoId, date, text);
+
+        photo.addComment(comment);
 
         User owner = User.getUsers().get(ownerId);
         if (owner != null) {

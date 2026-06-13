@@ -20,7 +20,7 @@ public class Photo {
         this.ownerId = ownerId;
         this.name = name;
         this.date = date;
-        this.tags = (tags != null) ? tags : new ArrayList<>();
+        this.tags = (tags != null) ? new ArrayList<>(tags) : new ArrayList<>();
         this.caption = caption;
         this.commentAllowed = commentAllowed;
         this.route = route;
@@ -29,29 +29,41 @@ public class Photo {
         this.userLikedIds = new ArrayList<>();
     }
 
-
     public void like(User user) {
+        if (user == null) {
+            return;
+        }
+
         if (!userLikedIds.contains(user.getId())) {
             userLikedIds.add(user.getId());
 
             if (!user.getLikedPhotoIds().contains(this.id)) {
-                user.getLikedPhotoIds().add(this.id);
+                user.addFavoritePhoto(this.id);
             }
         }
     }
 
-
     public void addComment(Comment comment) {
+        if (comment == null) {
+            return;
+        }
+
         if (!commentAllowed) {
             throw new IllegalStateException("Comments are not allowed for this photo.");
         }
-        this.commentIds.add(comment.getId());
+
+        if (!this.commentIds.contains(comment.getId())) {
+            this.commentIds.add(comment.getId());
+        }
     }
 
     public void deleteComment(Comment comment) {
+        if (comment == null) {
+            return;
+        }
+
         this.commentIds.remove(Integer.valueOf(comment.getId()));
     }
-
 
     public void addTag(String tag) {
         if (tag == null || tag.isBlank()) {
@@ -62,14 +74,12 @@ public class Photo {
         }
     }
 
-
     public void removeTag(String tag) {
         if (tag == null) {
             return;
         }
         this.tags.removeIf(a -> a.equalsIgnoreCase(tag));
     }
-
 
     public void editName(String newName) {
         this.name = newName;
@@ -79,7 +89,6 @@ public class Photo {
         this.caption = newCaption;
     }
 
-
     public static List<Photo> sortPhotosByName() {
         return photos.values()
                 .stream()
@@ -87,14 +96,12 @@ public class Photo {
                 .toList();
     }
 
-
     public static List<Photo> sortPhotosByDate() {
         return photos.values()
                 .stream()
                 .sorted(Comparator.comparing(Photo::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
     }
-
 
     public static List<Photo> searchByName(String name) {
         if (name == null || name.isBlank()) {
@@ -111,13 +118,12 @@ public class Photo {
         return matchedPhotos;
     }
 
-
     public static List<Photo> searchByTag(String tag) {
         if (tag == null || tag.isBlank()) {
             return new ArrayList<>();
         }
         List<Photo> matchedPhotos = new ArrayList<>();
-        String word = tag.toLowerCase();
+
         for (Photo photo : photos.values()) {
             if (photo.getTags() != null && photo.getTags().stream().anyMatch(a -> a.equalsIgnoreCase(tag))) {
                 matchedPhotos.add(photo);
@@ -126,7 +132,6 @@ public class Photo {
         return matchedPhotos;
     }
 
-
     public static Photo uploadPhoto(int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
         int id = IdGenerator.nextPhotoId();
         Photo photo = new Photo(id, ownerId, name, date, tags, caption, commentAllowed, route);
@@ -134,7 +139,7 @@ public class Photo {
 
         User owner = User.getUsers().get(ownerId);
         if (owner != null) {
-            owner.getPhotoIds().add(id);
+            owner.addPhoto(id);
         }
 
         return photo;
@@ -144,14 +149,25 @@ public class Photo {
         if (photo == null) {
             return;
         }
+
+        User owner = User.getUsers().get(photo.getOwnerId());
+        if (owner != null) {
+            owner.removePhoto(photo.getId());
+        }
+
+        for (Integer albumId : new ArrayList<>(photo.getAlbumIds())) {
+            Album album = Album.getAlbums().get(albumId);
+            if (album != null) {
+                album.getPhotoIds().remove(Integer.valueOf(photo.getId()));
+            }
+        }
+
         photos.remove(photo.getId());
     }
 
     static void clearPhotosForTest() {
         photos.clear();
     }
-
-
 
     public int getId() {
         return id;

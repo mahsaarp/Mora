@@ -20,11 +20,20 @@ public class Album {
     public void addPhoto(Photo photo) {
         if (photo != null && !photoIds.contains(photo.getId())) {
             this.photoIds.add(photo.getId());
+
+            if (!photo.getAlbumIds().contains(this.id)) {
+                photo.getAlbumIds().add(this.id);
+            }
         }
     }
 
     public void deletePhoto(Photo photo) {
+        if (photo == null) {
+            return;
+        }
+
         this.photoIds.remove(Integer.valueOf(photo.getId()));
+        photo.getAlbumIds().remove(Integer.valueOf(this.id));
     }
 
     public void movePhoto(Photo photo, Album destAlbum) {
@@ -34,21 +43,25 @@ public class Album {
     }
 
     public void sortPhotosByDate() {
-        this.photoIds = this.photoIds.stream()
-                .map(id -> Photo.getPhotos().get(id))
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Photo::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
-                .map(Photo::getId)
-                .toList();
+        this.photoIds = new ArrayList<>(
+                this.photoIds.stream()
+                        .map(id -> Photo.getPhotos().get(id))
+                        .filter(Objects::nonNull)
+                        .sorted(Comparator.comparing(Photo::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
+                        .map(Photo::getId)
+                        .toList()
+        );
     }
 
     public void sortPhotosByName() {
-        this.photoIds = this.photoIds.stream()
-                .map(id -> Photo.getPhotos().get(id))
-                .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Photo::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
-                .map(Photo::getId)
-                .toList();
+        this.photoIds = new ArrayList<>(
+                this.photoIds.stream()
+                        .map(id -> Photo.getPhotos().get(id))
+                        .filter(Objects::nonNull)
+                        .sorted(Comparator.comparing(Photo::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                        .map(Photo::getId)
+                        .toList()
+        );
     }
 
     public static Album createAlbum(int ownerId, String name, LocalDateTime date) {
@@ -58,17 +71,35 @@ public class Album {
 
         User owner = User.getUsers().get(ownerId);
         if (owner != null) {
-            owner.getAlbumIds().add(id);
+            owner.addAlbum(id);
         }
 
         return album;
     }
 
     public static void deleteAlbum(Album album) {
+        if (album == null) {
+            return;
+        }
+
+        User owner = User.getUsers().get(album.getOwnerId());
+        if (owner != null) {
+            owner.removeAlbum(album.getId());
+        }
+
+        for (Integer photoId : new ArrayList<>(album.getPhotoIds())) {
+            Photo photo = Photo.getPhotos().get(photoId);
+            if (photo != null) {
+                photo.getAlbumIds().remove(Integer.valueOf(album.getId()));
+            }
+        }
+
         albums.remove(album.getId());
     }
 
-
+    static void clearAlbumsForTest() {
+        albums.clear();
+    }
 
     public int getId() {
         return id;
@@ -109,5 +140,4 @@ public class Album {
     public static Map<Integer, Album> getAlbums() {
         return new LinkedHashMap<>(albums);
     }
-
 }
