@@ -29,6 +29,10 @@ public class Photo {
         this.userLikedIds = new ArrayList<>();
     }
 
+    public static Photo getPhotoById(int id) {
+        return photos.get(id);
+    }
+
     public void like(User user) {
         if (user == null) {
             return;
@@ -162,11 +166,26 @@ public class Photo {
             }
         }
 
+        for (Integer commentId : new ArrayList<>(photo.getCommentIds())) {
+            Comment comment = Comment.getComments().get(commentId);
+            if (comment != null) {
+                Comment.deleteComment(comment);
+            }
+        }
+
         photos.remove(photo.getId());
     }
 
     static void clearPhotosForTest() {
         photos.clear();
+    }
+
+    public List<Comment> getComments() {
+        return this.commentIds
+                .stream()
+                .map(id -> Comment.getComments().get(id))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public int getId() {

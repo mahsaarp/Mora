@@ -45,7 +45,7 @@ public class Album {
     public void sortPhotosByDate() {
         this.photoIds = new ArrayList<>(
                 this.photoIds.stream()
-                        .map(id -> Photo.getPhotos().get(id))
+                        .map(Photo::getPhotoById)
                         .filter(Objects::nonNull)
                         .sorted(Comparator.comparing(Photo::getDate, Comparator.nullsLast(Comparator.reverseOrder())))
                         .map(Photo::getId)
@@ -56,7 +56,7 @@ public class Album {
     public void sortPhotosByName() {
         this.photoIds = new ArrayList<>(
                 this.photoIds.stream()
-                        .map(id -> Photo.getPhotos().get(id))
+                        .map(Photo::getPhotoById)
                         .filter(Objects::nonNull)
                         .sorted(Comparator.comparing(Photo::getName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
                         .map(Photo::getId)
@@ -88,7 +88,7 @@ public class Album {
         }
 
         for (Integer photoId : new ArrayList<>(album.getPhotoIds())) {
-            Photo photo = Photo.getPhotos().get(photoId);
+            Photo photo = Photo.getPhotoById(photoId);
             if (photo != null) {
                 photo.getAlbumIds().remove(Integer.valueOf(album.getId()));
             }
