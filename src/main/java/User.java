@@ -100,10 +100,6 @@ public class User {
         return likedPhotoIds;
     }
 
-    public static Map<Integer, User> getAllUsers() {
-        return users;
-    }
-
     public static Map<Integer, User> getUsers() {
         return users;
     }
