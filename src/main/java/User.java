@@ -7,7 +7,6 @@ public class User {
     public static void clearUsersForTest() {
         users.clear();
     }
-
     //=============================================ENUM
     public enum UserRank {
         NEWBIE,
@@ -21,7 +20,6 @@ public class User {
         PHONE,
         EMAIL;
     }
-
     //=============================================PROPERTIES
     private int id;
     private String username;
@@ -36,7 +34,8 @@ public class User {
     private EnterType enterType;
 
     private static Map<Integer, User> users = new HashMap<>();
-
+    private static final int PHOTO_NUMBER = 100;
+    private static final int COMMENT_NUMBER = 200;
     //=============================================CONSTRUCTOR
     public User(int id, String username, String password, UserRank rank, EnterType enterType) {
         this.id = id;
@@ -122,9 +121,13 @@ public class User {
     }
 
     public void changeUsername(String newUsername) {
-        if (isValidUsername(newUsername, enterType)) {
-            username = newUsername;
+        if (!isValidUsername(newUsername, enterType)) {
+            throw new IllegalArgumentException("Invalid username");
         }
+        if (usernameExists(newUsername) && !username.equals(newUsername)) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        username = newUsername;
     }
 
     public void changePassword(String newPassword) {
@@ -211,6 +214,9 @@ public class User {
             throw new IllegalArgumentException("Invalid username");
         }
 
+        if (usernameExists(username)) {
+            throw new IllegalArgumentException("Username already exists");
+        }
         if (!isValidPassword(username, password)) {
            throw new IllegalArgumentException("Invalid password");
         }
@@ -222,17 +228,21 @@ public class User {
     }
 
     public static User login(String username, String password) {
-        for (User user : users.values()) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                if (user.isBanned()) {
-                    throw new IllegalStateException("User is banned");
-                }
-                user.isLoggedIn = true;
-                return user;
-            }
+        User user = users.values()
+                .stream()
+                .filter(u -> u.getUsername().equals(username))
+                .filter(u -> u.getPassword().equals(password))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Login failed"));
+
+        if (user.isBanned()) {
+            throw new IllegalStateException("User is banned");
         }
-        throw new IllegalArgumentException("Login failed");
-    }
+
+        user.login();
+        return user;
+        }
 
     //=============================================LOG OUT AND DELETE ACCOUNT
     public static void logout(User user) {
@@ -240,6 +250,25 @@ public class User {
     }
 
     public static void deleteAccount(User user) {
+        if (user == null) return;
+
+        for (Photo photo : new ArrayList<>(Photo.getPhotos().values())) {
+            if (photo.getOwnerId() == user.getId()) {
+                Photo.deletePhoto(photo);
+            }
+        }
+
+        for (Album album : new ArrayList<>(Album.getAlbums().values())) {
+            if (album.getOwnerId() == user.getId()) {
+                Album.deleteAlbum(album);
+            }
+        }
+
+        for (Comment comment : new ArrayList<>(Comment.getComments().values())) {
+            if (comment.getOwnerId() == user.getId()) {
+                Comment.deleteComment(comment);
+            }
+        }
         users.remove(user.getId());
     }
     //============================================UPDATE RANK
@@ -248,25 +277,33 @@ public class User {
             return;
         }
 
-        if (photoIds.size() >= 100 && commentCount >= 200) {
+        if (photoIds.size() >= PHOTO_NUMBER && commentCount >= COMMENT_NUMBER) {
             rank = UserRank.INFLUENCER;
-        } else if (photoIds.size() >= 100) {
+
+        } else if (photoIds.size() >= PHOTO_NUMBER) {
             rank = UserRank.PHOTOGRAPHER;
-        } else if (commentCount >= 200) {
+
+        } else if (commentCount >= COMMENT_NUMBER) {
             rank = UserRank.COMMENTER;
+
         } else {
             rank = UserRank.NEWBIE;
         }
     }
     //============================================SEARCH USERS
     public static List<User> searchByUsername(String name) {
-        List<User> result = new ArrayList<>();
-
-        for (User user : users.values()) {
-            if (user.getUsername().contains(name)) {
-                result.add(user);
-            }
-        }
-        return result;
+        return users.values()
+                .stream()
+                .filter(user ->
+                        user.getUsername()
+                                .toLowerCase()
+                                .contains(name.toLowerCase()))
+                .toList();
+    }
+    //=============================================CHECK USERS
+    public static boolean usernameExists(String username) {
+        return users.values()
+                .stream()
+                .anyMatch(user -> user.getUsername().equals(username));
     }
 }
