@@ -54,3 +54,9 @@ bin/
 # virtual machine crash logs
 hs_err_pid*
 replay_pid*
+
+# --- Mora Project Additions ---
+
+# Backend (Maven build)
+backend/target/
+backend/*.iml
