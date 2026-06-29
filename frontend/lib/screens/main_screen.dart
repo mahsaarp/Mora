@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mora/screens/search_screen.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -12,7 +14,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const Center(child: Text("Explore Screen")),
-    const Center(child: Text("Search Screen")),
+    const SearchScreen(),
     const Center(child: Text("Create Post Screen")),
     const Center(child: Text("Notifications Screen")),
     const Center(child: Text("Profile Screen")),
