@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mora/screens/publish_screen.dart';
 import 'package:mora/screens/search_screen.dart';
+import 'package:mora/screens/explore_screen.dart';
+
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,7 +18,7 @@ class _MainScreenState extends State<MainScreen> {
   final ImagePicker _picker = ImagePicker();
 
   final List<Widget> _screens = [
-    const Center(child: Text("Explore Screen")),
+    const ExploreScreen(),
     const SearchScreen(),
     const Center(child: Text("Create Post Screen")),
     const Center(child: Text("Notifications Screen")),

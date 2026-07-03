@@ -1,0 +1,55 @@
+class ExplorePhoto {
+  final String id;
+  final String name;
+  final String imageUrl;
+  final DateTime dateAdded;
+  final int likes;
+  bool isSelected;
+
+  ExplorePhoto({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+    required this.dateAdded,
+    required this.likes,
+    this.isSelected = false,
+  });
+}
+
+class ExploreAlbum {
+  final String id;
+  final String title;
+  final List<String> imageUrls;
+  final int photoCount;
+
+  ExploreAlbum({
+    required this.id,
+    required this.title,
+    required this.imageUrls,
+    required this.photoCount,
+  });
+}
+
+List<ExplorePhoto> initialMockPhotos = [
+  ExplorePhoto(id: '1', name: 'Rose', imageUrl: 'assets/images/rose.jpg', dateAdded: DateTime.now().subtract(const Duration(days: 2)), likes: 120),
+  ExplorePhoto(id: '2', name: 'Lily', imageUrl: 'assets/images/lily.jpg', dateAdded: DateTime.now().subtract(const Duration(days: 5)), likes: 85),
+  ExplorePhoto(id: '3', name: 'Tulip', imageUrl: 'assets/images/tulip.jpg', dateAdded: DateTime.now().subtract(const Duration(days: 1)), likes: 250),
+  ExplorePhoto(id: '4', name: 'Sunflower', imageUrl: 'assets/images/sunflower.jpg', dateAdded: DateTime.now().subtract(const Duration(days: 10)), likes: 45),
+  ExplorePhoto(id: '5', name: 'Daffodil', imageUrl: 'assets/images/daffodil.jpg', dateAdded: DateTime.now().subtract(const Duration(days: 3)), likes: 310),
+  ExplorePhoto(id: '6', name: 'Peony', imageUrl: 'assets/images/peony.jpg', dateAdded: DateTime.now().subtract(const Duration(days: 7)), likes: 95),
+];
+
+List<ExploreAlbum> mockAlbums = [
+  ExploreAlbum(
+    id: 'a1',
+    title: 'Trip to North',
+    imageUrls: ['assets/images/rose.jpg', 'assets/images/lily.jpg', 'assets/images/tulip.jpg'],
+    photoCount: 12,
+  ),
+  ExploreAlbum(
+    id: 'a2',
+    title: 'Family Gatherings',
+    imageUrls: ['assets/images/sunflower.jpg', 'assets/images/daffodil.jpg'],
+    photoCount: 5,
+  ),
+];
