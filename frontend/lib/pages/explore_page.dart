@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/album_detail_screen.dart';
 import '../utils/explore_mock_data.dart';
 import '../utils/shimmer_box.dart';
 import '../screens/photo_detail_screen.dart';
@@ -167,7 +168,77 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildAlbumsTab() { return Container(); }
+  Widget _buildAlbumsTab() {
+    return ListView.separated(
+      padding: const EdgeInsets.all(12),
+      itemCount: mockAlbums.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final album = mockAlbums[index];
+        final coverImage = album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
+
+        return InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => AlbumDetailScreen(album: album),
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                  child: SizedBox(
+                    width: 96,
+                    height: 96,
+                    child: _buildImage(coverImage),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          album.title,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          '${album.photoCount} photos',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(right: 12),
+                  child: Icon(Icons.chevron_right),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildSelectionActionBar() {return Container(); }
   Widget _buildActionItem(IconData icon, String label, VoidCallback onTap) {return Container(); }
   void _showMoveToAlbumDialog() {}

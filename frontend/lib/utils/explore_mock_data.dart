@@ -37,14 +37,17 @@ class ExploreAlbum {
   final List<String> imageUrl;
   final List<String> imageUrls;
   final int photoCount;
+  final DateTime createdAt;
 
   ExploreAlbum({
     required this.id,
     required this.title,
     required this.imageUrls,
     required this.photoCount,
+    required this.createdAt,
   }) : imageUrl = imageUrls;
 }
+
 
 List<ExplorePhoto> initialMockPhotos = [
   ExplorePhoto(
@@ -126,13 +129,23 @@ List<ExploreAlbum> mockAlbums = [
   ExploreAlbum(
     id: 'a1',
     title: 'Trip to North',
-    imageUrls: ['assets/images/rose.jpg', 'assets/images/lily.jpg', 'assets/images/tulip.jpg'],
-    photoCount: 12,
+    imageUrls: [
+      'assets/images/rose.jpg',
+      'assets/images/lily.jpg',
+      'assets/images/tulip.jpg',
+    ],
+    photoCount: 3,
+    createdAt: DateTime.now().subtract(const Duration(days: 20)),
   ),
   ExploreAlbum(
     id: 'a2',
     title: 'Family Gatherings',
-    imageUrls: ['assets/images/sunflower.jpg', 'assets/images/daffodil.jpg'],
-    photoCount: 5,
+    imageUrls: [
+      'assets/images/sunflower.jpg',
+      'assets/images/daffodil.jpg',
+    ],
+    photoCount: 2,
+    createdAt: DateTime.now().subtract(const Duration(days: 8)),
   ),
 ];
+
