@@ -1,6 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'sign_in_screen.dart';
+import 'log_in_screen.dart';
 import 'sign_up_screen.dart';
 
 class EntryScreen extends StatelessWidget {
@@ -108,7 +108,7 @@ class EntryScreen extends StatelessWidget {
                             );
                           },
                           child: const Text(
-                            "Sign In",
+                            "Log In",
                             style: TextStyle(
                               fontSize: 17,
                               color: Colors.white,
