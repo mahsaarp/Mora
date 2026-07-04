@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mora/screens/publish_screen.dart';
-import 'package:mora/screens/search_screen.dart';
-import 'package:mora/screens/explore_screen.dart';
+import 'package:mora/pages/publish_page.dart';
+import 'package:mora/pages/search_page.dart';
+import 'package:mora/pages/explore_page.dart';
 
 
 class MainScreen extends StatefulWidget {

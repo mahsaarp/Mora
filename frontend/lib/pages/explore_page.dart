@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/explore_mock_data.dart';
 import '../utils/shimmer_box.dart';
-import 'photo_detail_screen.dart';
+import '../screens/photo_detail_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
