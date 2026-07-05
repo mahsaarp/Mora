@@ -123,13 +123,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           hintText: isEmail
                               ? "Email"
                               : "Phone Number",
+
+                          hintStyle: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey,
+                          ),
+
                           prefixIcon: Icon(
                             isEmail
                                 ? Icons.email
                                 : Icons.phone,
                           ),
+
                           filled: true,
                           fillColor: Colors.white70,
+
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
                             borderSide: BorderSide.none,
