@@ -22,6 +22,41 @@ class _ProfilePageState extends State<ProfilePage> {
         centerTitle: true,
         backgroundColor: const Color(0xff6E8B5E),
         foregroundColor: Colors.white,
+
+        actions: [
+
+          IconButton(
+
+            icon: const Icon(Icons.settings),
+
+            onPressed: () {
+
+              showModalBottomSheet(
+
+                context: context,
+
+                shape: const RoundedRectangleBorder(
+
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(25),
+                  ),
+
+                ),
+
+                builder: (_) {
+
+                  return const SettingsSheet();
+
+                },
+
+              );
+
+            },
+
+          ),
+
+        ],
+
       ),
 
       body: SingleChildScrollView(
@@ -315,4 +350,101 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 );
               }
+            }
+            class SettingsSheet extends StatelessWidget {
+
+              const SettingsSheet({super.key});
+
+              @override
+              Widget build(BuildContext context) {
+
+                return Padding(
+
+                  padding: const EdgeInsets.all(20),
+
+                  child: Column(
+
+                    mainAxisSize: MainAxisSize.min,
+
+                    children: [
+
+                      const Text(
+
+                        "Settings",
+
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      ListTile(
+
+                        leading: const Icon(Icons.dark_mode),
+
+                        title: const Text("Night Mode"),
+
+                        onTap: () {},
+
+                      ),
+
+                      ListTile(
+
+                        leading: const Icon(Icons.palette),
+
+                        title: const Text("Theme Color"),
+
+                        onTap: () {},
+
+                      ),
+
+                      ListTile(
+
+                        leading: const Icon(
+                          Icons.logout,
+                          color: Colors.orange,
+                        ),
+
+                        title: const Text(
+                          "Log Out",
+                          style: TextStyle(
+                            color: Colors.orange,
+                          ),
+                        ),
+
+                        onTap: () {},
+
+                      ),
+
+                      ListTile(
+
+                        leading: const Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        ),
+
+                        title: const Text(
+                          "Delete Account",
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+
+                        onTap: () {},
+
+                      ),
+
+                      const SizedBox(height: 15),
+
+                    ],
+
+                  ),
+
+                );
+
+              }
+
             }
