@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:mora/pages/profile_page.dart';
 import 'package:mora/pages/publish_page.dart';
 import 'package:mora/pages/search_page.dart';
 import 'package:mora/pages/explore_page.dart';
@@ -22,7 +23,7 @@ class _MainScreenState extends State<MainScreen> {
     const SearchScreen(),
     const Center(child: Text("Create Post Screen")),
     const Center(child: Text("Notifications Screen")),
-    const Center(child: Text("Profile Screen")),
+    const ProfilePage(),
   ];
 
   Future<void> _pickImage(ImageSource source) async {
