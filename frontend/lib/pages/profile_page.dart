@@ -49,37 +49,13 @@ class _ProfilePageState extends State<ProfilePage> {
   late List<ExplorePhoto> _profilePhotos;
   late List<ExploreAlbum> _profileAlbums;
 
-  final List<AdminUserItem> _adminUsers = [
-    AdminUserItem(
-      id: "1",
-      name: "Sina Rad",
-      avatarUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde",
-      photoCount: 42,
-      albumCount: 5,
-      isBanned: false,
-    ),
-    AdminUserItem(
-      id: "2",
-      name: "Sara Karimi",
-      avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
-      photoCount: 18,
-      albumCount: 2,
-      isBanned: true,
-    ),
-    AdminUserItem(
-      id: "3",
-      name: "Ali Alavi",
-      avatarUrl: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
-      photoCount: 105,
-      albumCount: 12,
-      isBanned: false,
-    ),
-  ];
+  final List<AdminUserItem> _adminUsers = [];
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    _loadAdminUsers();
   }
 
   void _loadUserData() {
@@ -88,7 +64,8 @@ class _ProfilePageState extends State<ProfilePage> {
       _profileAlbums = List.from(mockAlbums);
     } else {
       _profilePhotos = initialMockPhotos
-          .where((photo) => photo.username.toLowerCase() == widget.viewUsername!.toLowerCase())
+          .where((photo) =>
+      photo.username.toLowerCase() == widget.viewUsername!.toLowerCase())
           .toList();
 
       if (_profilePhotos.isNotEmpty) {
@@ -104,6 +81,46 @@ class _ProfilePageState extends State<ProfilePage> {
       } else {
         _profileAlbums = [];
       }
+    }
+  }
+
+  void _loadAdminUsers() {
+    _adminUsers.clear();
+
+    final Set<String> uniqueUsernames = {};
+    for (var photo in initialMockPhotos) {
+      uniqueUsernames.add(photo.username);
+    }
+
+    int idCounter = 1;
+    for (var username in uniqueUsernames) {
+      final userPhotos =
+      initialMockPhotos.where((p) => p.username == username).toList();
+      final photoCount = userPhotos.length;
+      final avatarUrl = userPhotos.isNotEmpty
+          ? userPhotos.first.userAvatar
+          : 'assets/images/profile.jpg';
+
+      int albumCount = 0;
+      for (var album in mockAlbums) {
+        bool belongsToUser =
+        album.imageUrls.any((img) => userPhotos.any((p) => p.imageUrl == img));
+        if (belongsToUser) {
+          albumCount++;
+        }
+      }
+
+      _adminUsers.add(
+        AdminUserItem(
+          id: idCounter.toString(),
+          name: username,
+          avatarUrl: avatarUrl,
+          photoCount: photoCount,
+          albumCount: albumCount,
+          isBanned: false,
+        ),
+      );
+      idCounter++;
     }
   }
 
@@ -176,7 +193,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final String displayName = isOwnProfile ? "Mohammad" : (widget.viewUsername ?? "User");
+    final String displayName =
+    isOwnProfile ? "Mohammad" : (widget.viewUsername ?? "User");
     final String labelText = isOwnProfile ? "PHOTOGRAPHER" : "CREATOR";
 
     return Scaffold(
@@ -214,10 +232,14 @@ class _ProfilePageState extends State<ProfilePage> {
               radius: 55,
               backgroundColor: Colors.grey.shade300,
               backgroundImage: isOwnProfile
-                  ? const AssetImage("assets/images/profile.jpg") as ImageProvider
-                  : (widget.viewAvatar != null && widget.viewAvatar!.startsWith('http')
+                  ? const AssetImage("assets/images/profile.jpg")
+              as ImageProvider
+                  : (widget.viewAvatar != null &&
+                  widget.viewAvatar!.startsWith('http')
                   ? NetworkImage(widget.viewAvatar!)
-                  : AssetImage(widget.viewAvatar ?? "assets/images/profile.jpg") as ImageProvider),
+                  : AssetImage(
+                  widget.viewAvatar ?? "assets/images/profile.jpg")
+              as ImageProvider),
             ),
             const SizedBox(height: 15),
             Text(
@@ -298,7 +320,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             const SizedBox(height: 30),
-
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -326,14 +347,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           "Photos",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: selectedTabIndex == 0 ? Colors.white : Colors.black,
+                            color: selectedTabIndex == 0
+                                ? Colors.white
+                                : Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
                   ),
-
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
@@ -353,14 +375,15 @@ class _ProfilePageState extends State<ProfilePage> {
                           "Albums",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: selectedTabIndex == 1 ? Colors.white : Colors.black,
+                            color: selectedTabIndex == 1
+                                ? Colors.white
+                                : Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
                   ),
-
                   if (showAdminPanel)
                     Expanded(
                       child: GestureDetector(
@@ -381,7 +404,9 @@ class _ProfilePageState extends State<ProfilePage> {
                             "Users",
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: selectedTabIndex == 2 ? Colors.white : Colors.black,
+                              color: selectedTabIndex == 2
+                                  ? Colors.white
+                                  : Colors.black,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -392,7 +417,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 20),
-
             _buildTabContent(),
             const SizedBox(height: 25),
           ],
@@ -458,7 +482,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xff6E8B5E)),
+                  trailing:
+                  const Icon(Icons.arrow_forward_ios, color: Color(0xff6E8B5E)),
                 ),
               ),
             _profileAlbums.isEmpty
@@ -468,7 +493,8 @@ class _ProfilePageState extends State<ProfilePage> {
             )
                 : Column(
               children: _profileAlbums.map((album) {
-                final coverImage = album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
+                final coverImage =
+                album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
                   shape: RoundedRectangleBorder(
@@ -497,7 +523,12 @@ class _ProfilePageState extends State<ProfilePage> {
     } else if (selectedTabIndex == 2 && showAdminPanel) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18),
-        child: ListView.builder(
+        child: _adminUsers.isEmpty
+            ? const Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text("No users found."),
+        )
+            : ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _adminUsers.length,
@@ -513,7 +544,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: ListTile(
                   leading: CircleAvatar(
                     radius: 26,
-                    backgroundImage: NetworkImage(user.avatarUrl),
+                    backgroundImage: user.avatarUrl.startsWith('http')
+                        ? NetworkImage(user.avatarUrl) as ImageProvider
+                        : AssetImage(user.avatarUrl) as ImageProvider,
                     backgroundColor: Colors.grey.shade300,
                   ),
                   title: Text(
@@ -596,14 +629,18 @@ class SettingsSheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 20),
-          ListTile(
-            leading: const Icon(Icons.dark_mode),
-            title: const Text("Night Mode"),
-            onTap: () {
-              themeNotifier.value =
-              themeNotifier.value == ThemeMode.light
-                  ? ThemeMode.dark
-                  : ThemeMode.light;
+          ValueListenableBuilder<ThemeMode>(
+            valueListenable: themeNotifier,
+            builder: (context, currentMode, _) {
+              final isDarkMode = currentMode == ThemeMode.dark;
+              return ListTile(
+                leading: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
+                title: Text(isDarkMode ? "Day Mode" : "Night Mode"),
+                onTap: () {
+                  themeNotifier.value =
+                  isDarkMode ? ThemeMode.light : ThemeMode.dark;
+                },
+              );
             },
           ),
           ListTile(
