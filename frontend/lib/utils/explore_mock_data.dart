@@ -14,6 +14,8 @@ class ExplorePhoto {
   final String username;
   final String userAvatar;
   final bool isOwner;
+  
+  bool allowComments;
 
   ExplorePhoto({
     required this.id,
@@ -28,6 +30,7 @@ class ExplorePhoto {
     required this.username,
     required this.userAvatar,
     this.isOwner = false,
+    this.allowComments = true,
   });
 }
 
@@ -48,7 +51,6 @@ class ExploreAlbum {
   }) : imageUrl = imageUrls;
 }
 
-
 List<ExplorePhoto> initialMockPhotos = [
   ExplorePhoto(
     id: '1',
@@ -62,6 +64,7 @@ List<ExplorePhoto> initialMockPhotos = [
     isOwner: true,
     caption: 'A beautiful rose from my garden! #nature',
     tags: ['#nature', '#rose', '#red'],
+    allowComments: true,
   ),
   ExplorePhoto(
     id: '2',
@@ -75,6 +78,7 @@ List<ExplorePhoto> initialMockPhotos = [
     isOwner: false,
     caption: 'White lilies signify purity.',
     tags: ['#lily', '#white', '#pure'],
+    allowComments: true,
   ),
   ExplorePhoto(
     id: '3',
@@ -88,6 +92,7 @@ List<ExplorePhoto> initialMockPhotos = [
     isOwner: false,
     caption: 'Spring is here with Tulips.',
     tags: ['#spring', '#tulip'],
+    allowComments: true,
   ),
   ExplorePhoto(
     id: '4',
@@ -99,6 +104,7 @@ List<ExplorePhoto> initialMockPhotos = [
     userAvatar: 'assets/images/sunflower.jpg',
     caption: 'Follow the sun.',
     tags: ['#sun', '#yellow'],
+    allowComments: true,
   ),
   ExplorePhoto(
     id: '5',
@@ -111,6 +117,7 @@ List<ExplorePhoto> initialMockPhotos = [
     isOwner: true,
     caption: 'Yellow brightens the day.',
     tags: ['#yellow', '#daffodil'],
+    allowComments: true,
   ),
   ExplorePhoto(
     id: '6',
@@ -122,6 +129,7 @@ List<ExplorePhoto> initialMockPhotos = [
     userAvatar: 'assets/images/peony.jpg',
     caption: 'Pink peonies are the best.',
     tags: ['#pink', '#peony'],
+    allowComments: true,
   ),
 ];
 
@@ -148,4 +156,3 @@ List<ExploreAlbum> mockAlbums = [
     createdAt: DateTime.now().subtract(const Duration(days: 8)),
   ),
 ];
-

@@ -117,6 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
           return const ShimmerBox(
             width: double.infinity,
             height: double.infinity,
+            borderRadius: 0,
           );
         },
         errorBuilder: (context, error, stackTrace) {
@@ -175,7 +176,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    // تنظیم تصویر آواتار و نام کاربر
     final String displayName = isOwnProfile ? "Mohammad" : (widget.viewUsername ?? "User");
     final String labelText = isOwnProfile ? "PHOTOGRAPHER" : "CREATOR";
 
@@ -360,7 +360,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                   ),
-
 
                   if (showAdminPanel)
                     Expanded(
@@ -602,9 +601,9 @@ class SettingsSheet extends StatelessWidget {
             title: const Text("Night Mode"),
             onTap: () {
               themeNotifier.value =
-                  themeNotifier.value == ThemeMode.light
-                      ? ThemeMode.dark
-                      : ThemeMode.light;
+              themeNotifier.value == ThemeMode.light
+                  ? ThemeMode.dark
+                  : ThemeMode.light;
             },
           ),
           ListTile(

@@ -67,7 +67,11 @@ class _SearchScreenState extends State<SearchScreen> {
         fit: BoxFit.cover,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
-          return const ShimmerBox(width: double.infinity, height: double.infinity);
+          return const ShimmerBox(
+            width: double.infinity,
+            height: double.infinity,
+            borderRadius: 0,
+          );
         },
         errorBuilder: (context, error, stackTrace) =>
             Container(color: Colors.grey.shade200, child: const Icon(Icons.broken_image)),

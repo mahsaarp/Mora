@@ -15,23 +15,25 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   final FocusNode _commentFocus = FocusNode();
 
   late List<PhotoComment> _comments;
+  late bool _allowComments;
 
   @override
   void initState() {
     super.initState();
+    _allowComments = widget.photo.allowComments;
 
     _comments = [
       PhotoComment(
         id: 'c1',
         username: 'sara',
-        userAvatar: widget.photo.userAvatar,
+        userAvatar: "assets/images/user2.jpg",
         text: 'so pretty!',
         createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
       ),
       PhotoComment(
         id: 'c2',
         username: 'ali',
-        userAvatar: widget.photo.userAvatar,
+        userAvatar: "assets/images/user1.jpg",
         text: 'beautiful!',
         createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
       ),
@@ -55,7 +57,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         PhotoComment(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           username: 'mahsa',
-          userAvatar: widget.photo.userAvatar,
+          userAvatar: "assets/images/profile.jpg",
           text: text,
           createdAt: DateTime.now(),
         ),
@@ -71,7 +73,13 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     final result = await showModalBottomSheet<_EditResult>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _EditPhotoSheet(photo: widget.photo),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => _EditPhotoSheet(
+        photo: widget.photo,
+        currentAllowComments: _allowComments,
+      ),
     );
 
     if (result == null) return;
@@ -80,6 +88,8 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       widget.photo.name = result.name;
       widget.photo.caption = result.caption;
       widget.photo.tags = result.tags;
+      _allowComments = result.allowComments;
+      widget.photo.allowComments = result.allowComments;
     });
   }
 
@@ -127,12 +137,13 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
               ],
             ),
           ),
-
           Expanded(
             child: Column(
               children: [
-                _PostHeaderInfo(photo: p, onTapComment: () => _commentFocus.requestFocus()),
-
+                _PostHeaderInfo(
+                    photo: p,
+                    onTapComment: _allowComments ? () => _commentFocus.requestFocus() : null
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: Align(
@@ -157,18 +168,27 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                           .toList(),
                     ),
                   ),
-
                 const Divider(height: 16),
-
                 Expanded(
-                  child: _CommentsList(comments: _comments),
+                  child: _allowComments
+                      ? _CommentsList(comments: _comments)
+                      : const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.comments_disabled_outlined, color: Colors.grey, size: 40),
+                        SizedBox(height: 8),
+                        Text('Comments are turned off.', style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                  ),
                 ),
-
-                _CommentComposer(
-                  controller: _commentCtrl,
-                  focusNode: _commentFocus,
-                  onSend: _addComment,
-                ),
+                if (_allowComments)
+                  _CommentComposer(
+                    controller: _commentCtrl,
+                    focusNode: _commentFocus,
+                    onSend: _addComment,
+                  ),
               ],
             ),
           ),
@@ -180,7 +200,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 
 class _PostHeaderInfo extends StatelessWidget {
   final ExplorePhoto photo;
-  final VoidCallback onTapComment;
+  final VoidCallback? onTapComment;
 
   const _PostHeaderInfo({required this.photo, required this.onTapComment});
 
@@ -190,7 +210,6 @@ class _PostHeaderInfo extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Column(
         children: [
-          // row: owner
           Row(
             children: [
               CircleAvatar(backgroundImage: AssetImage(photo.userAvatar)),
@@ -204,23 +223,26 @@ class _PostHeaderInfo extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-
-          // row: likes + comments
           Row(
             children: [
               const Icon(Icons.favorite, size: 18, color: Colors.red),
               const SizedBox(width: 6),
               Text('${photo.likes}'),
-
               const SizedBox(width: 16),
-
               InkWell(
                 onTap: onTapComment,
                 child: Row(
                   children: [
-                    const Icon(Icons.mode_comment_outlined, size: 18),
+                    Icon(
+                      onTapComment != null ? Icons.mode_comment_outlined : Icons.comments_disabled_outlined,
+                      size: 18,
+                      color: onTapComment != null ? Colors.black : Colors.grey,
+                    ),
                     const SizedBox(width: 6),
-                    Text('${photo.commentsCount}'),
+                    Text(
+                      '${photo.commentsCount}',
+                      style: TextStyle(color: onTapComment != null ? Colors.black : Colors.grey),
+                    ),
                   ],
                 ),
               ),
@@ -250,7 +272,6 @@ class _CommentsList extends StatelessWidget {
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      reverse: true,
       itemCount: comments.length,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
@@ -317,7 +338,7 @@ class _CommentComposer extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             IconButton(
-              icon: const Icon(Icons.send),
+              icon: const Icon(Icons.send, color: Color(0xff6E8B5E)),
               onPressed: onSend,
             ),
           ],
@@ -327,18 +348,25 @@ class _CommentComposer extends StatelessWidget {
   }
 }
 
-// ---------------- Edit Bottom Sheet ----------------
-
 class _EditResult {
   final String name;
   final String caption;
   final List<String> tags;
-  _EditResult({required this.name, required this.caption, required this.tags});
+  final bool allowComments;
+
+  _EditResult({
+    required this.name,
+    required this.caption,
+    required this.tags,
+    required this.allowComments
+  });
 }
 
 class _EditPhotoSheet extends StatefulWidget {
   final ExplorePhoto photo;
-  const _EditPhotoSheet({required this.photo});
+  final bool currentAllowComments;
+
+  const _EditPhotoSheet({required this.photo, required this.currentAllowComments});
 
   @override
   State<_EditPhotoSheet> createState() => _EditPhotoSheetState();
@@ -348,6 +376,7 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _captionCtrl;
   late final TextEditingController _tagsCtrl;
+  late bool _allowComments;
 
   @override
   void initState() {
@@ -355,6 +384,7 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
     _nameCtrl = TextEditingController(text: widget.photo.name);
     _captionCtrl = TextEditingController(text: widget.photo.caption);
     _tagsCtrl = TextEditingController(text: widget.photo.tags.join(' '));
+    _allowComments = widget.currentAllowComments;
   }
 
   @override
@@ -386,7 +416,7 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
       child: Wrap(
         runSpacing: 12,
         children: [
-          const Text('Edit photo', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Edit photo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
           TextField(
             controller: _captionCtrl,
@@ -396,6 +426,17 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
           TextField(
             controller: _tagsCtrl,
             decoration: const InputDecoration(labelText: 'Tags (space separated)'),
+          ),
+          SwitchListTile(
+            title: const Text("Allow Comments"),
+            subtitle: const Text("Users can post comments on this photo"),
+            activeColor: const Color(0xff6E8B5E),
+            value: _allowComments,
+            onChanged: (val) {
+              setState(() {
+                _allowComments = val;
+              });
+            },
           ),
           const SizedBox(height: 6),
           Row(
@@ -409,6 +450,7 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff6E8B5E)),
                   onPressed: () {
                     Navigator.pop(
                       context,
@@ -416,10 +458,11 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
                         name: _nameCtrl.text.trim(),
                         caption: _captionCtrl.text.trim(),
                         tags: _parseTags(_tagsCtrl.text),
+                        allowComments: _allowComments,
                       ),
                     );
                   },
-                  child: const Text('Save'),
+                  child: const Text('Save', style: TextStyle(color: Colors.white)),
                 ),
               ),
             ],
