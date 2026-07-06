@@ -1,3 +1,4 @@
+import '../main.dart';
 import 'package:flutter/material.dart';
 import '../screens/album_detail_screen.dart';
 import '../screens/create_album_screen.dart';
@@ -599,7 +600,12 @@ class SettingsSheet extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.dark_mode),
             title: const Text("Night Mode"),
-            onTap: () {},
+            onTap: () {
+              themeNotifier.value =
+                  themeNotifier.value == ThemeMode.light
+                      ? ThemeMode.dark
+                      : ThemeMode.light;
+            },
           ),
           ListTile(
             leading: const Icon(Icons.palette),

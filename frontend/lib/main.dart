@@ -1,43 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:mora/screens/splash_screen.dart';
 
+ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  static _MyAppState? of(BuildContext context) {
-    return context.findAncestorStateOfType<_MyAppState>();
-  }
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool isDark = false;
-
-  void changeTheme(bool value) {
-    setState(() {
-      isDark = value;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Mora',
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentMode, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Mora',
 
-      theme: ThemeData.light(),
+          theme: ThemeData.light(),
 
-      darkTheme: ThemeData.dark(),
+          darkTheme: ThemeData.dark(),
 
-      themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+          themeMode: currentMode,
 
-      home: const SplashScreen(),
+          home: const SplashScreen(),
+        );
+      },
     );
   }
 }
