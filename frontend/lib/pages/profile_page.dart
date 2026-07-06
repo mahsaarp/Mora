@@ -315,6 +315,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
 
+
                   if (isAdmin)
                     Expanded(
                       child: GestureDetector(
@@ -462,7 +463,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Padding(
-                    padding: const EdgeInsets.top_subtitle ?? const EdgeInsets.only(top: 4.0),
+                    padding: const EdgeInsets.only(top: 4.0),
                     child: Row(
                       children: [
                         Text("Photos: ${user.photoCount}"),
