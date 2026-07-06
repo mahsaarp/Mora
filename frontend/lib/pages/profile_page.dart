@@ -25,15 +25,24 @@ class AdminUserItem {
 }
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final String? viewUsername;
+  final String? viewAvatar;
+
+  const ProfilePage({
+    super.key,
+    this.viewUsername,
+    this.viewAvatar,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final bool isAdmin = true;
+  bool get isOwnProfile => widget.viewUsername == null;
+  bool get showAdminPanel => isOwnProfile && isAdmin;
 
+  final bool isAdmin = true;
   int selectedTabIndex = 0;
 
   late List<ExplorePhoto> _profilePhotos;
@@ -69,8 +78,32 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    _profilePhotos = List.from(initialMockPhotos);
-    _profileAlbums = List.from(mockAlbums);
+    _loadUserData();
+  }
+
+  void _loadUserData() {
+    if (isOwnProfile) {
+      _profilePhotos = List.from(initialMockPhotos);
+      _profileAlbums = List.from(mockAlbums);
+    } else {
+      _profilePhotos = initialMockPhotos
+          .where((photo) => photo.username.toLowerCase() == widget.viewUsername!.toLowerCase())
+          .toList();
+
+      if (_profilePhotos.isNotEmpty) {
+        _profileAlbums = [
+          ExploreAlbum(
+            id: 'user_album_1',
+            title: 'My Works',
+            photoCount: _profilePhotos.length,
+            imageUrls: _profilePhotos.map((p) => p.imageUrl).toList(),
+            createdAt: DateTime.now(),
+          )
+        ];
+      } else {
+        _profileAlbums = [];
+      }
+    }
   }
 
   Widget _buildImage(String urlOrPath) {
@@ -141,13 +174,18 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    // تنظیم تصویر آواتار و نام کاربر
+    final String displayName = isOwnProfile ? "Mohammad" : (widget.viewUsername ?? "User");
+    final String labelText = isOwnProfile ? "PHOTOGRAPHER" : "CREATOR";
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: Text(isOwnProfile ? "Profile" : "$displayName's Profile"),
         centerTitle: true,
         backgroundColor: const Color(0xff6E8B5E),
         foregroundColor: Colors.white,
-        actions: [
+        actions: isOwnProfile
+            ? [
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
@@ -164,20 +202,26 @@ class _ProfilePageState extends State<ProfilePage> {
               );
             },
           ),
-        ],
+        ]
+            : null,
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 25),
-            const CircleAvatar(
+            CircleAvatar(
               radius: 55,
-              backgroundImage: AssetImage("assets/images/profile.jpg"),
+              backgroundColor: Colors.grey.shade300,
+              backgroundImage: isOwnProfile
+                  ? const AssetImage("assets/images/profile.jpg") as ImageProvider
+                  : (widget.viewAvatar != null && widget.viewAvatar!.startsWith('http')
+                  ? NetworkImage(widget.viewAvatar!)
+                  : AssetImage(widget.viewAvatar ?? "assets/images/profile.jpg") as ImageProvider),
             ),
             const SizedBox(height: 15),
-            const Text(
-              "Mohammad",
-              style: TextStyle(
+            Text(
+              displayName,
+              style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -192,9 +236,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.green.shade100,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
-                "PHOTOGRAPHER",
-                style: TextStyle(
+              child: Text(
+                labelText,
+                style: const TextStyle(
                   color: Color(0xff4F6A45),
                   fontWeight: FontWeight.bold,
                 ),
@@ -231,26 +275,27 @@ class _ProfilePageState extends State<ProfilePage> {
               ],
             ),
             const SizedBox(height: 25),
-            SizedBox(
-              width: 220,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff6E8B5E),
-                ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const EditProfilePage(),
-                    ),
-                  );
-                },
-                child: const Text(
-                  "Edit Profile",
-                  style: TextStyle(color: Colors.white),
+            if (isOwnProfile)
+              SizedBox(
+                width: 220,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xff6E8B5E),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const EditProfilePage(),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Edit Profile",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-            ),
             const SizedBox(height: 30),
 
             Container(
@@ -316,7 +361,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
 
 
-                  if (isAdmin)
+                  if (showAdminPanel)
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
@@ -360,7 +405,12 @@ class _ProfilePageState extends State<ProfilePage> {
     if (selectedTabIndex == 0) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: GridView.builder(
+        child: _profilePhotos.isEmpty
+            ? const Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text("No photos available."),
+        )
+            : GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _profilePhotos.length,
@@ -386,57 +436,65 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.symmetric(horizontal: 18),
         child: Column(
           children: [
-            Card(
-              margin: const EdgeInsets.only(bottom: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-                side: const BorderSide(color: Color(0xff6E8B5E), width: 1.5),
-              ),
-              elevation: 0,
-              color: const Color(0xff6E8B5E).withOpacity(0.05),
-              child: ListTile(
-                onTap: _createNewAlbum,
-                leading: const CircleAvatar(
-                  backgroundColor: Color(0xff6E8B5E),
-                  child: Icon(Icons.add, color: Colors.white),
-                ),
-                title: const Text(
-                  "Create New Album",
-                  style: TextStyle(
-                    color: Color(0xff6E8B5E),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xff6E8B5E)),
-              ),
-            ),
-            ..._profileAlbums.map((album) {
-              final coverImage = album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
+            if (isOwnProfile)
+              Card(
+                margin: const EdgeInsets.only(bottom: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
+                  side: const BorderSide(color: Color(0xff6E8B5E), width: 1.5),
                 ),
+                elevation: 0,
+                color: const Color(0xff6E8B5E).withOpacity(0.05),
                 child: ListTile(
-                  onTap: () => _openAlbumDetail(album),
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: SizedBox(
-                      width: 52,
-                      height: 52,
-                      child: _buildImage(coverImage),
+                  onTap: _createNewAlbum,
+                  leading: const CircleAvatar(
+                    backgroundColor: Color(0xff6E8B5E),
+                    child: Icon(Icons.add, color: Colors.white),
+                  ),
+                  title: const Text(
+                    "Create New Album",
+                    style: TextStyle(
+                      color: Color(0xff6E8B5E),
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  title: Text(album.title),
-                  subtitle: Text('${album.photoCount} Photos'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
+                  trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xff6E8B5E)),
                 ),
-              );
-            }),
+              ),
+            _profileAlbums.isEmpty
+                ? const Padding(
+              padding: EdgeInsets.all(20.0),
+              child: Text("No albums available."),
+            )
+                : Column(
+              children: _profileAlbums.map((album) {
+                final coverImage = album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
+                return Card(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: ListTile(
+                    onTap: () => _openAlbumDetail(album),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox(
+                        width: 52,
+                        height: 52,
+                        child: _buildImage(coverImage),
+                      ),
+                    ),
+                    title: Text(album.title),
+                    subtitle: Text('${album.photoCount} Photos'),
+                    trailing: const Icon(Icons.arrow_forward_ios),
+                  ),
+                );
+              }).toList(),
+            ),
           ],
         ),
       );
-    } else if (selectedTabIndex == 2 && isAdmin) {
+    } else if (selectedTabIndex == 2 && showAdminPanel) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18),
         child: ListView.builder(

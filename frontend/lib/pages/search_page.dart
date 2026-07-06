@@ -3,6 +3,7 @@ import '../utils/explore_mock_data.dart';
 import '../utils/shimmer_box.dart';
 import '../screens/photo_detail_screen.dart';
 import '../screens/album_detail_screen.dart';
+import '../pages/profile_page.dart';
 
 class MockUser {
   final String username;
@@ -335,11 +336,19 @@ class _SearchScreenState extends State<SearchScreen> {
             subtitle: const Text("User / Creator"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                    viewUsername: user.username,
+                    viewAvatar: user.avatar,
+                  ),
+                ),
+              );
             },
           ),
         );
       },
     );
   }
-
 }
