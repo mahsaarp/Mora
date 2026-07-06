@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/album_detail_screen.dart';
+import '../screens/create_album_screen.dart';
 import '../screens/photo_detail_screen.dart';
 import '../utils/explore_mock_data.dart';
 import '../utils/shimmer_box.dart';
@@ -15,8 +16,15 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool showPhotos = true;
 
-  List<ExplorePhoto> get _profilePhotos => initialMockPhotos;
-  List<ExploreAlbum> get _profileAlbums => mockAlbums;
+  late List<ExplorePhoto> _profilePhotos;
+  late List<ExploreAlbum> _profileAlbums;
+
+  @override
+  void initState() {
+    super.initState();
+    _profilePhotos = List.from(initialMockPhotos);
+    _profileAlbums = List.from(mockAlbums);
+  }
 
   Widget _buildImage(String urlOrPath) {
     if (urlOrPath.startsWith('http')) {
@@ -67,6 +75,21 @@ class _ProfilePageState extends State<ProfilePage> {
         builder: (_) => AlbumDetailScreen(album: album),
       ),
     );
+  }
+
+  Future<void> _createNewAlbum() async {
+    final result = await Navigator.push<ExploreAlbum>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateAlbumScreen(availablePhotos: _profilePhotos),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _profileAlbums.insert(0, result);
+      });
+    }
   }
 
   @override
@@ -275,31 +298,57 @@ class _ProfilePageState extends State<ProfilePage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Column(
-                  children: _profileAlbums.map((album) {
-                    final coverImage =
-                    album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
-
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
+                  children: [
+                    Card(
+                      margin: const EdgeInsets.only(bottom: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
+                        side: const BorderSide(color: Color(0xff6E8B5E), width: 1.5),
                       ),
+                      elevation: 0,
+                      color: const Color(0xff6E8B5E).withOpacity(0.05),
                       child: ListTile(
-                        onTap: () => _openAlbumDetail(album),
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: SizedBox(
-                            width: 52,
-                            height: 52,
-                            child: _buildImage(coverImage),
+                        onTap: _createNewAlbum,
+                        leading: const CircleAvatar(
+                          backgroundColor: Color(0xff6E8B5E),
+                          child: Icon(Icons.add, color: Colors.white),
+                        ),
+                        title: const Text(
+                          "Create New Album",
+                          style: TextStyle(
+                            color: Color(0xff6E8B5E),
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        title: Text(album.title),
-                        subtitle: Text('${album.photoCount} Photos'),
-                        trailing: const Icon(Icons.arrow_forward_ios),
+                        trailing: const Icon(Icons.arrow_forward_ios, color: Color(0xff6E8B5E)),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                    ..._profileAlbums.map((album) {
+                      final coverImage =
+                      album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: ListTile(
+                          onTap: () => _openAlbumDetail(album),
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: SizedBox(
+                              width: 52,
+                              height: 52,
+                              child: _buildImage(coverImage),
+                            ),
+                          ),
+                          title: Text(album.title),
+                          subtitle: Text('${album.photoCount} Photos'),
+                          trailing: const Icon(Icons.arrow_forward_ios),
+                        ),
+                      );
+                    }),
+                  ],
                 ),
               ),
             const SizedBox(height: 25),
