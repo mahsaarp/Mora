@@ -6,7 +6,6 @@ import 'package:mora/pages/publish_page.dart';
 import 'package:mora/pages/search_page.dart';
 import 'package:mora/pages/explore_page.dart';
 
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -22,7 +21,6 @@ class _MainScreenState extends State<MainScreen> {
     const ExploreScreen(),
     const SearchScreen(),
     const Center(child: Text("Create Post Screen")),
-    const Center(child: Text("Notifications Screen")),
     const ProfilePage(),
   ];
 
@@ -38,7 +36,6 @@ class _MainScreenState extends State<MainScreen> {
       );
     }
   }
-
 
   void _showCreatePostBottomSheet() {
     showModalBottomSheet(
@@ -99,8 +96,7 @@ class _MainScreenState extends State<MainScreen> {
                   _buildNavItem(Icons.explore, "Explore", 0),
                   _buildNavItem(Icons.search, "Search", 1),
                   _buildNavItem(Icons.add_box_outlined, "Post", 2),
-                  _buildNavItem(Icons.notifications, "Alerts", 3),
-                  _buildNavItem(Icons.person, "Profile", 4),
+                  _buildNavItem(Icons.person, "Profile", 3),
                 ],
               ),
             ),
