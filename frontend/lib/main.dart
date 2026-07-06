@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mora/screens/splash_screen.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
-ValueNotifier<Color> themeColorNotifier = ValueNotifier(const Color(0xFFB7D6B0));
+ValueNotifier<Color> themeColorNotifier = ValueNotifier(const Color(0xFF6C8E61));
 
 void main() {
   runApp(const MyApp());
