@@ -1,5 +1,5 @@
-import '../main.dart';
 import 'package:flutter/material.dart';
+import '../main.dart';
 import '../screens/album_detail_screen.dart';
 import '../screens/create_album_screen.dart';
 import '../screens/photo_detail_screen.dart';
@@ -64,8 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
       _profileAlbums = List.from(mockAlbums);
     } else {
       _profilePhotos = initialMockPhotos
-          .where((photo) =>
-      photo.username.toLowerCase() == widget.viewUsername!.toLowerCase())
+          .where((photo) => photo.username.toLowerCase() == widget.viewUsername!.toLowerCase())
           .toList();
 
       if (_profilePhotos.isNotEmpty) {
@@ -76,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
             photoCount: _profilePhotos.length,
             imageUrls: _profilePhotos.map((p) => p.imageUrl).toList(),
             createdAt: DateTime.now(),
-          )
+          ),
         ];
       } else {
         _profileAlbums = [];
@@ -94,16 +93,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
     int idCounter = 1;
     for (var username in uniqueUsernames) {
-      final userPhotos =
-      initialMockPhotos.where((p) => p.username == username).toList();
+      final userPhotos = initialMockPhotos.where((p) => p.username == username).toList();
       final photoCount = userPhotos.length;
-      final avatarUrl = userPhotos.isNotEmpty
-          ? userPhotos.first.userAvatar
-          : 'assets/images/profile.jpg';
+      final avatarUrl =
+      userPhotos.isNotEmpty ? userPhotos.first.userAvatar : 'assets/images/profile.jpg';
 
       int albumCount = 0;
       for (var album in mockAlbums) {
-        bool belongsToUser =
+        final belongsToUser =
         album.imageUrls.any((img) => userPhotos.any((p) => p.imageUrl == img));
         if (belongsToUser) {
           albumCount++;
@@ -124,7 +121,9 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  Widget _buildImage(String urlOrPath) {
+  Widget _buildImage(String urlOrPath, ThemeData theme) {
+    final scheme = theme.colorScheme;
+
     if (urlOrPath.startsWith('http')) {
       return Image.network(
         urlOrPath,
@@ -139,8 +138,11 @@ class _ProfilePageState extends State<ProfilePage> {
         },
         errorBuilder: (context, error, stackTrace) {
           return Container(
-            color: Colors.grey.shade200,
-            child: const Icon(Icons.broken_image),
+            color: scheme.surfaceContainerHighest,
+            child: Icon(
+              Icons.broken_image,
+              color: scheme.onSurfaceVariant,
+            ),
           );
         },
       );
@@ -151,8 +153,11 @@ class _ProfilePageState extends State<ProfilePage> {
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
         return Container(
-          color: Colors.grey.shade200,
-          child: const Icon(Icons.image_not_supported),
+          color: scheme.surfaceContainerHighest,
+          child: Icon(
+            Icons.image_not_supported,
+            color: scheme.onSurfaceVariant,
+          ),
         );
       },
     );
@@ -193,16 +198,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final String displayName =
-    isOwnProfile ? "Mohammad" : (widget.viewUsername ?? "User");
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final String displayName = isOwnProfile ? "Mohammad" : (widget.viewUsername ?? "User");
     final String labelText = isOwnProfile ? "PHOTOGRAPHER" : "CREATOR";
 
     return Scaffold(
       appBar: AppBar(
         title: Text(isOwnProfile ? "Profile" : "$displayName's Profile"),
-        centerTitle: true,
-        backgroundColor: const Color(0xff6E8B5E),
-        foregroundColor: Colors.white,
         actions: isOwnProfile
             ? [
           IconButton(
@@ -211,9 +214,7 @@ class _ProfilePageState extends State<ProfilePage> {
               showModalBottomSheet(
                 context: context,
                 shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(25),
-                  ),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
                 ),
                 builder: (_) {
                   return const SettingsSheet();
@@ -230,39 +231,34 @@ class _ProfilePageState extends State<ProfilePage> {
             const SizedBox(height: 25),
             CircleAvatar(
               radius: 55,
-              backgroundColor: Colors.grey.shade300,
+              backgroundColor: scheme.surfaceContainerHighest,
               backgroundImage: isOwnProfile
-                  ? const AssetImage("assets/images/profile.jpg")
-              as ImageProvider
-                  : (widget.viewAvatar != null &&
-                  widget.viewAvatar!.startsWith('http')
+                  ? const AssetImage("assets/images/profile.jpg") as ImageProvider
+                  : (widget.viewAvatar != null && widget.viewAvatar!.startsWith('http')
                   ? NetworkImage(widget.viewAvatar!)
-                  : AssetImage(
-                  widget.viewAvatar ?? "assets/images/profile.jpg")
+                  : AssetImage(widget.viewAvatar ?? "assets/images/profile.jpg")
               as ImageProvider),
             ),
             const SizedBox(height: 15),
             Text(
               displayName,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
+                color: scheme.onSurface,
               ),
             ),
             const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 18,
-                vertical: 7,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
               decoration: BoxDecoration(
-                color: Colors.green.shade100,
+                color: scheme.primary.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 labelText,
-                style: const TextStyle(
-                  color: Color(0xff4F6A45),
+                style: TextStyle(
+                  color: scheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -275,24 +271,32 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     Text(
                       '${_profilePhotos.length}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: scheme.onSurface,
                       ),
                     ),
-                    const Text("Posts"),
+                    Text(
+                      "Posts",
+                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ),
                   ],
                 ),
                 Column(
                   children: [
                     Text(
                       '${_profileAlbums.length}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: scheme.onSurface,
                       ),
                     ),
-                    const Text("Albums"),
+                    Text(
+                      "Albums",
+                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ),
                   ],
                 ),
               ],
@@ -302,9 +306,6 @@ class _ProfilePageState extends State<ProfilePage> {
               SizedBox(
                 width: 220,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff6E8B5E),
-                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -313,17 +314,14 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     );
                   },
-                  child: const Text(
-                    "Edit Profile",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: const Text("Edit Profile"),
                 ),
               ),
             const SizedBox(height: 30),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: scheme.surfaceContainerHighest.withOpacity(0.6),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Row(
@@ -338,9 +336,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: selectedTabIndex == 0
-                              ? const Color(0xff6E8B5E)
-                              : Colors.transparent,
+                          color: selectedTabIndex == 0 ? scheme.primary : Colors.transparent,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Text(
@@ -348,8 +344,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: selectedTabIndex == 0
-                                ? Colors.white
-                                : Colors.black,
+                                ? scheme.onPrimary
+                                : scheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -366,9 +362,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
-                          color: selectedTabIndex == 1
-                              ? const Color(0xff6E8B5E)
-                              : Colors.transparent,
+                          color: selectedTabIndex == 1 ? scheme.primary : Colors.transparent,
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Text(
@@ -376,8 +370,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: selectedTabIndex == 1
-                                ? Colors.white
-                                : Colors.black,
+                                ? scheme.onPrimary
+                                : scheme.onSurface,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -395,9 +389,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
-                            color: selectedTabIndex == 2
-                                ? const Color(0xff6E8B5E)
-                                : Colors.transparent,
+                            color: selectedTabIndex == 2 ? scheme.primary : Colors.transparent,
                             borderRadius: BorderRadius.circular(15),
                           ),
                           child: Text(
@@ -405,8 +397,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: selectedTabIndex == 2
-                                  ? Colors.white
-                                  : Colors.black,
+                                  ? scheme.onPrimary
+                                  : scheme.onSurface,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -417,7 +409,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 20),
-            _buildTabContent(),
+            _buildTabContent(theme),
             const SizedBox(height: 25),
           ],
         ),
@@ -425,14 +417,19 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildTabContent() {
+  Widget _buildTabContent(ThemeData theme) {
+    final scheme = theme.colorScheme;
+
     if (selectedTabIndex == 0) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12),
         child: _profilePhotos.isEmpty
-            ? const Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text("No photos available."),
+            ? Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            "No photos available.",
+            style: TextStyle(color: scheme.onSurfaceVariant),
+          ),
         )
             : GridView.builder(
           shrinkWrap: true,
@@ -449,7 +446,7 @@ class _ProfilePageState extends State<ProfilePage> {
               onTap: () => _openPhotoDetail(photo),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: _buildImage(photo.imageUrl),
+                child: _buildImage(photo.imageUrl, theme),
               ),
             );
           },
@@ -463,33 +460,32 @@ class _ProfilePageState extends State<ProfilePage> {
             if (isOwnProfile)
               Card(
                 margin: const EdgeInsets.only(bottom: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: const BorderSide(color: Color(0xff6E8B5E), width: 1.5),
-                ),
-                elevation: 0,
-                color: const Color(0xff6E8B5E).withOpacity(0.05),
                 child: ListTile(
                   onTap: _createNewAlbum,
-                  leading: const CircleAvatar(
-                    backgroundColor: Color(0xff6E8B5E),
-                    child: Icon(Icons.add, color: Colors.white),
+                  leading: CircleAvatar(
+                    backgroundColor: scheme.primary,
+                    child: Icon(Icons.add, color: scheme.onPrimary),
                   ),
-                  title: const Text(
+                  title: Text(
                     "Create New Album",
                     style: TextStyle(
-                      color: Color(0xff6E8B5E),
+                      color: scheme.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  trailing:
-                  const Icon(Icons.arrow_forward_ios, color: Color(0xff6E8B5E)),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    color: scheme.primary,
+                  ),
                 ),
               ),
             _profileAlbums.isEmpty
-                ? const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text("No albums available."),
+                ? Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                "No albums available.",
+                style: TextStyle(color: scheme.onSurfaceVariant),
+              ),
             )
                 : Column(
               children: _profileAlbums.map((album) {
@@ -497,9 +493,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
                   child: ListTile(
                     onTap: () => _openAlbumDetail(album),
                     leading: ClipRRect(
@@ -507,12 +500,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: SizedBox(
                         width: 52,
                         height: 52,
-                        child: _buildImage(coverImage),
+                        child: _buildImage(coverImage, theme),
                       ),
                     ),
-                    title: Text(album.title),
-                    subtitle: Text('${album.photoCount} Photos'),
-                    trailing: const Icon(Icons.arrow_forward_ios),
+                    title: Text(
+                      album.title,
+                      style: TextStyle(color: scheme.onSurface),
+                    ),
+                    subtitle: Text(
+                      '${album.photoCount} Photos',
+                      style: TextStyle(color: scheme.onSurfaceVariant),
+                    ),
+                    trailing: Icon(
+                      Icons.arrow_forward_ios,
+                      color: scheme.onSurfaceVariant,
+                    ),
                   ),
                 );
               }).toList(),
@@ -524,9 +526,12 @@ class _ProfilePageState extends State<ProfilePage> {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 18),
         child: _adminUsers.isEmpty
-            ? const Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text("No users found."),
+            ? Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Text(
+            "No users found.",
+            style: TextStyle(color: scheme.onSurfaceVariant),
+          ),
         )
             : ListView.builder(
           shrinkWrap: true,
@@ -536,9 +541,6 @@ class _ProfilePageState extends State<ProfilePage> {
             final user = _adminUsers[index];
             return Card(
               margin: const EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ListTile(
@@ -547,19 +549,28 @@ class _ProfilePageState extends State<ProfilePage> {
                     backgroundImage: user.avatarUrl.startsWith('http')
                         ? NetworkImage(user.avatarUrl) as ImageProvider
                         : AssetImage(user.avatarUrl) as ImageProvider,
-                    backgroundColor: Colors.grey.shade300,
+                    backgroundColor: scheme.surfaceContainerHighest,
                   ),
                   title: Text(
                     user.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: scheme.onSurface,
+                    ),
                   ),
                   subtitle: Padding(
                     padding: const EdgeInsets.only(top: 4.0),
                     child: Row(
                       children: [
-                        Text("Photos: ${user.photoCount}"),
+                        Text(
+                          "Photos: ${user.photoCount}",
+                          style: TextStyle(color: scheme.onSurfaceVariant),
+                        ),
                         const SizedBox(width: 12),
-                        Text("Albums: ${user.albumCount}"),
+                        Text(
+                          "Albums: ${user.albumCount}",
+                          style: TextStyle(color: scheme.onSurfaceVariant),
+                        ),
                       ],
                     ),
                   ),
@@ -569,8 +580,11 @@ class _ProfilePageState extends State<ProfilePage> {
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.zero,
                         backgroundColor: user.isBanned
-                            ? const Color(0xff6E8B5E)
-                            : Colors.red.shade400,
+                            ? scheme.primary
+                            : scheme.errorContainer,
+                        foregroundColor: user.isBanned
+                            ? scheme.onPrimary
+                            : scheme.onErrorContainer,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -593,7 +607,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text(
                         user.isBanned ? "Unban" : "Ban",
                         style: const TextStyle(
-                          color: Colors.white,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
@@ -607,6 +620,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       );
     }
+
     return const SizedBox.shrink();
   }
 }
@@ -614,18 +628,73 @@ class _ProfilePageState extends State<ProfilePage> {
 class SettingsSheet extends StatelessWidget {
   const SettingsSheet({super.key});
 
+  void _showColorPickerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        final scheme = Theme.of(dialogContext).colorScheme;
+
+        return AlertDialog(
+          title: Text(
+            "Select Theme Color",
+            style: TextStyle(color: scheme.onSurface),
+          ),
+          backgroundColor: scheme.surface,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFB7D6B0),
+                ),
+                title: const Text("Green"),
+                onTap: () {
+                  themeColorNotifier.value = const Color(0xFFB7D6B0);
+                  Navigator.pop(dialogContext);
+                },
+              ),
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFFFC0CB),
+                ),
+                title: const Text("Pink"),
+                onTap: () {
+                  themeColorNotifier.value = const Color(0xFFFFC0CB);
+                  Navigator.pop(dialogContext);
+                },
+              ),
+              ListTile(
+                leading: const CircleAvatar(
+                  backgroundColor: Color(0xFFB3E5FC),
+                ),
+                title: const Text("Blue"),
+                onTap: () {
+                  themeColorNotifier.value = const Color(0xFFB3E5FC);
+                  Navigator.pop(dialogContext);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
             "Settings",
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
+              color: scheme.onSurface,
             ),
           ),
           const SizedBox(height: 20),
@@ -634,8 +703,14 @@ class SettingsSheet extends StatelessWidget {
             builder: (context, currentMode, _) {
               final isDarkMode = currentMode == ThemeMode.dark;
               return ListTile(
-                leading: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
-                title: Text(isDarkMode ? "Day Mode" : "Night Mode"),
+                leading: Icon(
+                  isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                  color: scheme.primary,
+                ),
+                title: Text(
+                  isDarkMode ? "Day Mode" : "Night Mode",
+                  style: TextStyle(color: scheme.onSurface),
+                ),
                 onTap: () {
                   themeNotifier.value =
                   isDarkMode ? ThemeMode.light : ThemeMode.dark;
@@ -644,31 +719,29 @@ class SettingsSheet extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.palette),
-            title: const Text("Theme Color"),
-            onTap: () {},
+            leading: Icon(Icons.palette, color: scheme.primary),
+            title: Text(
+              "Theme Color",
+              style: TextStyle(color: scheme.onSurface),
+            ),
+            onTap: () {
+              Navigator.pop(context);
+              _showColorPickerDialog(context);
+            },
           ),
           ListTile(
-            leading: const Icon(
-              Icons.logout,
-              color: Colors.orange,
-            ),
-            title: const Text(
+            leading: Icon(Icons.logout, color: scheme.tertiary),
+            title: Text(
               "Log Out",
-              style: TextStyle(color: Colors.orange),
+              style: TextStyle(color: scheme.tertiary),
             ),
-            onTap: () {},
           ),
           ListTile(
-            leading: const Icon(
-              Icons.delete,
-              color: Colors.red,
-            ),
-            title: const Text(
+            leading: Icon(Icons.delete, color: scheme.error),
+            title: Text(
               "Delete Account",
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: scheme.error),
             ),
-            onTap: () {},
           ),
           const SizedBox(height: 15),
         ],

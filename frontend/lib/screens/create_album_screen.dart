@@ -4,7 +4,6 @@ import '../utils/shimmer_box.dart';
 
 class CreateAlbumScreen extends StatefulWidget {
   final List<ExplorePhoto> availablePhotos;
-
   const CreateAlbumScreen({super.key, required this.availablePhotos});
 
   @override
@@ -15,35 +14,29 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
   final Set<String> _selectedImageUrls = {};
   final TextEditingController _titleController = TextEditingController();
 
-  Widget _buildImage(String urlOrPath) {
+  Widget _buildImage(String urlOrPath, ThemeData theme) {
+    final scheme = theme.colorScheme;
     if (urlOrPath.startsWith('http')) {
       return Image.network(
         urlOrPath,
         fit: BoxFit.cover,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
-          return const ShimmerBox(
-            width: double.infinity,
-            height: double.infinity,
-          );
+          return const ShimmerBox(width: double.infinity, height: double.infinity);
         },
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            color: Colors.grey.shade200,
-            child: const Icon(Icons.broken_image),
-          );
-        },
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: scheme.surfaceContainerHighest,
+          child: Icon(Icons.broken_image, color: scheme.onSurfaceVariant),
+        ),
       );
     }
     return Image.asset(
       urlOrPath,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          color: Colors.grey.shade200,
-          child: const Icon(Icons.image_not_supported),
-        );
-      },
+      errorBuilder: (context, error, stackTrace) => Container(
+        color: scheme.surfaceContainerHighest,
+        child: Icon(Icons.image_not_supported, color: scheme.onSurfaceVariant),
+      ),
     );
   }
 
@@ -61,7 +54,6 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
       );
       return;
     }
-
     final newAlbum = ExploreAlbum(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
@@ -69,7 +61,6 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
       imageUrls: _selectedImageUrls.toList(),
       createdAt: DateTime.now(),
     );
-
     Navigator.pop(context, newAlbum);
   }
 
@@ -81,15 +72,15 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Create Album"),
-        backgroundColor: const Color(0xff6E8B5E),
-        foregroundColor: Colors.white,
-        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
+            icon: Icon(Icons.check, color: scheme.onPrimary),
             onPressed: _submitAlbum,
           ),
         ],
@@ -101,22 +92,33 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
           children: [
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
+              style: TextStyle(color: scheme.onSurface),
+              decoration: InputDecoration(
                 labelText: "Album Title",
                 hintText: "Enter a name for your album",
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.folder_open),
+                labelStyle: TextStyle(color: scheme.onSurfaceVariant),
+                hintStyle: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.8)),
+                prefixIcon: Icon(Icons.folder_open, color: scheme.primary),
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               "Select Photos:",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: scheme.onSurface,
+              ),
             ),
             const SizedBox(height: 10),
             Expanded(
               child: widget.availablePhotos.isEmpty
-                  ? const Center(child: Text("No photos available to select."))
+                  ? Center(
+                child: Text(
+                  "No photos available.",
+                  style: TextStyle(color: scheme.onSurfaceVariant),
+                ),
+              )
                   : GridView.builder(
                 itemCount: widget.availablePhotos.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -145,17 +147,19 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
                           borderRadius: BorderRadius.circular(12),
                           child: ColorFiltered(
                             colorFilter: ColorFilter.mode(
-                              isSelected ? Colors.black.withOpacity(0.4) : Colors.transparent,
+                              isSelected
+                                  ? scheme.scrim.withOpacity(0.35)
+                                  : Colors.transparent,
                               BlendMode.srcOver,
                             ),
-                            child: _buildImage(photo.imageUrl),
+                            child: _buildImage(photo.imageUrl, theme),
                           ),
                         ),
                         if (isSelected)
-                          const Center(
+                          Center(
                             child: Icon(
                               Icons.check_circle,
-                              color: Colors.white,
+                              color: scheme.primary,
                               size: 32,
                             ),
                           ),

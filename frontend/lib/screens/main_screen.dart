@@ -20,7 +20,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const ExploreScreen(),
     const SearchScreen(),
-    const Center(child: Text("Create Post Screen")),
+    const SizedBox.shrink(),
     const ProfilePage(),
   ];
 
@@ -38,24 +38,27 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _showCreatePostBottomSheet() {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
     showModalBottomSheet(
       context: context,
+      backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Container(
-        height: 200,
+        height: 180,
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: const Text("Camera"),
+              leading: Icon(Icons.camera_alt, color: scheme.primary),
+              title: Text("Camera", style: TextStyle(color: scheme.onSurface)),
               onTap: () => _pickImage(ImageSource.camera),
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: const Text("Gallery"),
+              leading: Icon(Icons.photo_library, color: scheme.primary),
+              title: Text("Gallery", style: TextStyle(color: scheme.onSurface)),
               onTap: () => _pickImage(ImageSource.gallery),
             ),
           ],
@@ -66,6 +69,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -80,23 +86,24 @@ class _MainScreenState extends State<MainScreen> {
             child: Container(
               height: 65,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.85),
+                color: scheme.surfaceContainerHigh.withOpacity(0.95),
                 borderRadius: BorderRadius.circular(30),
+                border: Border.all(color: scheme.outlineVariant.withOpacity(0.3)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: scheme.scrim.withOpacity(0.15),
                     blurRadius: 10,
                     offset: const Offset(0, 5),
-                  ),
+                  )
                 ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildNavItem(Icons.explore, "Explore", 0),
-                  _buildNavItem(Icons.search, "Search", 1),
-                  _buildNavItem(Icons.add_box_outlined, "Post", 2),
-                  _buildNavItem(Icons.person, "Profile", 3),
+                  _buildNavItem(Icons.explore, "Explore", 0, scheme),
+                  _buildNavItem(Icons.search, "Search", 1, scheme),
+                  _buildNavItem(Icons.add_box_outlined, "Post", 2, scheme),
+                  _buildNavItem(Icons.person, "Profile", 3, scheme),
                 ],
               ),
             ),
@@ -106,35 +113,41 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
+  Widget _buildNavItem(IconData icon, String label, int index, ColorScheme scheme) {
     final bool isSelected = _currentIndex == index;
+    final activeColor = scheme.primary;
+    final inactiveColor = scheme.onSurfaceVariant;
+
     return GestureDetector(
       onTap: () {
         if (index == 2) {
           _showCreatePostBottomSheet();
         } else {
-          setState(() {
-            _currentIndex = index;
-          });
+          setState(() => _currentIndex = index);
         }
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? Colors.white : Colors.grey,
-            size: 24,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey,
-              fontSize: 10,
+      child: Container(
+        color: Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? activeColor : inactiveColor,
+              size: 24,
             ),
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? activeColor : inactiveColor,
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

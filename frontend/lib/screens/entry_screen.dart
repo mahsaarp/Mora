@@ -8,145 +8,82 @@ class EntryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
-
-          // Background
           Positioned.fill(
-            child: Image.asset(
-              "assets/images/background.png",
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset("assets/images/background.png", fit: BoxFit.cover),
           ),
-
-          // Dark overlay
           Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.20),
-            ),
+            child: Container(color: scheme.scrim.withOpacity(0.20)),
           ),
-
           Center(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 12,
-                  sigmaY: 12,
-                ),
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
                   width: 340,
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: scheme.surface.withOpacity(0.25),
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.4),
-                    ),
+                    border: Border.all(color: scheme.onSurface.withOpacity(0.4)),
                   ),
-
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-
-                      const Icon(
-                        Icons.camera_alt_outlined,
-                        color: Color(0xff596346),
-                        size: 55,
-                      ),
-
+                      Icon(Icons.camera_alt_outlined, color: scheme.primary, size: 55),
                       const SizedBox(height: 15),
-
-                      const Text(
+                      Text(
                         "Mora",
                         style: TextStyle(
                           fontSize: 44,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xff404030),
+                          color: scheme.onSurface,
                         ),
                       ),
-
                       const SizedBox(height: 10),
-
-                      const Text(
+                      Text(
                         "Capture. Share. Inspire.",
                         style: TextStyle(
                           fontSize: 18,
-                          color: Colors.black87,
+                          color: scheme.onSurfaceVariant,
                         ),
                       ),
-
-                      const SizedBox(height: 8),
-
-                      const Text(
-                        "Every moment tells a story.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black54,
-                        ),
-                      ),
-
                       const SizedBox(height: 35),
-
                       SizedBox(
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff6E8B5E),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            backgroundColor: scheme.primary,
+                            foregroundColor: scheme.onPrimary,
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const SignInScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Log In",
-                            style: TextStyle(
-                              fontSize: 17,
-                              color: Colors.white,
-                            ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SignInScreen()),
                           ),
+                          child: const Text("Log In", style: TextStyle(fontSize: 17)),
                         ),
                       ),
-
                       const SizedBox(height: 15),
-
                       SizedBox(
                         width: double.infinity,
                         height: 52,
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(
-                              color: Color(0xff6E8B5E),
-                              width: 2,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            side: BorderSide(color: scheme.primary, width: 2),
+                            foregroundColor: scheme.primary,
                           ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const SignUpScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              color: Color(0xff596346),
-                              fontSize: 17,
-                            ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SignUpScreen()),
                           ),
+                          child: const Text("Sign Up", style: TextStyle(fontSize: 17)),
                         ),
                       ),
                     ],

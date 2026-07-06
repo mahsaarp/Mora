@@ -27,6 +27,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -38,7 +41,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           Positioned.fill(
             child: Container(
-              color: Colors.black.withOpacity(0.20),
+              color: scheme.scrim.withOpacity(0.20),
             ),
           ),
           Center(
@@ -53,35 +56,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   width: 340,
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: scheme.surface.withOpacity(0.25),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.4),
+                      color: scheme.onSurface.withOpacity(0.22),
                     ),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.person_add_alt_1,
-                        color: Color(0xff596346),
+                        color: scheme.primary,
                         size: 55,
                       ),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         "Create Account",
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xff404030),
+                          color: scheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         "Join Mora and share your moments.",
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: scheme.onSurfaceVariant,
                           fontSize: 15,
                         ),
                       ),
@@ -92,8 +95,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: RadioListTile<bool>(
                               value: true,
                               groupValue: isEmail,
-                              activeColor: const Color(0xff6E8B5E),
-                              title: const Text("Email"),
+                              activeColor: scheme.primary,
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                "Email",
+                                style: TextStyle(color: scheme.onSurface),
+                              ),
                               onChanged: (value) {
                                 setState(() {
                                   isEmail = true;
@@ -105,8 +112,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: RadioListTile<bool>(
                               value: false,
                               groupValue: isEmail,
-                              activeColor: const Color(0xff6E8B5E),
-                              title: const Text("Phone"),
+                              activeColor: scheme.primary,
+                              contentPadding: EdgeInsets.zero,
+                              title: Text(
+                                "Phone",
+                                style: TextStyle(color: scheme.onSurface),
+                              ),
                               onChanged: (value) {
                                 setState(() {
                                   isEmail = false;
@@ -119,28 +130,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       const SizedBox(height: 10),
                       TextField(
                         controller: usernameController,
+                        style: TextStyle(color: scheme.onSurface),
                         decoration: InputDecoration(
-                          hintText: isEmail
-                              ? "Email"
-                              : "Phone Number",
-
-                          hintStyle: const TextStyle(
+                          hintText: isEmail ? "Email" : "Phone Number",
+                          hintStyle: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey,
+                            color: scheme.onSurfaceVariant.withOpacity(0.8),
                           ),
-
                           prefixIcon: Icon(
-                            isEmail
-                                ? Icons.email
-                                : Icons.phone,
+                            isEmail ? Icons.email : Icons.phone,
+                            color: scheme.onSurfaceVariant,
                           ),
-
                           filled: true,
-                          fillColor: Colors.white70,
-
-                          border: OutlineInputBorder(
+                          fillColor: scheme.surface.withOpacity(0.78),
+                          enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                            borderSide: BorderSide(
+                              color: scheme.outlineVariant.withOpacity(0.5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: scheme.primary,
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
@@ -148,14 +162,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       TextField(
                         controller: passwordController,
                         obscureText: true,
+                        style: TextStyle(color: scheme.onSurface),
                         decoration: InputDecoration(
                           hintText: "Password",
-                          prefixIcon: const Icon(Icons.lock),
+                          hintStyle: TextStyle(
+                            color: scheme.onSurfaceVariant.withOpacity(0.8),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.lock,
+                            color: scheme.onSurfaceVariant,
+                          ),
                           filled: true,
-                          fillColor: Colors.white70,
-                          border: OutlineInputBorder(
+                          fillColor: scheme.surface.withOpacity(0.78),
+                          enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                            borderSide: BorderSide(
+                              color: scheme.outlineVariant.withOpacity(0.5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: scheme.primary,
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
@@ -163,14 +193,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       TextField(
                         controller: confirmPasswordController,
                         obscureText: true,
+                        style: TextStyle(color: scheme.onSurface),
                         decoration: InputDecoration(
                           hintText: "Confirm Password",
-                          prefixIcon: const Icon(Icons.lock_outline),
+                          hintStyle: TextStyle(
+                            color: scheme.onSurfaceVariant.withOpacity(0.8),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.lock_outline,
+                            color: scheme.onSurfaceVariant,
+                          ),
                           filled: true,
-                          fillColor: Colors.white70,
-                          border: OutlineInputBorder(
+                          fillColor: scheme.surface.withOpacity(0.78),
+                          enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                            borderSide: BorderSide(
+                              color: scheme.outlineVariant.withOpacity(0.5),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(
+                              color: scheme.primary,
+                              width: 1.5,
+                            ),
                           ),
                         ),
                       ),
@@ -180,7 +226,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         height: 52,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff6E8B5E),
+                            backgroundColor: scheme.primary,
+                            foregroundColor: scheme.onPrimary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
@@ -191,15 +238,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               MaterialPageRoute(
                                 builder: (_) => const MainScreen(),
                               ),
-                              (route) => false,
+                                  (route) => false,
                             );
                           },
                           child: const Text(
                             "Create Account",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                            ),
+                            style: TextStyle(fontSize: 17),
                           ),
                         ),
                       ),
@@ -207,9 +251,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "Already have an account?",
-                            style: TextStyle(color: Colors.black87),
+                            style: TextStyle(color: scheme.onSurface),
                           ),
                           TextButton(
                             onPressed: () {
@@ -220,10 +264,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 ),
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               "Log In",
                               style: TextStyle(
-                                color: Color(0xff596346),
+                                color: scheme.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

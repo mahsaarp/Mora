@@ -5,41 +5,36 @@ class EditProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile"),
         centerTitle: true,
-        backgroundColor: const Color(0xff6E8B5E),
-        foregroundColor: Colors.white,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(25),
-
         child: Column(
           children: [
-
             Stack(
               children: [
-
                 const CircleAvatar(
                   radius: 55,
-                  backgroundImage:
-                      AssetImage("assets/images/profile.jpg"),
+                  backgroundImage: AssetImage("assets/images/profile.jpg"),
                 ),
-
                 Positioned(
                   bottom: 0,
                   right: 0,
                   child: CircleAvatar(
                     radius: 18,
-                    backgroundColor: const Color(0xff6E8B5E),
+                    backgroundColor: scheme.primary,
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.camera_alt,
                         size: 18,
-                        color: Colors.white,
+                        color: scheme.onPrimary,
                       ),
                       onPressed: () {},
                     ),
@@ -47,71 +42,35 @@ class EditProfilePage extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 35),
-
             TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Username",
-                prefixIcon: const Icon(Icons.person),
-
-                filled: true,
-                fillColor: Colors.white,
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                prefixIcon: Icon(Icons.person),
               ),
             ),
-
             const SizedBox(height: 20),
-
             TextField(
               obscureText: true,
-
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Password",
-                prefixIcon: const Icon(Icons.lock),
-
-                filled: true,
-                fillColor: Colors.white,
-
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                prefixIcon: Icon(Icons.lock),
               ),
             ),
-
             const SizedBox(height: 35),
-
             SizedBox(
               width: double.infinity,
               height: 55,
-
               child: ElevatedButton(
-
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff6E8B5E),
-
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                ),
-
                 onPressed: () {
                   Navigator.pop(context);
                 },
-
                 child: const Text(
                   "Save Changes",
-                  style: TextStyle(
-                    fontSize: 17,
-                    color: Colors.white,
-                  ),
+                  style: TextStyle(fontSize: 17),
                 ),
               ),
             ),
-
           ],
         ),
       ),

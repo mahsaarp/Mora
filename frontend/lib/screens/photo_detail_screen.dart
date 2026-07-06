@@ -16,11 +16,15 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 
   late List<PhotoComment> _comments;
   late bool _allowComments;
+  late bool _isLiked;
+  late int _likes;
 
   @override
   void initState() {
     super.initState();
     _allowComments = widget.photo.allowComments;
+    _isLiked = false;
+    _likes = widget.photo.likes;
 
     _comments = [
       PhotoComment(
@@ -45,6 +49,14 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     _commentCtrl.dispose();
     _commentFocus.dispose();
     super.dispose();
+  }
+
+  void _toggleLike() {
+    setState(() {
+      _isLiked = !_isLiked;
+      _likes += _isLiked ? 1 : -1;
+      widget.photo.likes = _likes;
+    });
   }
 
   void _addComment() {
@@ -73,6 +85,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     final result = await showModalBottomSheet<_EditResult>(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -93,9 +106,45 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     });
   }
 
+  Widget _buildPhotoImage(String urlOrPath) {
+    final scheme = Theme.of(context).colorScheme;
+
+    if (urlOrPath.startsWith('http')) {
+      return Image.network(
+        urlOrPath,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          color: scheme.surfaceContainerHighest,
+          alignment: Alignment.center,
+          child: Icon(
+            Icons.broken_image_outlined,
+            color: scheme.onSurfaceVariant,
+            size: 40,
+          ),
+        ),
+      );
+    }
+
+    return Image.asset(
+      urlOrPath,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Container(
+        color: scheme.surfaceContainerHighest,
+        alignment: Alignment.center,
+        child: Icon(
+          Icons.broken_image_outlined,
+          color: scheme.onSurfaceVariant,
+          size: 40,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = widget.photo;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Scaffold(
       appBar: AppBar(
@@ -103,7 +152,6 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         actions: [
           if (p.isOwner)
             IconButton(
-              tooltip: 'Edit',
               icon: const Icon(Icons.edit),
               onPressed: _openEditSheet,
             ),
@@ -113,44 +161,41 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         children: [
           AspectRatio(
             aspectRatio: 1,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(p.imageUrl, fit: BoxFit.cover),
-                if (p.isOwner)
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Material(
-                      color: Colors.black45,
-                      borderRadius: BorderRadius.circular(20),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: _openEditSheet,
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.edit, color: Colors.white, size: 18),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
+            child: _buildPhotoImage(p.imageUrl),
           ),
           Expanded(
             child: Column(
               children: [
                 _PostHeaderInfo(
-                    photo: p,
-                    onTapComment: _allowComments ? () => _commentFocus.requestFocus() : null
+                  photo: p,
+                  isLiked: _isLiked,
+                  likes: _likes,
+                  onToggleLike: _toggleLike,
+                  onTapComment: _allowComments
+                      ? () => _commentFocus.requestFocus()
+                      : null,
                 ),
+                if (p.name.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        p.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: scheme.onSurface,
+                        ),
+                      ),
+                    ),
+                  ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       p.caption,
-                      style: const TextStyle(fontSize: 14),
+                      style: TextStyle(color: scheme.onSurface),
                     ),
                   ),
                 ),
@@ -161,10 +206,17 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                       spacing: 8,
                       runSpacing: 4,
                       children: p.tags
-                          .map((t) => Chip(
-                        label: Text(t),
-                        visualDensity: VisualDensity.compact,
-                      ))
+                          .map(
+                            (t) => Chip(
+                          label: Text(t),
+                          visualDensity: VisualDensity.compact,
+                          backgroundColor: scheme.primary.withOpacity(0.12),
+                          side: BorderSide(
+                            color: scheme.primary.withOpacity(0.25),
+                          ),
+                          labelStyle: TextStyle(color: scheme.primary),
+                        ),
+                      )
                           .toList(),
                     ),
                   ),
@@ -172,13 +224,22 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                 Expanded(
                   child: _allowComments
                       ? _CommentsList(comments: _comments)
-                      : const Center(
+                      : Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.comments_disabled_outlined, color: Colors.grey, size: 40),
-                        SizedBox(height: 8),
-                        Text('Comments are turned off.', style: TextStyle(color: Colors.grey)),
+                        Icon(
+                          Icons.comments_disabled_outlined,
+                          color: scheme.onSurfaceVariant,
+                          size: 40,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Comments are turned off.',
+                          style: TextStyle(
+                            color: scheme.onSurfaceVariant,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -201,23 +262,44 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 class _PostHeaderInfo extends StatelessWidget {
   final ExplorePhoto photo;
   final VoidCallback? onTapComment;
+  final bool isLiked;
+  final int likes;
+  final VoidCallback onToggleLike;
 
-  const _PostHeaderInfo({required this.photo, required this.onTapComment});
+  const _PostHeaderInfo({
+    required this.photo,
+    required this.onTapComment,
+    required this.isLiked,
+    required this.likes,
+    required this.onToggleLike,
+  });
+
+  ImageProvider _buildAvatarProvider(String avatarPath) {
+    if (avatarPath.startsWith('http')) {
+      return NetworkImage(avatarPath);
+    }
+    return AssetImage(avatarPath);
+  }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Column(
         children: [
           Row(
             children: [
-              CircleAvatar(backgroundImage: AssetImage(photo.userAvatar)),
+              CircleAvatar(
+                backgroundImage: _buildAvatarProvider(photo.userAvatar),
+              ),
               const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  photo.username,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                photo.username,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: scheme.onSurface,
                 ),
               ),
             ],
@@ -225,32 +307,38 @@ class _PostHeaderInfo extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.favorite, size: 18, color: Colors.red),
-              const SizedBox(width: 6),
-              Text('${photo.likes}'),
-              const SizedBox(width: 16),
-              InkWell(
-                onTap: onTapComment,
-                child: Row(
-                  children: [
-                    Icon(
-                      onTapComment != null ? Icons.mode_comment_outlined : Icons.comments_disabled_outlined,
-                      size: 18,
-                      color: onTapComment != null ? Colors.black : Colors.grey,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      '${photo.commentsCount}',
-                      style: TextStyle(color: onTapComment != null ? Colors.black : Colors.grey),
-                    ),
-                  ],
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(
+                  isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: isLiked ? scheme.error : scheme.onSurface,
                 ),
+                onPressed: onToggleLike,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '$likes',
+                style: TextStyle(color: scheme.onSurface),
+              ),
+              const SizedBox(width: 16),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                icon: Icon(
+                  onTapComment != null
+                      ? Icons.mode_comment_outlined
+                      : Icons.comments_disabled_outlined,
+                  color: scheme.onSurface,
+                ),
+                onPressed: onTapComment,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '${photo.commentsCount}',
+                style: TextStyle(color: scheme.onSurface),
               ),
               const Spacer(),
-              Text(
-                photo.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
             ],
           ),
         ],
@@ -264,14 +352,28 @@ class _CommentsList extends StatelessWidget {
 
   const _CommentsList({required this.comments});
 
+  ImageProvider _buildAvatarProvider(String avatarPath) {
+    if (avatarPath.startsWith('http')) {
+      return NetworkImage(avatarPath);
+    }
+    return AssetImage(avatarPath);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     if (comments.isEmpty) {
-      return const Center(child: Text('There is no comments yet.'));
+      return Center(
+        child: Text(
+          'No comments yet.',
+          style: TextStyle(color: scheme.onSurfaceVariant),
+        ),
+      );
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       itemCount: comments.length,
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
@@ -279,16 +381,21 @@ class _CommentsList extends StatelessWidget {
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(radius: 16, backgroundImage: AssetImage(c.userAvatar)),
+            CircleAvatar(
+              radius: 16,
+              backgroundImage: _buildAvatarProvider(c.userAvatar),
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: RichText(
                 text: TextSpan(
-                  style: DefaultTextStyle.of(context).style,
+                  style: DefaultTextStyle.of(context).style.copyWith(
+                    color: scheme.onSurface,
+                  ),
                   children: [
                     TextSpan(
-                      text: '${c.username}  ',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      text: '${c.username} ',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(text: c.text),
                   ],
@@ -315,30 +422,40 @@ class _CommentComposer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return SafeArea(
-      top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+        padding: const EdgeInsets.all(12),
         child: Row(
           children: [
             Expanded(
               child: TextField(
                 controller: controller,
                 focusNode: focusNode,
-                textInputAction: TextInputAction.send,
-                onSubmitted: (_) => onSend(),
+                style: TextStyle(color: scheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Add a comment...',
+                  hintStyle: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: scheme.outlineVariant),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: scheme.outlineVariant.withOpacity(0.5)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: scheme.primary, width: 1.5),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                 ),
+                onSubmitted: (_) => onSend(),
               ),
             ),
-            const SizedBox(width: 10),
             IconButton(
-              icon: const Icon(Icons.send, color: Color(0xff6E8B5E)),
+              icon: Icon(Icons.send, color: scheme.primary),
               onPressed: onSend,
             ),
           ],
@@ -358,7 +475,7 @@ class _EditResult {
     required this.name,
     required this.caption,
     required this.tags,
-    required this.allowComments
+    required this.allowComments,
   });
 }
 
@@ -366,7 +483,10 @@ class _EditPhotoSheet extends StatefulWidget {
   final ExplorePhoto photo;
   final bool currentAllowComments;
 
-  const _EditPhotoSheet({required this.photo, required this.currentAllowComments});
+  const _EditPhotoSheet({
+    required this.photo,
+    required this.currentAllowComments,
+  });
 
   @override
   State<_EditPhotoSheet> createState() => _EditPhotoSheetState();
@@ -406,6 +526,9 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -416,21 +539,52 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
       child: Wrap(
         runSpacing: 12,
         children: [
-          const Text('Edit photo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          TextField(controller: _nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
+          Text(
+            'Edit photo',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: scheme.onSurface,
+            ),
+          ),
+          TextField(
+            controller: _nameCtrl,
+            style: TextStyle(color: scheme.onSurface),
+            decoration: InputDecoration(
+              labelText: 'Name',
+              labelStyle: TextStyle(color: scheme.onSurfaceVariant),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: scheme.primary, width: 2),
+              ),
+            ),
+          ),
           TextField(
             controller: _captionCtrl,
-            decoration: const InputDecoration(labelText: 'Caption'),
+            style: TextStyle(color: scheme.onSurface),
+            decoration: InputDecoration(
+              labelText: 'Caption',
+              labelStyle: TextStyle(color: scheme.onSurfaceVariant),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: scheme.primary, width: 2),
+              ),
+            ),
             maxLines: 3,
           ),
           TextField(
             controller: _tagsCtrl,
-            decoration: const InputDecoration(labelText: 'Tags (space separated)'),
+            style: TextStyle(color: scheme.onSurface),
+            decoration: InputDecoration(
+              labelText: 'Tags (space separated)',
+              labelStyle: TextStyle(color: scheme.onSurfaceVariant),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: scheme.primary, width: 2),
+              ),
+            ),
           ),
           SwitchListTile(
-            title: const Text("Allow Comments"),
-            subtitle: const Text("Users can post comments on this photo"),
-            activeColor: const Color(0xff6E8B5E),
+            contentPadding: EdgeInsets.zero,
+            title: Text('Allow Comments', style: TextStyle(color: scheme.onSurface)),
+            subtitle: Text('Users can post comments on this photo', style: TextStyle(color: scheme.onSurfaceVariant)),
+            activeColor: scheme.primary,
             value: _allowComments,
             onChanged: (val) {
               setState(() {
@@ -443,6 +597,10 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
             children: [
               Expanded(
                 child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: scheme.outline),
+                    foregroundColor: scheme.onSurface,
+                  ),
                   onPressed: () => Navigator.pop(context),
                   child: const Text('Cancel'),
                 ),
@@ -450,7 +608,10 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
               const SizedBox(width: 10),
               Expanded(
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xff6E8B5E)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: scheme.primary,
+                    foregroundColor: scheme.onPrimary,
+                  ),
                   onPressed: () {
                     Navigator.pop(
                       context,
@@ -462,7 +623,7 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
                       ),
                     );
                   },
-                  child: const Text('Save', style: TextStyle(color: Colors.white)),
+                  child: const Text('Save'),
                 ),
               ),
             ],

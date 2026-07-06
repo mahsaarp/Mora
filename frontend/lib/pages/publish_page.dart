@@ -13,7 +13,6 @@ class PublishScreen extends StatefulWidget {
 class _PublishScreenState extends State<PublishScreen> {
   final _titleController = TextEditingController();
   final _captionController = TextEditingController();
-
   final List<TextEditingController> _tagControllers = [];
 
   @override
@@ -64,7 +63,6 @@ class _PublishScreenState extends State<PublishScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text("Post created successfully"),
-        backgroundColor: Colors.green,
       ),
     );
 
@@ -73,34 +71,29 @@ class _PublishScreenState extends State<PublishScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
+        title: const Text("New Post"),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: scheme.onPrimary),
           onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          "New Post",
-          style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold
-          ),
         ),
         actions: [
           TextButton(
             onPressed: _publishPost,
-            child: const Text(
+            child: Text(
               "Share",
               style: TextStyle(
-                  color: Colors.blueAccent,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold
+                color: scheme.onPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          )
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -121,12 +114,12 @@ class _PublishScreenState extends State<PublishScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-
-              const Text(
+              Text(
                 "Photo Name",
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: scheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -134,19 +127,26 @@ class _PublishScreenState extends State<PublishScreen> {
                 controller: _titleController,
                 decoration: InputDecoration(
                   hintText: "Enter photo name",
-                  prefixIcon: const Icon(Icons.image_outlined),
+                  hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+                  prefixIcon: Icon(
+                    Icons.image_outlined,
+                    color: scheme.primary,
+                  ),
+                  filled: true,
+                  fillColor: scheme.surfaceContainerHighest.withOpacity(0.35),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-
-              const Text(
+              Text(
                 "Caption",
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: scheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -155,22 +155,25 @@ class _PublishScreenState extends State<PublishScreen> {
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: "Write something about this photo...",
+                  hintStyle: TextStyle(color: scheme.onSurfaceVariant),
+                  filled: true,
+                  fillColor: scheme.surfaceContainerHighest.withOpacity(0.35),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
-
-              const Text(
+              Text(
                 "Tags",
                 style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: scheme.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
-
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -185,47 +188,51 @@ class _PublishScreenState extends State<PublishScreen> {
                             controller: _tagControllers[index],
                             decoration: InputDecoration(
                               hintText: "nature",
-
+                              hintStyle:
+                              TextStyle(color: scheme.onSurfaceVariant),
                               prefixText: "# ",
-                              prefixStyle: const TextStyle(
-                                color: Colors.blueAccent,
+                              prefixStyle: TextStyle(
+                                color: scheme.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
+                              filled: true,
+                              fillColor:
+                              scheme.surfaceContainerHighest.withOpacity(0.35),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(14),
+                                borderSide: BorderSide.none,
                               ),
                             ),
                           ),
                         ),
-
                         if (_tagControllers.length > 1) ...[
                           const SizedBox(width: 8),
                           IconButton(
-                            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: scheme.error,
+                            ),
                             onPressed: () => _removeTagField(index),
                           ),
-                        ]
+                        ],
                       ],
                     ),
                   );
                 },
               ),
-
               const SizedBox(height: 4),
-
               TextButton.icon(
                 onPressed: _addNewTagField,
-                icon: const Icon(Icons.add, color: Colors.blueAccent),
-                label: const Text(
+                icon: Icon(Icons.add, color: scheme.primary),
+                label: Text(
                   "New tag",
                   style: TextStyle(
-                    color: Colors.blueAccent,
+                    color: scheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-
               const SizedBox(height: 40),
             ],
           ),

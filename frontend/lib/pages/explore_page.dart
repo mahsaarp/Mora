@@ -32,7 +32,8 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
     super.dispose();
   }
 
-  Widget _buildImage(String urlOrPath) {
+  Widget _buildImage(String urlOrPath, ThemeData theme) {
+    final scheme = theme.colorScheme;
     if (urlOrPath.startsWith('http')) {
       return Image.network(
         urlOrPath,
@@ -45,15 +46,19 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
             borderRadius: 0,
           );
         },
-        errorBuilder: (context, error, stackTrace) =>
-            Container(color: Colors.grey.shade200, child: const Icon(Icons.broken_image)),
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: scheme.surfaceContainerHighest,
+          child: Icon(Icons.broken_image, color: scheme.onSurfaceVariant),
+        ),
       );
     } else {
       return Image.asset(
         urlOrPath,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-            Container(color: Colors.grey.shade200, child: const Icon(Icons.image_not_supported)),
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: scheme.surfaceContainerHighest,
+          child: Icon(Icons.image_not_supported, color: scheme.onSurfaceVariant),
+        ),
       );
     }
   }
@@ -73,7 +78,9 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
   void _cancelSelection() {
     setState(() {
       isSelectionMode = false;
-      for (var p in photos) p.isSelected = false;
+      for (var p in photos) {
+        p.isSelected = false;
+      }
     });
   }
 
@@ -81,16 +88,27 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: isSelectionMode ? Text('${_selectedPhotos.length} selected') : const Text('Explore'),
-        leading: isSelectionMode ? IconButton(icon: const Icon(Icons.close), onPressed: _cancelSelection) : null,
-        bottom: TabBar(controller: _tabController, tabs: const [Tab(text: 'Photos'), Tab(text: 'Albums')]),
+        leading: isSelectionMode
+            ? IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: _cancelSelection,
+        )
+            : null,
         actions: [
           if (!isSelectionMode)
             PopupMenuButton<String>(
-              icon: const Icon(Icons.sort),
-              onSelected: (val) { sortBy = val; _sortPhotos(); },
+              icon: Icon(Icons.sort, color: scheme.onPrimary),
+              onSelected: (val) {
+                sortBy = val;
+                _sortPhotos();
+              },
               itemBuilder: (context) => [
                 const PopupMenuItem(value: 'date', child: Text('Sort by Date')),
                 const PopupMenuItem(value: 'name', child: Text('Sort by Name')),
@@ -98,32 +116,62 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
               ],
             ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            color: scheme.surface,
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Photos'),
+                Tab(text: 'Albums'),
+              ],
+            ),
+          ),
+        ),
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [_buildPhotosTab(), _buildAlbumsTab()],
+        children: [
+          _buildPhotosTab(theme),
+          _buildAlbumsTab(theme),
+        ],
       ),
-      bottomNavigationBar: isSelectionMode ? _buildSelectionActionBar() : null,
+      bottomNavigationBar: isSelectionMode ? _buildSelectionActionBar(theme) : null,
     );
   }
 
-  Widget _buildPhotosTab() {
+  Widget _buildPhotosTab(ThemeData theme) {
+    final scheme = theme.colorScheme;
+
     return GridView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 0.85,
+        crossAxisCount: 2,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.85,
       ),
       itemCount: photos.length,
       itemBuilder: (context, index) {
         final photo = photos[index];
+        final isSelected = photo.isSelected;
+
         return GestureDetector(
-          onLongPress: () => setState(() { isSelectionMode = true; photo.isSelected = true; }),
+          onLongPress: () {
+            setState(() {
+              isSelectionMode = true;
+              photo.isSelected = true;
+            });
+          },
           onTap: () {
             if (isSelectionMode) {
               setState(() {
                 photo.isSelected = !photo.isSelected;
-                if (_selectedPhotos.isEmpty) isSelectionMode = false;
+                if (_selectedPhotos.isEmpty) {
+                  isSelectionMode = false;
+                }
               });
             } else {
               Navigator.push(
@@ -135,26 +183,56 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
           child: Card(
             clipBehavior: Clip.antiAlias,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: photo.isSelected ? Colors.blue : Colors.transparent, width: 2),
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isSelected ? scheme.primary : Colors.transparent,
+                width: 2,
+              ),
             ),
             child: Stack(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Expanded(child: _buildImage(photo.imageUrl)),
+                    Expanded(child: _buildImage(photo.imageUrl, theme)),
                     Padding(
                       padding: const EdgeInsets.all(8),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(photo.name, style: const TextStyle(fontWeight: FontWeight.bold), maxLines: 1),
+                          Text(
+                            photo.name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: scheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${photo.dateAdded.day}/${photo.dateAdded.month}', style: const TextStyle(fontSize: 10, color: Colors.grey)),
-                              Row(children: [const Icon(Icons.favorite, size: 12, color: Colors.red), const SizedBox(width: 2), Text('${photo.likes}', style: const TextStyle(fontSize: 10))]),
+                              Text(
+                                '${photo.dateAdded.day}/${photo.dateAdded.month}/${photo.dateAdded.year}',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(Icons.favorite, size: 12, color: Colors.red.shade400),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    '${photo.likes}',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: scheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ],
@@ -163,7 +241,15 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
                   ],
                 ),
                 if (isSelectionMode)
-                  Positioned(top: 8, left: 8, child: CircleAvatar(radius: 12, backgroundColor: photo.isSelected ? Colors.blue : Colors.black45, child: photo.isSelected ? const Icon(Icons.check, size: 14, color: Colors.white) : null)),
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundColor: isSelected ? scheme.primary : Colors.black45,
+                      child: isSelected ? Icon(Icons.check, size: 14, color: scheme.onPrimary) : null,
+                    ),
+                  ),
               ],
             ),
           ),
@@ -172,7 +258,9 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildAlbumsTab() {
+  Widget _buildAlbumsTab(ThemeData theme) {
+    final scheme = theme.colorScheme;
+
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       itemCount: mockAlbums.length,
@@ -182,7 +270,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
         final coverImage = album.imageUrls.isNotEmpty ? album.imageUrls.first : '';
 
         return InkWell(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           onTap: () {
             Navigator.push(
               context,
@@ -193,47 +281,49 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
           },
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              color: scheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: scheme.outlineVariant),
             ),
             child: Row(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(8)),
+                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
                   child: SizedBox(
-                    width: 96,
-                    height: 96,
-                    child: _buildImage(coverImage),
+                    width: 80,
+                    height: 80,
+                    child: _buildImage(coverImage, theme),
                   ),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           album.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: scheme.onSurface,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 4),
                         Text(
                           '${album.photoCount} photos',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey,
+                            color: scheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(Icons.chevron_right),
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -243,7 +333,20 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
     );
   }
 
-  Widget _buildSelectionActionBar() {return Container(); }
-  Widget _buildActionItem(IconData icon, String label, VoidCallback onTap) {return Container(); }
-  void _showMoveToAlbumDialog() {}
+  Widget _buildSelectionActionBar(ThemeData theme) {
+    final scheme = theme.colorScheme;
+
+    return Container(
+      color: scheme.surface,
+      height: 60,
+      alignment: Alignment.center,
+      child: Text(
+        'Selection mode active',
+        style: TextStyle(
+          color: scheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
 }

@@ -23,74 +23,65 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.asset(
-              "assets/images/background.png",
-              fit: BoxFit.cover,
-            ),
+            child: Image.asset("assets/images/background.png", fit: BoxFit.cover),
           ),
           Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.20),
-            ),
+            child: Container(color: scheme.scrim.withOpacity(0.20)),
           ),
           Center(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 12,
-                  sigmaY: 12,
-                ),
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
                   width: 340,
                   padding: const EdgeInsets.all(30),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.25),
+                    color: scheme.surface.withOpacity(0.25),
                     borderRadius: BorderRadius.circular(30),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.4),
-                    ),
+                    border: Border.all(color: scheme.onSurface.withOpacity(0.4)),
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
-                        Icons.camera_alt_outlined,
-                        color: Color(0xff596346),
-                        size: 55,
-                      ),
+                      Icon(Icons.camera_alt_outlined, color: scheme.primary, size: 55),
                       const SizedBox(height: 15),
-                      const Text(
+                      Text(
                         "Welcome Back",
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xff404030),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Log in to continue your journey.",
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 15,
+                          color: scheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 25),
                       TextField(
                         controller: usernameController,
+                        style: TextStyle(color: scheme.onSurface),
                         decoration: InputDecoration(
                           hintText: "Username",
-                          prefixIcon: const Icon(Icons.person),
+                          hintStyle: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7)),
+                          prefixIcon: Icon(Icons.person, color: scheme.primary),
                           filled: true,
-                          fillColor: Colors.white70,
+                          fillColor: scheme.surfaceContainerHighest.withOpacity(0.3),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: scheme.outlineVariant),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: scheme.outlineVariant.withOpacity(0.5)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: scheme.primary, width: 2),
                           ),
                         ),
                       ),
@@ -98,80 +89,58 @@ class _SignInScreenState extends State<SignInScreen> {
                       TextField(
                         controller: passwordController,
                         obscureText: true,
+                        style: TextStyle(color: scheme.onSurface),
                         decoration: InputDecoration(
                           hintText: "Password",
-                          prefixIcon: const Icon(Icons.lock),
+                          hintStyle: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7)),
+                          prefixIcon: Icon(Icons.lock, color: scheme.primary),
                           filled: true,
-                          fillColor: Colors.white70,
+                          fillColor: scheme.surfaceContainerHighest.withOpacity(0.3),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: scheme.outlineVariant),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: scheme.outlineVariant.withOpacity(0.5)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: scheme.primary, width: 2),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              color: Color(0xff596346),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 25),
                       SizedBox(
                         width: double.infinity,
                         height: 52,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff6E8B5E),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
+                            backgroundColor: scheme.primary,
+                            foregroundColor: scheme.onPrimary,
                           ),
-                          onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const MainScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          },
-                          child: const Text(
-                            "Log In",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 17,
-                            ),
+                          onPressed: () => Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const MainScreen()),
+                                (route) => false,
                           ),
+                          child: const Text("Log In", style: TextStyle(fontSize: 17)),
                         ),
                       ),
                       const SizedBox(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
-                            "Don't have an account?",
-                            style: TextStyle(color: Colors.black87),
-                          ),
+                          Text("Don't have an account?", style: TextStyle(color: scheme.onSurfaceVariant)),
                           TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const SignUpScreen(),
-                                ),
-                              );
-                            },
-                            child: const Text(
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                            ),
+                            child: Text(
                               "Sign Up",
                               style: TextStyle(
-                                color: Color(0xff596346),
+                                color: scheme.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

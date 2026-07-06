@@ -122,14 +122,11 @@ class _SearchScreenState extends State<SearchScreen> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: theme.scaffoldBackgroundColor,
           elevation: 0,
           toolbarHeight: 140,
           title: Column(
             children: [
-              // Search Input Field
               Container(
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -155,7 +152,6 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               const SizedBox(height: 15),
-              // TabBar Navigation
               Container(
                 height: 45,
                 decoration: BoxDecoration(
@@ -166,10 +162,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   dividerColor: Colors.transparent,
                   indicatorSize: TabBarIndicatorSize.tab,
                   indicator: BoxDecoration(
-                    color: const Color(0xff6E8B5E), // رنگ ثابت برند شما برای تب فعال
+                    color: scheme.primary,
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  labelColor: Colors.white,
+                  labelColor: scheme.onPrimary,
                   unselectedLabelColor: scheme.onSurfaceVariant,
                   tabs: const [
                     Tab(text: "Photos"),
@@ -195,6 +191,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildPhotosGrid(ThemeData theme) {
     final scheme = theme.colorScheme;
     final filtered = _filteredPhotos;
+
     if (filtered.isEmpty) {
       return Center(
         child: Text(
@@ -203,6 +200,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       );
     }
+
     return GridView.builder(
       padding: const EdgeInsets.all(12),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -238,7 +236,10 @@ class _SearchScreenState extends State<SearchScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [Colors.black.withOpacity(0.85), Colors.transparent],
+                        colors: [
+                          scheme.scrim.withOpacity(0.80),
+                          scheme.scrim.withOpacity(0.00),
+                        ],
                       ),
                     ),
                     padding: const EdgeInsets.all(8),
@@ -248,11 +249,17 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Text(
                           photo.name,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: scheme.onPrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           '@${photo.username}',
-                          style: const TextStyle(color: Colors.white70, fontSize: 11),
+                          style: TextStyle(
+                            color: scheme.onPrimary.withOpacity(0.85),
+                            fontSize: 11,
+                          ),
                         ),
                       ],
                     ),
@@ -269,6 +276,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildAlbumsList(ThemeData theme) {
     final scheme = theme.colorScheme;
     final filtered = _filteredAlbums;
+
     if (filtered.isEmpty) {
       return Center(
         child: Text(
@@ -277,6 +285,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       );
     }
+
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       itemCount: filtered.length,
@@ -347,6 +356,7 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget _buildUsersList(ThemeData theme) {
     final scheme = theme.colorScheme;
     final filtered = _filteredUsers;
+
     if (filtered.isEmpty) {
       return Center(
         child: Text(
@@ -355,6 +365,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
       );
     }
+
     return ListView.builder(
       padding: const EdgeInsets.all(12),
       itemCount: filtered.length,
@@ -374,9 +385,15 @@ class _SearchScreenState extends State<SearchScreen> {
             ),
             title: Text(
               user.username,
-              style: TextStyle(fontWeight: FontWeight.bold, color: scheme.onSurface),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: scheme.onSurface,
+              ),
             ),
-            subtitle: Text("User / Creator", style: TextStyle(color: scheme.onSurfaceVariant)),
+            subtitle: Text(
+              "User / Creator",
+              style: TextStyle(color: scheme.onSurfaceVariant),
+            ),
             trailing: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
             onTap: () {
               Navigator.push(
