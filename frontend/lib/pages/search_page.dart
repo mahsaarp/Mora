@@ -60,7 +60,8 @@ class _SearchScreenState extends State<SearchScreen> {
     super.dispose();
   }
 
-  Widget _buildImage(String urlOrPath) {
+  Widget _buildImage(String urlOrPath, ThemeData theme) {
+    final scheme = theme.colorScheme;
     if (urlOrPath.startsWith('http')) {
       return Image.network(
         urlOrPath,
@@ -73,15 +74,19 @@ class _SearchScreenState extends State<SearchScreen> {
             borderRadius: 0,
           );
         },
-        errorBuilder: (context, error, stackTrace) =>
-            Container(color: Colors.grey.shade200, child: const Icon(Icons.broken_image)),
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: scheme.surfaceContainerHighest,
+          child: Icon(Icons.broken_image, color: scheme.onSurfaceVariant),
+        ),
       );
     } else {
       return Image.asset(
         urlOrPath,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) =>
-            Container(color: Colors.grey.shade200, child: const Icon(Icons.image_not_supported)),
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: scheme.surfaceContainerHighest,
+          child: Icon(Icons.image_not_supported, color: scheme.onSurfaceVariant),
+        ),
       );
     }
   }
@@ -111,32 +116,38 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: theme.scaffoldBackgroundColor,
           elevation: 0,
           toolbarHeight: 140,
           title: Column(
             children: [
+              // Search Input Field
               Container(
                 height: 50,
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: scheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: TextField(
                   controller: _searchController,
+                  style: TextStyle(color: scheme.onSurface),
                   decoration: InputDecoration(
                     hintText: "Search by title, tag, or user...",
+                    hintStyle: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7)),
                     border: InputBorder.none,
-                    icon: const Icon(Icons.search, color: Colors.grey),
+                    icon: Icon(Icons.search, color: scheme.onSurfaceVariant),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      icon: Icon(Icons.clear, color: scheme.onSurfaceVariant),
                       onPressed: () => _searchController.clear(),
                     )
                         : null,
@@ -144,19 +155,22 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ),
               const SizedBox(height: 15),
+              // TabBar Navigation
               Container(
                 height: 45,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: scheme.surfaceContainerHigh,
                   borderRadius: BorderRadius.circular(25),
                 ),
                 child: TabBar(
+                  dividerColor: Colors.transparent,
+                  indicatorSize: TabBarIndicatorSize.tab,
                   indicator: BoxDecoration(
-                    color: const Color(0xff6E8B5E),
+                    color: const Color(0xff6E8B5E), // رنگ ثابت برند شما برای تب فعال
                     borderRadius: BorderRadius.circular(25),
                   ),
                   labelColor: Colors.white,
-                  unselectedLabelColor: Colors.grey,
+                  unselectedLabelColor: scheme.onSurfaceVariant,
                   tabs: const [
                     Tab(text: "Photos"),
                     Tab(text: "Albums"),
@@ -169,19 +183,25 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         body: TabBarView(
           children: [
-            _buildPhotosGrid(),
-            _buildAlbumsList(),
-            _buildUsersList(),
+            _buildPhotosGrid(theme),
+            _buildAlbumsList(theme),
+            _buildUsersList(theme),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPhotosGrid() {
+  Widget _buildPhotosGrid(ThemeData theme) {
+    final scheme = theme.colorScheme;
     final filtered = _filteredPhotos;
     if (filtered.isEmpty) {
-      return const Center(child: Text("No photos found."));
+      return Center(
+        child: Text(
+          "No photos found.",
+          style: TextStyle(color: scheme.onSurfaceVariant),
+        ),
+      );
     }
     return GridView.builder(
       padding: const EdgeInsets.all(12),
@@ -202,12 +222,13 @@ class _SearchScreenState extends State<SearchScreen> {
             ).then((_) => setState(() {}));
           },
           child: Card(
+            color: scheme.surface,
             clipBehavior: Clip.antiAlias,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Stack(
               fit: StackFit.expand,
               children: [
-                _buildImage(photo.imageUrl),
+                _buildImage(photo.imageUrl, theme),
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -217,7 +238,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [Colors.black.withOpacity(0.8), Colors.transparent],
+                        colors: [Colors.black.withOpacity(0.85), Colors.transparent],
                       ),
                     ),
                     padding: const EdgeInsets.all(8),
@@ -245,10 +266,16 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildAlbumsList() {
+  Widget _buildAlbumsList(ThemeData theme) {
+    final scheme = theme.colorScheme;
     final filtered = _filteredAlbums;
     if (filtered.isEmpty) {
-      return const Center(child: Text("No albums found."));
+      return Center(
+        child: Text(
+          "No albums found.",
+          style: TextStyle(color: scheme.onSurfaceVariant),
+        ),
+      );
     }
     return ListView.separated(
       padding: const EdgeInsets.all(12),
@@ -268,8 +295,9 @@ class _SearchScreenState extends State<SearchScreen> {
           },
           child: Container(
             decoration: BoxDecoration(
+              color: scheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: scheme.outlineVariant),
             ),
             child: Row(
               children: [
@@ -278,7 +306,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: SizedBox(
                     width: 80,
                     height: 80,
-                    child: _buildImage(coverImage),
+                    child: _buildImage(coverImage, theme),
                   ),
                 ),
                 Expanded(
@@ -289,20 +317,24 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: [
                         Text(
                           album.title,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: scheme.onSurface,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '${album.photoCount} photos',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
                         ),
                       ],
                     ),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(right: 12),
-                  child: Icon(Icons.chevron_right, color: Colors.grey),
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -312,10 +344,16 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildUsersList() {
+  Widget _buildUsersList(ThemeData theme) {
+    final scheme = theme.colorScheme;
     final filtered = _filteredUsers;
     if (filtered.isEmpty) {
-      return const Center(child: Text("No users found."));
+      return Center(
+        child: Text(
+          "No users found.",
+          style: TextStyle(color: scheme.onSurfaceVariant),
+        ),
+      );
     }
     return ListView.builder(
       padding: const EdgeInsets.all(12),
@@ -323,6 +361,7 @@ class _SearchScreenState extends State<SearchScreen> {
       itemBuilder: (context, index) {
         final user = filtered[index];
         return Card(
+          color: scheme.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           margin: const EdgeInsets.only(bottom: 10),
           child: ListTile(
@@ -330,15 +369,15 @@ class _SearchScreenState extends State<SearchScreen> {
               child: SizedBox(
                 width: 40,
                 height: 40,
-                child: _buildImage(user.avatar),
+                child: _buildImage(user.avatar, theme),
               ),
             ),
             title: Text(
               user.username,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold, color: scheme.onSurface),
             ),
-            subtitle: const Text("User / Creator"),
-            trailing: const Icon(Icons.chevron_right),
+            subtitle: Text("User / Creator", style: TextStyle(color: scheme.onSurfaceVariant)),
+            trailing: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
             onTap: () {
               Navigator.push(
                 context,
