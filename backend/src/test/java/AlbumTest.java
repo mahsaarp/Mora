@@ -1,3 +1,5 @@
+import model.Album;
+import model.Photo;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

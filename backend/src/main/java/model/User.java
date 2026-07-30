@@ -1,3 +1,5 @@
+package model;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -237,7 +239,7 @@ public class User {
                         new IllegalArgumentException("Login failed"));
 
         if (user.isBanned()) {
-            throw new IllegalStateException("User is banned");
+            throw new IllegalStateException("model.User is banned");
         }
 
         user.login();

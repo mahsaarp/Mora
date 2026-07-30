@@ -1,3 +1,6 @@
+import model.Comment;
+import model.Photo;
+import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

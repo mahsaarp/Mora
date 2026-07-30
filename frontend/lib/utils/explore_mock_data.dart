@@ -17,6 +17,7 @@ class ExplorePhoto {
   
   bool allowComments;
 
+  //constructor:
   ExplorePhoto({
     required this.id,
     required this.name,

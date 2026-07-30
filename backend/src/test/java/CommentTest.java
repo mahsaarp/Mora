@@ -1,3 +1,6 @@
+import model.Comment;
+import model.Photo;
+import model.User;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -30,7 +33,7 @@ public class CommentTest {
                 "Beautiful photo!"
         );
 
-        assertNotNull(comment, "Comment shouldn't be null");
+        assertNotNull(comment, "model.Comment shouldn't be null");
         assertEquals(user.getId(), comment.getOwnerId());
         assertEquals(photo.getId(), comment.getPhotoId());
         assertEquals(date, comment.getDate());
