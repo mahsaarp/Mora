@@ -33,7 +33,7 @@ public class CommentTest {
                 "Beautiful photo!"
         );
 
-        assertNotNull(comment, "model.Comment shouldn't be null");
+        assertNotNull(comment, "Comment shouldn't be null");
         assertEquals(user.getId(), comment.getOwnerId());
         assertEquals(photo.getId(), comment.getPhotoId());
         assertEquals(date, comment.getDate());

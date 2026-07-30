@@ -239,7 +239,7 @@ public class User {
                         new IllegalArgumentException("Login failed"));
 
         if (user.isBanned()) {
-            throw new IllegalStateException("model.User is banned");
+            throw new IllegalStateException("User is banned");
         }
 
         user.login();
