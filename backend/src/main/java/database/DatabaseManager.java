@@ -60,7 +60,7 @@ public class DatabaseManager {
         File file = new File("database/database.json");
         if (!file.exists()) {
             databaseData = new DatabaseData();
-            // TODO ********** save database
+            saveDatabase();
             return;
         }
         try {
@@ -123,7 +123,47 @@ public class DatabaseManager {
         return databaseData.getUsers();
     }
 
-    
+
+    public synchronized void addAlbum(Album album) {
+        databaseData.getAlbums().put(album.getId(), album);
+        Album.getAlbums().put(album.getId(), album);
+        saveDatabase();
+    }
+
+    public synchronized Album getAlbum(int albumId) {
+        return databaseData.getAlbums().get(albumId);
+    }
+
+    public synchronized void removeAlbum(int albumId) {
+        databaseData.getAlbums().remove(albumId);
+        Album.getAlbums().remove(albumId);
+        saveDatabase();
+    }
+
+    public synchronized Map<Integer, Album> getAllAlbums() {
+        return databaseData.getAlbums();
+    }
+
+
+    public synchronized void addPhoto(Photo photo) {
+        databaseData.getPhotos().put(photo.getId(), photo);
+        Photo.getPhotos().put(photo.getId(), photo);
+        saveDatabase();
+    }
+
+    public synchronized Photo getPhoto(int photoId) {
+        return databaseData.getPhotos().get(photoId);
+    }
+
+    public synchronized void removePhoto(int photoId) {
+        databaseData.getPhotos().remove(photoId);
+        Photo.getPhotos().remove(photoId);
+        saveDatabase();
+    }
+
+    public synchronized Map<Integer, Photo> getAllPhotos() {
+        return databaseData.getPhotos();
+    }
 
 
 
