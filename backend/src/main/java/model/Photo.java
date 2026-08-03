@@ -2,6 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Photo {
     private final int id;
@@ -14,7 +15,7 @@ public class Photo {
     private boolean commentAllowed;
     private List<Integer> albumIds;
     private List<Integer> commentIds;
-    private static final Map<Integer, Photo> photos = new LinkedHashMap<>();
+    private static final Map<Integer, Photo> photos = Collections.synchronizedMap(new LinkedHashMap<>());
     private String route;
 
     public Photo(int id, int ownerId, String name, LocalDateTime date, List<String> tags, String caption, boolean commentAllowed, String route) {
@@ -280,5 +281,9 @@ public class Photo {
 
     public void setCommentIds(List<Integer> commentIds) {
         this.commentIds = commentIds;
+    }
+
+    public String getFilePath() {
+        return route;
     }
 }

@@ -3,6 +3,7 @@ package model;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Comment {
     private final int id;
@@ -10,7 +11,7 @@ public class Comment {
     private final int photoId;
     private final LocalDateTime date;
     private String text;
-    private static Map<Integer, Comment> comments = new HashMap<>();
+    private static Map<Integer, Comment> comments = new ConcurrentHashMap<>();
 
     public Comment(int id, int ownerId, int photoId, LocalDateTime date, String text) {
         this.id = id;

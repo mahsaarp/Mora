@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class User {
     public static void clearUsersForTest() {
@@ -35,7 +36,7 @@ public class User {
     private UserRank rank;
     private EnterType enterType;
 
-    private static Map<Integer, User> users = new HashMap<>();
+    private static Map<Integer, User> users = new ConcurrentHashMap<>();
     private static final int PHOTO_NUMBER = 100;
     private static final int COMMENT_NUMBER = 200;
     //=============================================CONSTRUCTOR
@@ -307,5 +308,25 @@ public class User {
         return users.values()
                 .stream()
                 .anyMatch(user -> user.getUsername().equals(username));
+    }
+
+    public static User findUserById(int id) {
+        return users.get(id);
+    }
+
+    public static User findUserById(String idStr) {
+        try {
+            int id = Integer.parseInt(idStr);
+            return findUserById(id);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    public void addPhoto(Photo photo) {
+        if (photo != null && !photoIds.contains(photo.getId())) {
+            photoIds.add(photo.getId());
+            updateRank();
+        }
     }
 }

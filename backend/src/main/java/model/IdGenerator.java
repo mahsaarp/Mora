@@ -1,26 +1,26 @@
 package model;
 
-public class IdGenerator {
+import java.util.concurrent.atomic.AtomicInteger;
 
-    private static int userId = 1;
-    private static int photoId = 1;
-    private static int albumId = 1;
-    private static int commentId = 1;
+public class IdGenerator {
+    private static AtomicInteger userId = new AtomicInteger(1);
+    private static AtomicInteger photoId = new AtomicInteger(1);
+    private static AtomicInteger albumId = new AtomicInteger(1);
+    private static AtomicInteger commentId = new AtomicInteger(1);
 
     public static int nextUserId() {
-        return userId++;
+        return userId.getAndIncrement();
     }
 
     public static int nextPhotoId() {
-        return photoId++;
+        return photoId.getAndIncrement();
     }
 
     public static int nextAlbumId() {
-        return albumId++;
+        return albumId.getAndIncrement();
     }
 
     public static int nextCommentId() {
-        return commentId++;
+        return commentId.getAndIncrement();
     }
-
 }

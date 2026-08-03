@@ -9,7 +9,7 @@ public class Album {
     private String name;
     private LocalDateTime date;
     private List<Integer> photoIds;
-    private static final Map<Integer, Album> albums = new LinkedHashMap<>();
+    private static final Map<Integer, Album> albums = Collections.synchronizedMap(new LinkedHashMap<>());
 
     public Album(int id, int ownerId, String name, LocalDateTime date) {
         this.id = id;
