@@ -9,6 +9,7 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 public class DatabaseManager {
 
@@ -92,6 +93,37 @@ public class DatabaseManager {
         }
     }
 
+
+    public synchronized void saveDatabase() {
+        try {
+            databaseData.setUsers(User.getUsers());
+            databaseData.setAlbums(Album.getAlbums());
+            databaseData.setPhotos(Photo.getPhotos());
+
+            FileWriter writer = new FileWriter("database/database.json");
+            gson.toJson(databaseData, writer);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public synchronized void addUser(User user) {
+        databaseData.getUsers().put(user.getId(), user);
+        User.getUsers().put(user.getId(), user);
+        saveDatabase();
+    }
+
+    public synchronized User getUser(int userId) {
+        return databaseData.getUsers().get(userId);
+    }
+
+    public synchronized Map<Integer, User> getAllUsers() {
+        return databaseData.getUsers();
+    }
+
+    
 
 
 
