@@ -19,28 +19,35 @@ public class Album {
         this.photoIds = new ArrayList<>();
     }
 
-    public void addPhoto(Photo photo) {
+    public boolean addPhoto(Photo photo) {
         if (photo != null && !photoIds.contains(photo.getId())) {
             this.photoIds.add(photo.getId());
 
             if (!photo.getAlbumIds().contains(this.id)) {
                 photo.getAlbumIds().add(this.id);
             }
+            return true;
         }
+        return false;
     }
 
-    public void deletePhoto(Photo photo) {
-        if (photo == null) {
-            return;
+    public boolean removePhoto(Photo photo) {
+        if (photo == null || !this.photoIds.contains(photo.getId())) {
+            return false;
         }
 
         this.photoIds.remove(Integer.valueOf(photo.getId()));
         photo.getAlbumIds().remove(Integer.valueOf(this.id));
+        return true;
+    }
+
+    public void deletePhoto(Photo photo) {
+        removePhoto(photo);
     }
 
     public void movePhoto(Photo photo, Album destAlbum) {
         if (photo == null || destAlbum == null) return;
-        this.deletePhoto(photo);
+        this.removePhoto(photo);
         destAlbum.addPhoto(photo);
     }
 
@@ -77,6 +84,15 @@ public class Album {
         }
 
         return album;
+    }
+
+    // Overload for AlbumController compatibility
+    public static Album createAlbum(int ownerId, String name) {
+        return createAlbum(ownerId, name, LocalDateTime.now());
+    }
+
+    public static Album getAlbumById(int id) {
+        return albums.get(id);
     }
 
     public static void deleteAlbum(Album album) {
@@ -133,6 +149,17 @@ public class Album {
 
     public List<Integer> getPhotoIds() {
         return photoIds;
+    }
+
+    public List<Photo> getPhotos() {
+        List<Photo> photos = new ArrayList<>();
+        for (int photoId : photoIds) {
+            Photo photo = Photo.getPhotoById(photoId);
+            if (photo != null) {
+                photos.add(photo);
+            }
+        }
+        return photos;
     }
 
     public void setPhotoIds(List<Integer> photoIds) {
