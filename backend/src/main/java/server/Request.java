@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.JsonObject;
 
-public class Request<JsonObject> {
+public class Request {
     private String route;
     private String method;
     private JsonObject payload;
