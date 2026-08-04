@@ -60,3 +60,8 @@ replay_pid*
 # Backend (Maven build)
 backend/target/
 backend/*.iml
+
+# Uploaded Photos Directory
+photos/
+/photos/
+**/photos/
