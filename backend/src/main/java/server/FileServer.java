@@ -24,6 +24,7 @@ public class FileServer {
         }
 
         byte[] fileBytes = Base64.getDecoder().decode(base64Data);
+
         String uniqueFileName = System.currentTimeMillis() + "_" + originalName.replaceAll("\\s+", "_");
         Path targetPath = Paths.get(UPLOAD_DIR, uniqueFileName);
 
