@@ -21,6 +21,28 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
+  void _handleLogin() {
+    final username = usernameController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (username.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill in all fields"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    // In a real app, you would validate credentials with the backend here
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const MainScreen()),
+          (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -119,11 +141,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             backgroundColor: scheme.primary,
                             foregroundColor: scheme.onPrimary,
                           ),
-                          onPressed: () => Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (_) => const MainScreen()),
-                                (route) => false,
-                          ),
+                          onPressed: _handleLogin,
                           child: const Text("Log In", style: TextStyle(fontSize: 17)),
                         ),
                       ),

@@ -47,8 +47,18 @@ class _PublishScreenState extends State<PublishScreen> {
   }
 
   void _publishPost() {
-    final title = _titleController.text;
-    final caption = _captionController.text;
+    final title = _titleController.text.trim();
+    final caption = _captionController.text.trim();
+
+    if (title.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Photo Name is required"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
 
     final tagsList = _tagControllers
         .map((controller) => controller.text.trim())
@@ -115,7 +125,7 @@ class _PublishScreenState extends State<PublishScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                "Photo Name",
+                "Photo Name *",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

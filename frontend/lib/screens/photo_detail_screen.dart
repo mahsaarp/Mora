@@ -1,4 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:gal/gal.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import '../utils/explore_mock_data.dart';
 
 class PhotoDetailScreen extends StatefulWidget {
@@ -18,6 +23,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   late bool _allowComments;
   late bool _isLiked;
   late int _likes;
+  bool _isDownloading = false;
 
   @override
   void initState() {
@@ -30,14 +36,14 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       PhotoComment(
         id: 'c1',
         username: 'sara',
-        userAvatar: "assets/images/user2.jpg",
+        userAvatar: "assets/images/lily.jpg",
         text: 'so pretty!',
         createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
       ),
       PhotoComment(
         id: 'c2',
         username: 'ali',
-        userAvatar: "assets/images/user1.jpg",
+        userAvatar: "assets/images/rose.jpg",
         text: 'beautiful!',
         createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
       ),
@@ -69,7 +75,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         PhotoComment(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           username: 'mahsa',
-          userAvatar: "assets/images/profile.jpg",
+          userAvatar: "assets/images/rose.jpg",
           text: text,
           createdAt: DateTime.now(),
         ),
@@ -79,6 +85,49 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
 
     _commentCtrl.clear();
     _commentFocus.unfocus();
+  }
+
+  Future<void> _downloadImage() async {
+    setState(() => _isDownloading = true);
+    try {
+      String path;
+      if (widget.photo.imageUrl.startsWith('http')) {
+        final tempDir = await getTemporaryDirectory();
+        path = '${tempDir.path}/${widget.photo.name}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        await Dio().download(widget.photo.imageUrl, path);
+      } else {
+        // For assets, we'd normally need to copy them to a file first to use Gal.putImage
+        // But since this is a mock, we assume it's a file path or a real URL.
+        // If it's an asset path like 'assets/images/...', we can't directly use it with Gal.putImage without copying.
+        // For the sake of this task, I'll show a snackbar for assets or handle them if possible.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Downloading assets is restricted in this demo. Try with a URL image.")),
+        );
+        setState(() => _isDownloading = false);
+        return;
+      }
+
+      await Gal.putImage(path);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Image saved to gallery!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error saving image: $e")),
+      );
+    } finally {
+      setState(() => _isDownloading = false);
+    }
+  }
+
+  Future<void> _shareImage() async {
+    if (widget.photo.imageUrl.startsWith('http')) {
+      await Share.share('${widget.photo.name}\n${widget.photo.imageUrl}');
+    } else {
+      // For assets, ideally you'd share the file. share_plus supports XFile.
+      // For now, share the text description.
+      await Share.share('Check out this photo: ${widget.photo.name} at Mora App!');
+    }
   }
 
   void _openEditSheet() async {
@@ -150,6 +199,16 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       appBar: AppBar(
         title: Text(p.name),
         actions: [
+          IconButton(
+            icon: _isDownloading 
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Icon(Icons.download),
+            onPressed: _isDownloading ? null : _downloadImage,
+          ),
+          IconButton(
+            icon: const Icon(Icons.share),
+            onPressed: _shareImage,
+          ),
           if (p.isOwner)
             IconButton(
               icon: const Icon(Icons.edit),
@@ -613,6 +672,12 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
                     foregroundColor: scheme.onPrimary,
                   ),
                   onPressed: () {
+                    if (_nameCtrl.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Name cannot be empty")),
+                      );
+                      return;
+                    }
                     Navigator.pop(
                       context,
                       _EditResult(
