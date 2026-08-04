@@ -96,10 +96,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
         path = '${tempDir.path}/${widget.photo.name}_${DateTime.now().millisecondsSinceEpoch}.jpg';
         await Dio().download(widget.photo.imageUrl, path);
       } else {
-        // For assets, we'd normally need to copy them to a file first to use Gal.putImage
-        // But since this is a mock, we assume it's a file path or a real URL.
-        // If it's an asset path like 'assets/images/...', we can't directly use it with Gal.putImage without copying.
-        // For the sake of this task, I'll show a snackbar for assets or handle them if possible.
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Downloading assets is restricted in this demo. Try with a URL image.")),
         );
@@ -124,8 +121,6 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     if (widget.photo.imageUrl.startsWith('http')) {
       await Share.share('${widget.photo.name}\n${widget.photo.imageUrl}');
     } else {
-      // For assets, ideally you'd share the file. share_plus supports XFile.
-      // For now, share the text description.
       await Share.share('Check out this photo: ${widget.photo.name} at Mora App!');
     }
   }

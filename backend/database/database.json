@@ -1,0 +1,19 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "Mahsa@gmail.com",
+      "password": "Mahsa1386_",
+      "photoIds": [],
+      "albumIds": [],
+      "likedPhotoIds": [],
+      "isBanned": false,
+      "isLoggedIn": false,
+      "commentCount": 0,
+      "rank": "NEWBIE",
+      "enterType": "EMAIL"
+    }
+  ],
+  "albums": [],
+  "photos": []
+}

@@ -4,36 +4,36 @@ import model.Album;
 import model.Photo;
 import model.User;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseData {
 
-    private Map<Integer, User> users = new HashMap<>();
-    private Map<Integer, Album> albums = new HashMap<>();
-    private Map<Integer, Photo> photos = new HashMap<>();
+    private List<User> users = new ArrayList<>();
+    private List<Album> albums = new ArrayList<>();
+    private List<Photo> photos = new ArrayList<>();
 
-    public Map<Integer, User> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(Map<Integer, User> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
 
-    public Map<Integer, Album> getAlbums() {
+    public List<Album> getAlbums() {
         return albums;
     }
 
-    public void setAlbums(Map<Integer, Album> albums) {
+    public void setAlbums(List<Album> albums) {
         this.albums = albums;
     }
 
-    public Map<Integer, Photo> getPhotos() {
+    public List<Photo> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(Map<Integer, Photo> photos) {
+    public void setPhotos(List<Photo> photos) {
         this.photos = photos;
     }
 }

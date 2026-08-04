@@ -1,5 +1,6 @@
 package controllers;
 
+import database.DatabaseManager;
 import server.Response;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -12,11 +13,14 @@ public class AlbumController {
             int userId = payload.get("userId").getAsInt();
             String name = payload.get("albumName").getAsString();
 
-            if (User.getUsers().get(userId) == null) {
+            if (DatabaseManager.getInstance().getUser(userId) == null) {
                 return new Response(404, "User not found", null);
             }
 
             Album album = Album.createAlbum(userId, name);
+
+            DatabaseManager.getInstance().addAlbum(album);
+
             JsonObject data = new JsonObject();
             data.addProperty("albumId", album.getId());
             data.addProperty("albumName", album.getName());
@@ -32,8 +36,8 @@ public class AlbumController {
             int albumId = payload.get("albumId").getAsInt();
             int photoId = payload.get("photoId").getAsInt();
 
-            Album album = Album.getAlbumById(albumId);
-            Photo photo = Photo.getPhotoById(photoId);
+            Album album = DatabaseManager.getInstance().getAlbum(albumId);
+            Photo photo = DatabaseManager.getInstance().getPhoto(photoId);
 
             if (album == null || photo == null) {
                 return new Response(404, "Not found", null);
@@ -43,9 +47,11 @@ public class AlbumController {
                 return new Response(400, "Already in album", null);
             }
 
+            DatabaseManager.getInstance().saveDatabase();
+
             return new Response(200, "Added", null);
         } catch (Exception e) {
-            return new Response(500, e.getMessage(), null);
+            return new Response(500, "Server error", null);
         }
     }
 
@@ -54,23 +60,25 @@ public class AlbumController {
             int albumId = payload.get("albumId").getAsInt();
             int photoId = payload.get("photoId").getAsInt();
 
-            Album album = Album.getAlbumById(albumId);
-            Photo photo = Photo.getPhotoById(photoId);
+            Album album = DatabaseManager.getInstance().getAlbum(albumId);
+            Photo photo = DatabaseManager.getInstance().getPhoto(photoId);
 
             if (album == null || photo == null || !album.removePhoto(photo)) {
                 return new Response(400, "Error removing photo", null);
             }
 
+            DatabaseManager.getInstance().saveDatabase();
+
             return new Response(200, "Removed", null);
         } catch (Exception e) {
-            return new Response(500, e.getMessage(), null);
+            return new Response(500, "Server error", null);
         }
     }
 
     public static Response getAlbumDetails(JsonObject payload) {
         try {
             int albumId = payload.get("albumId").getAsInt();
-            Album album = Album.getAlbumById(albumId);
+            Album album = DatabaseManager.getInstance().getAlbum(albumId);
             if (album == null) {
                 return new Response(404, "Album not found", null);
             }

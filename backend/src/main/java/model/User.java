@@ -27,6 +27,7 @@ public class User {
     private int id;
     private String username;
     private String password;
+    private String avatarRoute;
     private List<Integer> photoIds;
     private List<Integer> albumIds;
     private List<Integer> likedPhotoIds;
@@ -60,6 +61,10 @@ public class User {
     //=============================================GETTERS
     public int getId() {
         return id;
+    }
+
+    public String getAvatarRoute() {
+        return avatarRoute;
     }
 
     public String getUsername() {
@@ -109,6 +114,10 @@ public class User {
     //=============================================SETTERS
     public void ban() {
         isBanned = true;
+    }
+
+    public void setAvatarRoute(String avatarRoute) {
+        this.avatarRoute = avatarRoute;
     }
 
     public void unban() {

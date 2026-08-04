@@ -33,6 +33,25 @@ class ExplorePhoto {
     this.isOwner = false,
     this.allowComments = true,
   });
+
+  factory ExplorePhoto.fromJson(Map<String, dynamic> json) {
+    return ExplorePhoto(
+      id: json['id']?.toString() ?? '',
+      name: json['name'] ?? 'Untitled',
+      imageUrl: json['route'] ?? '',
+      dateAdded: json['date'] != null 
+          ? DateTime.tryParse(json['date'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      likes: json['likes'] ?? 0,
+      commentsCount: json['comments_count'] ?? 0,
+      caption: json['caption'] ?? '',
+      tags: List<String>.from(json['tags'] ?? []),
+      username: json['owner_username'] ?? 'User',
+      userAvatar: json['avatar_url'] ?? 'assets/images/default_avatar.png',
+      isOwner: json['is_owner'] ?? false,
+      allowComments: json['allow_comments'] ?? true,
+    );
+  }
 }
 
 class ExploreAlbum {
@@ -50,6 +69,18 @@ class ExploreAlbum {
     required this.photoCount,
     required this.createdAt,
   }) : imageUrl = imageUrls;
+
+  factory ExploreAlbum.fromJson(Map<String, dynamic> json) {
+    return ExploreAlbum(
+      id: json['id']?.toString() ?? '',
+      title: json['name'] ?? 'Untitled',
+      imageUrls: List<String>.from(json['image_urls'] ?? (json['route'] != null ? [json['route']] : [])),
+      photoCount: json['photo_count'] ?? 0,
+      createdAt: json['date'] != null
+          ? DateTime.tryParse(json['date'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+    );
+  }
 }
 
 List<ExplorePhoto> initialMockPhotos = [

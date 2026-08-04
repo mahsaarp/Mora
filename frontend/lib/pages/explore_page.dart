@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import '../services/SocketService.dart';
 import '../screens/album_detail_screen.dart';
 import '../utils/explore_mock_data.dart';
 import '../utils/shimmer_box.dart';
 import '../screens/photo_detail_screen.dart';
 
 class ExploreScreen extends StatefulWidget {
-  const ExploreScreen({super.key}); //constructor
+  const ExploreScreen({super.key});
 
   @override
   State<ExploreScreen> createState() => _ExploreScreenState();
@@ -15,13 +16,47 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
   late TabController _tabController;
   final ScrollController _scrollController = ScrollController();
 
-  List<ExplorePhoto> photos = List.from(initialMockPhotos); //creates a copy list
+  List<ExplorePhoto> photos = [];
+  bool _isLoading = true;
   String sortBy = 'date';
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _fetchPhotos();
+  }
+
+  Future<void> _fetchPhotos() async {
+    setState(() => _isLoading = true);
+    try {
+      final response = await SocketService.getHomePhotos();
+      if (response['statusCode'] == 200 || response['success'] == true) {
+        final List<dynamic> data = response['data'] ?? [];
+        setState(() {
+          photos = data.map((json) => ExplorePhoto(
+            id: json['id']?.toString() ?? '',
+            name: json['name'] ?? 'Untitled',
+            imageUrl: json['route'] ?? '',
+            dateAdded: json['date'] != null 
+                ? DateTime.parse(json['date']) 
+                : DateTime.now(),
+            likes: json['likes'] ?? 0,
+            caption: json['caption'] ?? '',
+            tags: List<String>.from(json['tags'] ?? []),
+            username: json['owner_username'] ?? 'User',
+            userAvatar: json['avatar_url'] ?? 'assets/images/default_avatar.png',
+          )).toList();
+          _sortPhotos();
+        });
+      } else {
+        debugPrint("Server error: ${response['message']}");
+      }
+    } catch (e) {
+      debugPrint("Error fetching photos: $e");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -33,32 +68,25 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
 
   Widget _buildImage(String urlOrPath, ThemeData theme) {
     final scheme = theme.colorScheme;
-    if (urlOrPath.startsWith('http')) {
+    if (urlOrPath.startsWith('http') || urlOrPath.startsWith('https')) {
       return Image.network(
         urlOrPath,
         fit: BoxFit.cover,
         loadingBuilder: (context, child, loadingProgress) {
           if (loadingProgress == null) return child;
-          return const ShimmerBox(
-            width: double.infinity,
-            height: double.infinity,
-            borderRadius: 0,
-          );
+          return const ShimmerBox(width: double.infinity, height: double.infinity, borderRadius: 0);
         },
         errorBuilder: (context, error, stackTrace) => Container(
           color: scheme.surfaceContainerHighest,
           child: Icon(Icons.broken_image, color: scheme.onSurfaceVariant),
         ),
       );
+    } else if (urlOrPath.startsWith('assets/')) {
+      return Image.asset(urlOrPath, fit: BoxFit.cover);
     } else {
-      return Image.asset(
-        urlOrPath,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) => Container(
+      return Container(
           color: scheme.surfaceContainerHighest,
-          child: Icon(Icons.image_not_supported, color: scheme.onSurfaceVariant),
-        ),
-      );
+          child: Icon(Icons.image, color: scheme.onSurfaceVariant));
     }
   }
 
@@ -84,8 +112,12 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
       appBar: AppBar(
         title: const Text('Explore'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _fetchPhotos,
+          ),
           PopupMenuButton<String>(
-            icon: Icon(Icons.sort, color: scheme.onPrimary),
+            icon: const Icon(Icons.sort),
             onSelected: (val) {
               sortBy = val;
               _sortPhotos();
@@ -114,7 +146,9 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildPhotosTab(theme),
+          _isLoading 
+            ? const Center(child: CircularProgressIndicator())
+            : RefreshIndicator(onRefresh: _fetchPhotos, child: _buildPhotosTab(theme)),
           _buildAlbumsTab(theme),
         ],
       ),
@@ -122,8 +156,8 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
   }
 
   Widget _buildPhotosTab(ThemeData theme) {
-    final scheme = theme.colorScheme;
-
+    if (photos.isEmpty) return const Center(child: Text("No photos found"));
+    
     return GridView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(12),
@@ -136,7 +170,6 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
       itemCount: photos.length,
       itemBuilder: (context, index) {
         final photo = photos[index];
-
         return GestureDetector(
           onTap: () {
             Navigator.push(
@@ -146,9 +179,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
           },
           child: Card(
             clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -160,10 +191,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
                     children: [
                       Text(
                         photo.name,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: scheme.onSurface,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -172,23 +200,14 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            '${photo.dateAdded.day}/${photo.dateAdded.month}/${photo.dateAdded.year}',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: scheme.onSurfaceVariant,
-                            ),
+                            '${photo.dateAdded.day}/${photo.dateAdded.month}',
+                            style: const TextStyle(fontSize: 10),
                           ),
                           Row(
                             children: [
-                              Icon(Icons.favorite, size: 12, color: Colors.red.shade400),
+                              const Icon(Icons.favorite, size: 12, color: Colors.red),
                               const SizedBox(width: 2),
-                              Text(
-                                '${photo.likes}',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: scheme.onSurface,
-                                ),
-                              ),
+                              Text('${photo.likes}', style: const TextStyle(fontSize: 10)),
                             ],
                           ),
                         ],
@@ -205,8 +224,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
   }
 
   Widget _buildAlbumsTab(ThemeData theme) {
-    final scheme = theme.colorScheme;
-
+     final scheme = theme.colorScheme;
     return ListView.separated(
       padding: const EdgeInsets.all(12),
       itemCount: mockAlbums.length,
@@ -217,14 +235,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
 
         return InkWell(
           borderRadius: BorderRadius.circular(12),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => AlbumDetailScreen(album: album),
-              ),
-            );
-          },
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => AlbumDetailScreen(album: album))),
           child: Container(
             decoration: BoxDecoration(
               color: scheme.surface,
@@ -235,11 +246,7 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.horizontal(left: Radius.circular(11)),
-                  child: SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: _buildImage(coverImage, theme),
-                  ),
+                  child: SizedBox(width: 80, height: 80, child: _buildImage(coverImage, theme)),
                 ),
                 Expanded(
                   child: Padding(
@@ -247,30 +254,14 @@ class _ExploreScreenState extends State<ExploreScreen> with SingleTickerProvider
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          album.title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: scheme.onSurface,
-                          ),
-                        ),
+                        Text(album.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                         const SizedBox(height: 4),
-                        Text(
-                          '${album.photoCount} photos',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: scheme.onSurfaceVariant,
-                          ),
-                        ),
+                        Text('${album.photoCount} photos', style: const TextStyle(fontSize: 12)),
                       ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
-                ),
+                const Padding(padding: EdgeInsets.only(right: 12), child: Icon(Icons.chevron_right)),
               ],
             ),
           ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/explore_mock_data.dart';
 import '../utils/shimmer_box.dart';
+import '../services/SocketService.dart';
+import '../services/session_manager.dart';
 
 class CreateAlbumScreen extends StatefulWidget {
   final List<ExplorePhoto> availablePhotos;
@@ -13,34 +15,39 @@ class CreateAlbumScreen extends StatefulWidget {
 class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
   final Set<String> _selectedImageUrls = {};
   final TextEditingController _titleController = TextEditingController();
+  bool _isSubmitting = false;
 
   Widget _buildImage(String urlOrPath, ThemeData theme) {
     final scheme = theme.colorScheme;
-    if (urlOrPath.startsWith('http')) {
-      return Image.network(
-        urlOrPath,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return const ShimmerBox(width: double.infinity, height: double.infinity);
-        },
-        errorBuilder: (context, error, stackTrace) => Container(
-          color: scheme.surfaceContainerHighest,
-          child: Icon(Icons.broken_image, color: scheme.onSurfaceVariant),
-        ),
-      );
+    if (urlOrPath.startsWith('http') || urlOrPath.startsWith('assets')) {
+      if (urlOrPath.startsWith('http')) {
+        return Image.network(
+          urlOrPath,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const ShimmerBox(width: double.infinity, height: double.infinity);
+          },
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: scheme.surfaceContainerHighest,
+            child: Icon(Icons.broken_image, color: scheme.onSurfaceVariant),
+          ),
+        );
+      } else {
+        return Image.asset(
+          urlOrPath,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: scheme.surfaceContainerHighest,
+            child: Icon(Icons.image_not_supported, color: scheme.onSurfaceVariant),
+          ),
+        );
+      }
     }
-    return Image.asset(
-      urlOrPath,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) => Container(
-        color: scheme.surfaceContainerHighest,
-        child: Icon(Icons.image_not_supported, color: scheme.onSurfaceVariant),
-      ),
-    );
+    return Container(color: scheme.surfaceContainerHighest);
   }
 
-  void _submitAlbum() {
+  void _submitAlbum() async {
     final title = _titleController.text.trim();
     if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -54,14 +61,45 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
       );
       return;
     }
-    final newAlbum = ExploreAlbum(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: title,
-      photoCount: _selectedImageUrls.length,
-      imageUrls: _selectedImageUrls.toList(),
-      createdAt: DateTime.now(),
+
+    setState(() => _isSubmitting = true);
+
+    final userId = SessionManager().userId;
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("User session not found.")),
+      );
+      setState(() => _isSubmitting = false);
+      return;
+    }
+
+    final List<int> selectedIds = widget.availablePhotos
+        .where((p) => _selectedImageUrls.contains(p.imageUrl))
+        .map((p) => int.tryParse(p.id) ?? 0)
+        .toList();
+
+    final response = await SocketService.createAlbum(
+      userId: userId,
+      name: title,
+      photoIds: selectedIds,
     );
-    Navigator.pop(context, newAlbum);
+
+    setState(() => _isSubmitting = false);
+
+    if (response['statusCode'] == 200 || response['statusCode'] == 201) {
+      final newAlbum = ExploreAlbum(
+        id: response['payload']?['id']?.toString() ?? DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title,
+        photoCount: _selectedImageUrls.length,
+        imageUrls: _selectedImageUrls.toList(),
+        createdAt: DateTime.now(),
+      );
+      Navigator.pop(context, newAlbum);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to create album: ${response['message']}")),
+      );
+    }
   }
 
   @override
@@ -79,10 +117,16 @@ class _CreateAlbumScreenState extends State<CreateAlbumScreen> {
       appBar: AppBar(
         title: const Text("Create Album"),
         actions: [
-          IconButton(
-            icon: Icon(Icons.check, color: scheme.onPrimary),
-            onPressed: _submitAlbum,
-          ),
+          if (_isSubmitting)
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          else
+            IconButton(
+              icon: Icon(Icons.check, color: scheme.onPrimary),
+              onPressed: _submitAlbum,
+            ),
         ],
       ),
       body: Padding(

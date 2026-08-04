@@ -9,6 +9,7 @@ import java.io.*;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class DatabaseManager {
@@ -25,20 +26,17 @@ public class DatabaseManager {
                 }
             })
             .registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
-
                 @Override
                 public LocalDateTime deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
                     return LocalDateTime.parse(jsonElement.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                 }
             })
-              .create();
-
+            .create();
 
     private DatabaseManager() {
         createDatabaseDirectoryIfNeeded();
         loadDatabase();
     }
-
 
     public static synchronized DatabaseManager getInstance() {
         if (instance == null) {
@@ -47,7 +45,6 @@ public class DatabaseManager {
         return instance;
     }
 
-
     private void createDatabaseDirectoryIfNeeded() {
         File file = new File("database");
         if (!file.exists()) {
@@ -55,117 +52,129 @@ public class DatabaseManager {
         }
     }
 
-
     public synchronized void loadDatabase() {
         File file = new File("database/database.json");
+        System.out.println("Reading database from: " + file.getAbsolutePath());
         if (!file.exists()) {
             databaseData = new DatabaseData();
             saveDatabase();
             return;
         }
-        try {
-            FileReader reader = new FileReader(file);
+        try (FileReader reader = new FileReader(file)) {
             databaseData = gson.fromJson(reader, DatabaseData.class);
-            reader.close();
 
-            if (databaseData== null) {
+            if (databaseData == null) {
                 databaseData = new DatabaseData();
             }
 
             if (databaseData.getUsers() != null) {
                 User.getUsers().clear();
-                User.getUsers().putAll(databaseData.getUsers());
+                for (User user : databaseData.getUsers()) {
+                    User.getUsers().put(user.getId(), user);
+                }
             }
 
             if (databaseData.getPhotos() != null) {
                 Photo.getPhotos().clear();
-                Photo.getPhotos().putAll(databaseData.getPhotos());
+                for (Photo photo : databaseData.getPhotos()) {
+                    Photo.getPhotos().put(photo.getId(), photo);
+                }
             }
 
             if (databaseData.getAlbums() != null) {
                 Album.getAlbums().clear();
-                Album.getAlbums().putAll(databaseData.getAlbums());
+                for (Album album : databaseData.getAlbums()) {
+                    Album.getAlbums().put(album.getId(), album);
+                }
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             databaseData = new DatabaseData();
         }
     }
 
-
     public synchronized void saveDatabase() {
         try {
-            databaseData.setUsers(User.getUsers());
-            databaseData.setAlbums(Album.getAlbums());
-            databaseData.setPhotos(Photo.getPhotos());
+            if (databaseData == null) {
+                databaseData = new DatabaseData();
+            }
 
-            FileWriter writer = new FileWriter("database/database.json");
-            gson.toJson(databaseData, writer);
-            writer.close();
-        } catch (IOException e) {
+            databaseData.setUsers(new ArrayList<>(User.getUsers().values()));
+            databaseData.setAlbums(new ArrayList<>(Album.getAlbums().values()));
+            databaseData.setPhotos(new ArrayList<>(Photo.getPhotos().values()));
+
+            File file = new File("database/database.json");
+            System.out.println("Saving database to: " + file.getAbsolutePath());
+
+            try (FileWriter writer = new FileWriter(file)) {
+                System.out.println("Users count to save: " + User.getUsers().size());
+                System.out.println("Photos count to save: " + Photo.getPhotos().size());
+                gson.toJson(databaseData, writer);
+                writer.flush();
+                System.out.println("Database saved successfully!");
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR saving database:");
             e.printStackTrace();
         }
-
     }
 
     public synchronized void addUser(User user) {
-        databaseData.getUsers().put(user.getId(), user);
+        if (databaseData == null) {
+            databaseData = new DatabaseData();
+        }
         User.getUsers().put(user.getId(), user);
         saveDatabase();
     }
 
     public synchronized User getUser(int userId) {
-        return databaseData.getUsers().get(userId);
+        return User.getUsers().get(userId);
     }
 
     public synchronized Map<Integer, User> getAllUsers() {
-        return databaseData.getUsers();
+        return User.getUsers();
     }
 
-
     public synchronized void addAlbum(Album album) {
-        databaseData.getAlbums().put(album.getId(), album);
+        if (databaseData == null) {
+            databaseData = new DatabaseData();
+        }
         Album.getAlbums().put(album.getId(), album);
         saveDatabase();
     }
 
     public synchronized Album getAlbum(int albumId) {
-        return databaseData.getAlbums().get(albumId);
+        return Album.getAlbums().get(albumId);
     }
 
     public synchronized void removeAlbum(int albumId) {
-        databaseData.getAlbums().remove(albumId);
         Album.getAlbums().remove(albumId);
         saveDatabase();
     }
 
     public synchronized Map<Integer, Album> getAllAlbums() {
-        return databaseData.getAlbums();
+        return Album.getAlbums();
     }
 
-
     public synchronized void addPhoto(Photo photo) {
-        databaseData.getPhotos().put(photo.getId(), photo);
+        if (databaseData == null) {
+            databaseData = new DatabaseData();
+        }
         Photo.getPhotos().put(photo.getId(), photo);
         saveDatabase();
     }
 
     public synchronized Photo getPhoto(int photoId) {
-        return databaseData.getPhotos().get(photoId);
+        return Photo.getPhotos().get(photoId);
     }
 
     public synchronized void removePhoto(int photoId) {
-        databaseData.getPhotos().remove(photoId);
         Photo.getPhotos().remove(photoId);
         saveDatabase();
     }
 
     public synchronized Map<Integer, Photo> getAllPhotos() {
-        return databaseData.getPhotos();
+        return Photo.getPhotos();
     }
-
-
-
-
 }

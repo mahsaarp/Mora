@@ -1,15 +1,20 @@
 package controllers;
 
-import server.Response;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import database.DatabaseManager;
 import model.*;
+import server.Response;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Base64;
+import java.util.*;
 
 public class PhotoController {
+    private static final Gson gson = new Gson();
 
     public static Response uploadPhoto(JsonObject payload) {
         try {
@@ -29,6 +34,8 @@ public class PhotoController {
                 return new Response(400, "error", null);
             }
 
+            DatabaseManager.getInstance().addPhoto(photo);
+
             JsonObject data = new JsonObject();
             data.addProperty("photoId", photo.getId());
             data.addProperty("name", photo.getName());
@@ -43,7 +50,7 @@ public class PhotoController {
     public static Response downloadPhoto(JsonObject payload) {
         try {
             int photoId = payload.get("photoId").getAsInt();
-            Photo photo = Photo.getPhotoById(photoId);
+            Photo photo = DatabaseManager.getInstance().getPhoto(photoId);
             if (photo == null) {
                 return new Response(404, "not found", null);
             }
@@ -65,14 +72,16 @@ public class PhotoController {
             int userId = payload.get("userId").getAsInt();
             int photoId = payload.get("photoId").getAsInt();
 
-            User user = User.getUsers().get(userId);
-            Photo photo = Photo.getPhotoById(photoId);
+            User user = DatabaseManager.getInstance().getUser(userId);
+            Photo photo = DatabaseManager.getInstance().getPhoto(photoId);
 
             if (user == null || photo == null) {
                 return new Response(404, "not found", null);
             }
 
             photo.like(user);
+            DatabaseManager.getInstance().saveDatabase();
+
             JsonObject data = new JsonObject();
             data.addProperty("likesCount", photo.getLikes());
 
@@ -93,11 +102,46 @@ public class PhotoController {
                 return new Response(400, "failed", null);
             }
 
+            DatabaseManager.getInstance().saveDatabase();
+
             JsonObject data = new JsonObject();
             data.addProperty("commentId", c.getId());
             data.addProperty("text", c.getText());
 
             return new Response(200, "comment added", data);
+        } catch (Exception e) {
+            return new Response(500, e.getMessage(), null);
+        }
+    }
+
+    public static Response getHomePhotos() {
+        try {
+            List<Photo> allPhotos = new ArrayList<>(DatabaseManager.getInstance().getAllPhotos().values());
+            allPhotos.sort((p1, p2) -> p2.getDate().compareTo(p1.getDate()));
+
+            JsonElement data = gson.toJsonTree(allPhotos);
+            return new Response(200, "OK", data);
+        } catch (Exception e) {
+            return new Response(500, e.getMessage(), null);
+        }
+    }
+
+    public static Response search(JsonObject payload) {
+        try {
+            if (payload == null || !payload.has("query")) {
+                return new Response(400, "Query is required", null);
+            }
+            String query = payload.get("query").getAsString();
+
+            List<Photo> byName = Photo.searchByName(query);
+            List<Photo> byTag = Photo.searchByTag(query);
+
+            Set<Photo> combined = new LinkedHashSet<>();
+            if (byName != null) combined.addAll(byName);
+            if (byTag != null) combined.addAll(byTag);
+
+            JsonElement data = gson.toJsonTree(combined);
+            return new Response(200, "OK", data);
         } catch (Exception e) {
             return new Response(500, e.getMessage(), null);
         }

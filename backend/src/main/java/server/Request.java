@@ -3,7 +3,7 @@ package server;
 import com.google.gson.JsonObject;
 
 public class Request {
-    private String route;
+    private String action;
     private String method;
     private JsonObject payload;
 
@@ -11,25 +11,17 @@ public class Request {
     }
 
     public Request(String route, String method, JsonObject payload) {
-        this.route = route;
+        this.action = route;
         this.method = method;
         this.payload = payload;
     }
 
-    public String getRoute() {
-        return route;
-    }
-
-    public void setRoute(String route) {
-        this.route = route;
-    }
-
     public String getAction() {
-        return route;
+        return action;
     }
 
     public void setAction(String action) {
-        this.route = action;
+        this.action = action;
     }
 
     public String getMethod() {
@@ -51,7 +43,7 @@ public class Request {
     @Override
     public String toString() {
         return "Request{" +
-                "route='" + route + '\'' +
+                "route='" + action + '\'' +
                 ", method='" + method + '\'' +
                 ", payload=" + payload +
                 '}';

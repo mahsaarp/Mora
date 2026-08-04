@@ -6,7 +6,7 @@ import java.net.Socket;
 
 public class BackendServer {
 
-    private static final int socket_port = 8080;
+    private static final int socket_port = 8888;
 
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(socket_port)) {
