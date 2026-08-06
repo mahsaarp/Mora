@@ -1,6 +1,7 @@
 package controllers;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import database.DatabaseManager;
@@ -119,8 +120,11 @@ public class PhotoController {
             List<Photo> allPhotos = new ArrayList<>(DatabaseManager.getInstance().getAllPhotos().values());
             allPhotos.sort((p1, p2) -> p2.getDate().compareTo(p1.getDate()));
 
-            JsonElement data = gson.toJsonTree(allPhotos);
-            return new Response(200, "OK", data);
+            JsonArray arr = new JsonArray();
+            for (Photo photo : allPhotos) {
+                arr.add(photoToJson(photo));
+            }
+            return new Response(200, "OK", arr);
         } catch (Exception e) {
             return new Response(500, e.getMessage(), null);
         }
@@ -140,10 +144,44 @@ public class PhotoController {
             if (byName != null) combined.addAll(byName);
             if (byTag != null) combined.addAll(byTag);
 
-            JsonElement data = gson.toJsonTree(combined);
-            return new Response(200, "OK", data);
+            JsonArray arr = new JsonArray();
+            for (Photo photo : combined) {
+                arr.add(photoToJson(photo));
+            }
+            return new Response(200, "OK", arr);
         } catch (Exception e) {
             return new Response(500, e.getMessage(), null);
         }
+    }
+
+    public static JsonObject photoToJson(Photo photo) {
+        JsonObject json = gson.toJsonTree(photo).getAsJsonObject();
+
+        User owner = DatabaseManager.getInstance().getUser(photo.getOwnerId());
+        if (owner != null) {
+            json.addProperty("username", owner.getUsername());
+            json.addProperty("userAvatar", owner.getAvatarRoute());
+        } else {
+            json.addProperty("username", "Unknown");
+        }
+
+        JsonArray commentsArray = new JsonArray();
+        List<Comment> comments = photo.getComments();
+        if (comments != null) {
+            for (Comment comment : comments) {
+                JsonObject commentJson = gson.toJsonTree(comment).getAsJsonObject();
+                User commenter = DatabaseManager.getInstance().getUser(comment.getOwnerId());
+                if (commenter != null) {
+                    commentJson.addProperty("username", commenter.getUsername());
+                    commentJson.addProperty("userAvatar", commenter.getAvatarRoute());
+                } else {
+                    commentJson.addProperty("username", "User");
+                }
+                commentsArray.add(commentJson);
+            }
+        }
+        json.add("comments", commentsArray);
+
+        return json;
     }
 }

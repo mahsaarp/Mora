@@ -4,6 +4,7 @@ import 'dart:convert';
 class SocketService {
   static const String _serverIp = '172.20.10.7';
   static const int _serverPort = 8888;
+  static const String baseUrl = 'http://$_serverIp:$_serverPort';
 
   static Future<Map<String, dynamic>> sendRequest({
     required String action,
@@ -17,7 +18,6 @@ class SocketService {
         timeout: const Duration(seconds: 5),
       );
 
-      // ✅ تغییر کلید از 'route' به 'action' برای هماهنگی با بک‌اند جاوا
       final Map<String, dynamic> requestMap = {
         'action': action,
         'payload': payload ?? {},
