@@ -15,10 +15,10 @@ Signing up takes just a few seconds using an **Email address** (`@gmail.com`) or
 - **Dark Mode & Color Themes:** Eyestrain at 3 AM? Switch to **Dark Mode** or pick from multiple vibrant **Color Themes** to match your personal vibe!
 
 <p align="center">
-  <img src="screenshots/splash.jpg" alt="Splash Screen" width="220"/>
-  <img src="screenshots/login.jpg" alt="Login Screen" width="220"/>
-  <img src="screenshots/profile.jpg" alt="Profile Screen" width="220"/>
-  <img src="screenshots/edit_profile.jpg" alt="Edit Profile Screen" width="220"/>
+  <img src="scrennshots/splash.jpg" alt="Splash Screen" width="220"/>
+  <img src="scrennshots/login.jpg" alt="Login Screen" width="220"/>
+  <img src="scrennshots/profile.jpg" alt="Profile Screen" width="220"/>
+  <img src="scrennshots/edit_profile.jpg" alt="Edit Profile Screen" width="220"/>
 </p>
 
 ---
@@ -30,8 +30,8 @@ Unleash your creativity with a complete media uploading and discovery ecosystem!
 - **Captions, Tags & Privacy:** Add custom captions, throw in `#hashtags`, edit post details, and toggle whether comments are **Enabled or Disabled** on your post.
 
 <p align="center">
-  <img src="screenshots/posts.jpg" alt="Posts Feed" width="300"/>
-  <img src="screenshots/edit_photo.jpg" alt="Edit Photo & Captions" width="300"/>
+  <img src="scrennshots/posts.jpg" alt="Posts Feed" width="300"/>
+  <img src="scrennshots/edit_photo.jpg" alt="Edit Photo & Captions" width="300"/>
 </p>
 
 ---
@@ -40,8 +40,8 @@ Unleash your creativity with a complete media uploading and discovery ecosystem!
 Discover trending content from creators across the platform! Filter and sort the Explore feed on the fly by **Date** (Newest/Oldest), **Name/Title**, or **Most Liked**.
 
 <p align="center">
-  <img src="screenshots/explore_photos.jpg" alt="Explore Photos" width="300"/>
-  <img src="screenshots/explore_album.jpg" alt="Explore Albums" width="300"/>
+  <img src="scrennshots/explore_photos.jpg" alt="Explore Photos" width="300"/>
+  <img src="scrennshots/explore_album.jpg" alt="Explore Albums" width="300"/>
 </p>
 
 ---
@@ -51,7 +51,7 @@ Discover trending content from creators across the platform! Filter and sort the
 - **User Directory:** Browse the full list of community members, check out their public profiles, and see what they've been capturing.
 
 <p align="center">
-  <img src="screenshots/explore_users.jpg" alt="User Directory" width="300"/>
+  <img src="scrennshots/explore_users.jpg" alt="User Directory" width="300"/>
 </p>
 
 ---
@@ -63,7 +63,7 @@ Group your favorite shots into neat, thematic albums to keep your profile organi
 - **Album Sorting:** Organize your albums seamlessly based on **Album Name** (Alphabetical), **Creation Date**, or **Total Likes**.
 
 <p align="center">
-  <img src="screenshots/albums.jpg" alt="Albums View" width="300"/>
+  <img src="scrennshots/albums.jpg" alt="Albums View" width="300"/>
 </p>
 
 ---
@@ -72,7 +72,7 @@ Group your favorite shots into neat, thematic albums to keep your profile organi
 Take control of community safety! Admins can inspect the full user list, view account metrics, and maintain order by **Banning toxic profiles** or **Unbanning reformed users** in real time.
 
 <p align="center">
-  <img src="screenshots/adminpanel.jpg" alt="Admin Panel" width="300"/>
+  <img src="scrennshots/adminpanel.jpg" alt="Admin Panel" width="300"/>
 </p>
 
 > [!NOTE]
