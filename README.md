@@ -123,7 +123,6 @@ The application combines a Flutter mobile client with a Java backend connected t
 
 <p align="center">
   <img src="screenshots/photo_detail.jpg" alt="Photo Details" width="220"/>
-  <img src="screenshots/save_to_gallery.jpg" alt="Save Photo to Gallery" width="220"/>
 </p>
 
 ### Photo Publishing
@@ -201,8 +200,8 @@ Data Logic  File Management
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd MORA
+git clone https://github.com/mahsaarp/Mora.git
+cd Mora
 ```
 
 ### 2. Start the Backend
@@ -250,7 +249,8 @@ The project covers:
 ## 👥 Credits
 
 **Course:** Advanced Programming
+
 **Instructor:** Dr. Sadegh Aliakbari
+
 **Contributors:** Mahsadat Ahmadi, Sara Jafari
 
-Built with **Flutter, Dart, Java, TCP Sockets, and JSON**.
