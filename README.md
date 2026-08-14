@@ -1,16 +1,16 @@
 # MORA
 
 <p align="center">
-  <strong>A modern photo-sharing and album management application built with Flutter and Java.</strong>
+  <strong>Photo sharing, discovery, and organization — built for a seamless mobile experience.</strong>
 </p>
 
 <p align="center">
   <a href="#features">Features</a>
-  ·
+  &nbsp;·&nbsp;
   <a href="#screenshots">Screenshots</a>
-  ·
+  &nbsp;·&nbsp;
   <a href="#technology">Technology</a>
-  ·
+  &nbsp;·&nbsp;
   <a href="#getting-started">Getting Started</a>
 </p>
 
@@ -18,11 +18,11 @@
 
 ## About
 
-**MORA** is a full-featured photo-sharing application developed as a project for the **Advanced Programming** course.
+**MORA** is a photo-sharing and album management application developed for the **Advanced Programming** course.
 
-The application combines a Flutter mobile client with a Java backend connected through a custom **TCP Socket** communication layer. MORA is designed around a simple idea: giving users a clean space to upload, organize, discover, and share their photos while providing the tools needed to manage personal profiles, albums, interactions, and application preferences.
+Built with **Flutter** and **Java**, MORA combines photo management, album organization, search and discovery, social interactions, account customization, and administrative controls in a single mobile application.
 
-From photo publishing and album management to search, social interactions, personalization, and administration, MORA brings the complete experience into a single mobile application.
+The client and server communicate through a custom **TCP Socket** layer using **JSON** for data exchange.
 
 ---
 
@@ -30,61 +30,44 @@ From photo publishing and album management to search, social interactions, perso
 
 ### Authentication & Profiles
 
-MORA provides a complete account and profile management experience.
-
 * User registration and login
 * Profile and account management
 * Username and password editing
-* Profile picture selection from the camera or gallery
+* Profile picture selection from camera or gallery
 * Account logout and deletion
-* User photo and album overview
 
-### Photo Sharing & Management
+### Photo Management
 
-Photos can be uploaded, edited, organized, and shared directly from the application.
-
-* Select photos from the device gallery
-* Capture photos using the camera
+* Upload photos from gallery or camera
 * Add titles, captions, and tags
 * Assign photos to albums
 * Edit published photos
-* Enable or disable comments on individual posts
+* Enable or disable comments
 * Like and comment on photos
-* Share photos with other applications
-* Save photos directly to the device gallery
+* Share photos
+* Save photos to the device gallery
 
-### Explore, Search & Discovery
-
-The Explore section makes it easy to discover content across the platform.
+### Explore & Discovery
 
 * Browse photos, albums, and users
-* Search photos by name or tag
+* Search by photo name or tag
 * Sort available content
-* Explore user profiles
-* Browse public album collections
+* Explore user profiles and public albums
 
 ### Albums
 
-Albums provide a flexible way to organize and curate photos.
-
 * Create custom albums
-* Add photos to albums
-* Organize photos into multiple collections
+* Add and remove photos
+* Organize photos across multiple collections
 * Browse album contents
-* View albums associated with user profiles
 
 ### Personalization
 
-MORA includes appearance and account settings designed to make the application adaptable to individual preferences.
-
-* Light mode
-* Dark mode
+* Light and dark modes
 * Multiple color themes
-* Account management settings
+* Account and application settings
 
 ### Administration
-
-A dedicated administration interface provides tools for managing platform users.
 
 * Admin dashboard
 * User management
@@ -118,11 +101,11 @@ A dedicated administration interface provides tools for managing platform users.
   <img src="screenshots/comments_off.jpg" alt="Comments Disabled" width="220"/>
 </p>
 
-### Photo Editing & Publishing
+### Photo Publishing & Editing
 
 <p align="center">
-  <img src="screenshots/choose.jpg" alt="Choose Photo from Gallery" width="220"/>
-  <img src="screenshots/post.jpg" alt="Create New Post" width="220"/>
+  <img src="screenshots/choose.jpg" alt="Choose Photo" width="220"/>
+  <img src="screenshots/post.jpg" alt="Create Post" width="220"/>
   <img src="screenshots/edit_photo.jpg" alt="Edit Photo" width="220"/>
 </p>
 
@@ -148,9 +131,9 @@ A dedicated administration interface provides tools for managing platform users.
 ### Personalization & Settings
 
 <p align="center">
-  <img src="screenshots/light_mode.jpg" alt="Light Mode and Theme Settings" width="220"/>
+  <img src="screenshots/light_mode.jpg" alt="Light Mode" width="220"/>
   <img src="screenshots/dark_mode.jpg" alt="Dark Mode" width="220"/>
-  <img src="screenshots/blue_theme.jpg" alt="Color Theme" width="220"/>
+  <img src="screenshots/blue_theme.jpg" alt="Blue Theme" width="220"/>
 </p>
 
 ### Administration
@@ -163,40 +146,35 @@ A dedicated administration interface provides tools for managing platform users.
 
 ## Technology
 
-MORA is built using a combination of mobile and backend technologies:
-
 | Layer              | Technology |
 | ------------------ | ---------- |
 | Mobile Application | Flutter    |
-| Frontend Language  | Dart       |
-| Backend            | Java       |
+| Frontend           | Dart       |
+| Backend            | Java 17    |
 | Communication      | TCP Socket |
 | Data Exchange      | JSON       |
 | JSON Processing    | Gson       |
-
-The application uses a custom socket-based communication layer between the Flutter client and Java backend rather than a conventional REST API.
 
 ---
 
 ## Client–Server Communication
 
-The Flutter client communicates directly with the Java server through a custom TCP socket connection.
+MORA uses a custom TCP Socket communication layer between the Flutter client and Java backend.
 
-Requests and responses are exchanged as JSON messages, allowing the client to perform operations such as authentication, photo management, album operations, and user-related actions through a single communication layer.
+Requests and responses are exchanged as JSON messages, allowing the application to handle authentication, photo management, albums, user operations, and other interactions through a unified communication channel.
 
-The backend is designed to support multiple client connections concurrently.
-
-A simplified representation of the communication flow is:
+The backend supports concurrent client connections and processes requests independently.
 
 ```text
 Flutter Application
         |
-        |  JSON over TCP
+        | JSON over TCP
         v
    Java Backend
         |
    +----+----+
    |         |
+   v         v
 Data Logic  File Management
 ```
 
@@ -204,42 +182,40 @@ Data Logic  File Management
 
 ## Requirements
 
-Before running MORA, make sure the following are installed:
-
 * Flutter SDK
 * Dart SDK
-* Java Development Kit (JDK 17 or newer)
+* Java Development Kit 17+
 * Android Studio or Visual Studio Code
-* Android Emulator or a physical Android device
+* Android Emulator or physical Android device
 
 ---
 
 ## Getting Started
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone <repository-url>
 cd MORA
 ```
 
-### 2. Start the Backend
+### 2. Start the backend
 
-Launch the Java backend and make sure the server is running before starting the mobile application.
+Run the Java backend and make sure the server is active before launching the mobile application.
 
-### 3. Configure the Connection
+### 3. Configure the connection
 
-Set the backend machine's local IP address in the Flutter application's socket configuration.
+Set the backend machine's local IP address in the Flutter socket configuration.
 
-When using a physical device or an emulator, make sure it can communicate with the machine running the Java server.
+For physical devices and emulators, ensure that the client can reach the machine running the backend.
 
-### 4. Install Flutter Dependencies
+### 4. Install dependencies
 
 ```bash
 flutter pub get
 ```
 
-### 5. Run the Application
+### 5. Run the application
 
 ```bash
 flutter run
@@ -247,9 +223,9 @@ flutter run
 
 ---
 
-## Project Scope
+## Academic Context
 
-MORA was developed with an emphasis on applying core concepts of **Advanced Programming** to a complete client-server application.
+MORA was developed as part of the **Advanced Programming** course, with a focus on applying software engineering and object-oriented programming concepts to a complete client-server application.
 
 The project covers:
 
@@ -261,14 +237,13 @@ The project covers:
 * Persistent data management
 * File handling
 * Concurrent server processing
-* Cross-platform mobile development with Flutter
+* Mobile application development with Flutter
 
 ---
 
 ## Credits
 
 **Course:** Advanced Programming
-
 **Instructor:** Dr. Sadegh Aliakbari
 
-Built with **Flutter, Dart, Java, TCP Sockets, and JSON**.
+**Built with Flutter, Dart, Java, TCP Sockets, and JSON.**
