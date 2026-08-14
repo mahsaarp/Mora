@@ -35,8 +35,14 @@ public class PhotoController {
         User owner = DatabaseManager.getInstance().getUser(photo.getOwnerId());
         if (owner != null) {
             json.addProperty("username", owner.getUsername());
+            json.addProperty("avatarRoute", owner.getAvatarRoute() != null ? owner.getAvatarRoute() : "");
+            json.addProperty("avatar_url", owner.getAvatarRoute() != null ? owner.getAvatarRoute() : "");
+            json.addProperty("userAvatar", owner.getAvatarRoute() != null ? owner.getAvatarRoute() : "");
         } else {
             json.addProperty("username", "Unknown");
+            json.addProperty("avatarRoute", "");
+            json.addProperty("avatar_url", "");
+            json.addProperty("userAvatar", "");
         }
 
         JsonArray commentsArray = new JsonArray();
@@ -47,8 +53,12 @@ public class PhotoController {
                 User commenter = DatabaseManager.getInstance().getUser(comment.getOwnerId());
                 if (commenter != null) {
                     commentJson.addProperty("username", commenter.getUsername());
+                    commentJson.addProperty("avatarRoute", commenter.getAvatarRoute() != null ? commenter.getAvatarRoute() : "");
+                    commentJson.addProperty("avatar_url", commenter.getAvatarRoute() != null ? commenter.getAvatarRoute() : "");
                 } else {
                     commentJson.addProperty("username", "User");
+                    commentJson.addProperty("avatarRoute", "");
+                    commentJson.addProperty("avatar_url", "");
                 }
                 commentsArray.add(commentJson);
             }
@@ -297,6 +307,8 @@ public class PhotoController {
             data.addProperty("commentId", c.getId());
             data.addProperty("text", c.getText());
             data.addProperty("username", user.getUsername());
+            data.addProperty("avatarRoute", user.getAvatarRoute() != null ? user.getAvatarRoute() : "");
+            data.addProperty("avatar_url", user.getAvatarRoute() != null ? user.getAvatarRoute() : "");
             data.addProperty("userRank", user.getRank().name());
 
             return new Response(200, "comment added", data);

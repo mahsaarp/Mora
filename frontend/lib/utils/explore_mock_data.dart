@@ -82,6 +82,8 @@ class ExplorePhoto {
       date = DateTime.tryParse(dateStr.toString()) ?? DateTime.now();
     }
 
+    final avatarValue = json['avatar_url'] ?? json['avatarUrl'] ?? json['avatarRoute'] ?? json['userAvatar'] ?? 'assets/images/default_avatar.png';
+
     return ExplorePhoto(
       id: id,
       name: json['name'] ?? json['title'] ?? 'Untitled',
@@ -92,7 +94,7 @@ class ExplorePhoto {
       caption: json['caption'] ?? json['description'] ?? '',
       tags: json['tags'] is List ? List<String>.from(json['tags']) : [],
       username: json['owner_username'] ?? json['username'] ?? 'User',
-      userAvatar: json['avatar_url'] ?? 'assets/images/default_avatar.png',
+      userAvatar: avatarValue.toString(),
       isOwner: (json['ownerId'] != null && json['ownerId'].toString() == currentUserId?.toString()) || (json['is_owner'] == true),
       allowComments: json['commentAllowed'] ?? json['allow_comments'] ?? true,
       isLiked: isLiked,

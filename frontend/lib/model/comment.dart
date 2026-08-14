@@ -5,6 +5,7 @@ class Comment {
   String? date;
   String text;
   String? username;
+  String? avatarRoute;
 
   Comment({
     this.id,
@@ -13,6 +14,7 @@ class Comment {
     this.date,
     required this.text,
     this.username,
+    this.avatarRoute,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class Comment {
       date: json['date']?.toString(),
       text: json['text'] ?? '',
       username: json['username'] ?? json['owner_username'],
+      avatarRoute: json['avatarRoute'] ?? json['avatar_route'] ?? json['avatar_url'],
     );
   }
 
@@ -34,6 +37,7 @@ class Comment {
       if (date != null) 'date': date,
       'text': text,
       if (username != null) 'username': username,
+      if (avatarRoute != null) 'avatarRoute': avatarRoute,
     };
   }
 }

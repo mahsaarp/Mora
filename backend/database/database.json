@@ -22,7 +22,7 @@
         3
       ],
       "isBanned": false,
-      "isLoggedIn": true,
+      "isLoggedIn": false,
       "commentCount": 2,
       "rank": "PHOTOGRAPHER",
       "enterType": "EMAIL",
@@ -109,32 +109,6 @@
       "enterType": "EMAIL",
       "themeMode": "light",
       "themeColor": "green"
-    },
-    {
-      "id": 7,
-      "username": "Ehsan@gmail.com",
-      "password": "Welcome123",
-      "avatarRoute": "uploads/avatars/user_7.jpg",
-      "photoIds": [
-        16
-      ],
-      "albumIds": [
-        7
-      ],
-      "likedPhotoIds": [
-        9,
-        11,
-        13,
-        8,
-        2
-      ],
-      "isBanned": false,
-      "isLoggedIn": false,
-      "commentCount": 1,
-      "rank": "NEWBIE",
-      "enterType": "EMAIL",
-      "themeMode": "dark",
-      "themeColor": "blue"
     }
   ],
   "albums": [
@@ -179,13 +153,6 @@
         12,
         13
       ]
-    },
-    {
-      "id": 7,
-      "ownerId": 7,
-      "name": "Sea",
-      "date": "2026-08-07T10:19:19.4293012",
-      "photoIds": []
     }
   ],
   "photos": [
@@ -204,8 +171,7 @@
       "caption": "Just a little fluff with a big attitude",
       "userLikedIds": [
         4,
-        5,
-        7
+        5
       ],
       "commentAllowed": true,
       "albumIds": [],
@@ -336,8 +302,7 @@
       ],
       "caption": "Pure beauty in every petal",
       "userLikedIds": [
-        5,
-        7
+        5
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -362,8 +327,7 @@
       "userLikedIds": [
         4,
         5,
-        2,
-        7
+        2
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -407,8 +371,7 @@
       "caption": "Chasing snowy peaks with the best company",
       "userLikedIds": [
         5,
-        2,
-        7
+        2
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -453,34 +416,16 @@
       ],
       "caption": "One line and one sip at a time",
       "userLikedIds": [
-        4,
-        7
+        4
       ],
       "commentAllowed": true,
       "albumIds": [
         5
       ],
       "commentIds": [
-        6,
-        11
+        6
       ],
       "route": "photos/1785963360863_Sketch.jpg"
-    },
-    {
-      "id": 16,
-      "ownerId": 7,
-      "name": "Sea Otter",
-      "date": "2026-08-07T10:18:30.8152745",
-      "tags": [
-        "Otter",
-        "Water"
-      ],
-      "caption": "Look at this! So cute",
-      "userLikedIds": [],
-      "commentAllowed": true,
-      "albumIds": [],
-      "commentIds": [],
-      "route": "photos/1786085310806_Sea Otter.jpg"
     }
   ],
   "comments": [
@@ -539,13 +484,6 @@
       "photoId": 8,
       "date": "2026-08-06T01:25:04.8432804",
       "text": "So beautiful 🌸"
-    },
-    {
-      "id": 11,
-      "ownerId": 7,
-      "photoId": 13,
-      "date": "2026-08-07T10:16:29.9576214",
-      "text": "Wow!"
     }
   ]
 }

@@ -72,15 +72,15 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     if (text.isEmpty) return;
 
     final String username = SocketService.loggedInUsername ?? "User";
-
     final newComment = Comment(
       text: text,
       date: DateTime.now().toIso8601String(),
       username: username,
+      avatarRoute: '',
     );
 
     setState(() {
-      _comments.insert(0, newComment);
+      _comments = [newComment, ..._comments];
       widget.photo.comments = _comments;
       widget.photo.commentsCount = _comments.length;
     });
@@ -541,7 +541,7 @@ class _CommentsList extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundImage: _buildAvatarProvider(null),
+              backgroundImage: _buildAvatarProvider(c.avatarRoute),
             ),
             const SizedBox(width: 10),
             Expanded(

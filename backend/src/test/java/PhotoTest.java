@@ -1,3 +1,6 @@
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import controllers.PhotoController;
 import model.Comment;
 import model.Photo;
 import model.User;
@@ -119,6 +122,36 @@ class PhotoTest {
             photo2.addComment(comment2);
         });
         assertTrue(photo2.getCommentIds().contains(comment2.getId()));
+    }
+
+    @Test
+    void photoToJsonIncludesCommentAvatarRoute() {
+        User owner = new User(1, "owner", "Password1", User.UserRank.PHOTOGRAPHER, User.EnterType.PHONE);
+        owner.setAvatarRoute("uploads/avatars/owner.png");
+        User.getUsers().put(owner.getId(), owner);
+
+        Photo photo = Photo.uploadPhoto(owner.getId(),
+                "sea",
+                LocalDateTime.now(),
+                new ArrayList<>(List.of("nature")),
+                "caption",
+                true,
+                "abcd");
+
+        User commenter = new User(2, "commenter", "Password2", User.UserRank.COMMENTER, User.EnterType.PHONE);
+        commenter.setAvatarRoute("uploads/avatars/commenter.png");
+        User.getUsers().put(commenter.getId(), commenter);
+
+        Comment comment = Comment.createComment(commenter.getId(), photo.getId(), LocalDateTime.now(), "Nice pic!");
+        assertNotNull(comment);
+
+        JsonObject photoJson = PhotoController.photoToJson(photo);
+        JsonArray comments = photoJson.getAsJsonArray("comments");
+        assertFalse(comments.isEmpty());
+
+        JsonObject commentJson = comments.get(0).getAsJsonObject();
+        assertEquals("commenter", commentJson.get("username").getAsString());
+        assertEquals("uploads/avatars/commenter.png", commentJson.get("avatarRoute").getAsString());
     }
 
     @Test
