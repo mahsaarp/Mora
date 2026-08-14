@@ -73,33 +73,34 @@ class _MainScreenState extends State<MainScreen> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 80.0),
+            padding: const EdgeInsets.only(bottom: 88.0),
             child: _screens[_currentIndex],
           ),
           Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
+            bottom: 18,
+            left: 18,
+            right: 18,
             child: Container(
-              height: 65,
+              height: 76,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                color: scheme.surfaceContainerHigh.withOpacity(0.95),
+                color: scheme.surface.withValues(alpha: 0.96),
                 borderRadius: BorderRadius.circular(30),
-                border: Border.all(color: scheme.outlineVariant.withOpacity(0.3)),
+                border: Border.all(color: scheme.outlineVariant.withValues(alpha: 0.45)),
                 boxShadow: [
                   BoxShadow(
-                    color: scheme.scrim.withOpacity(0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
+                    color: scheme.shadow.withValues(alpha: 0.12),
+                    blurRadius: 28,
+                    offset: const Offset(0, 12),
                   )
                 ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildNavItem(Icons.explore, "Explore", 0, scheme),
-                  _buildNavItem(Icons.add_box_outlined, "Post", 1, scheme),
-                  _buildNavItem(Icons.person, "Profile", 2, scheme),
+                  _buildNavItem(Icons.explore_rounded, "Explore", 0, scheme),
+                  _buildNavItem(Icons.add_box_rounded, "Post", 1, scheme),
+                  _buildNavItem(Icons.person_rounded, "Profile", 2, scheme),
                 ],
               ),
             ),
@@ -114,7 +115,8 @@ class _MainScreenState extends State<MainScreen> {
     final activeColor = scheme.primary;
     final inactiveColor = scheme.onSurfaceVariant;
 
-    return GestureDetector(
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
       onTap: () {
         if (index == 1) {
           _showCreatePostBottomSheet();
@@ -125,23 +127,27 @@ class _MainScreenState extends State<MainScreen> {
         }
       },
       child: Container(
-        color: Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        width: 92,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? scheme.primary.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(18),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
               color: isSelected ? activeColor : inactiveColor,
-              size: 24,
+              size: 23,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 color: isSelected ? activeColor : inactiveColor,
                 fontSize: 10,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
               ),
             ),
           ],

@@ -112,99 +112,141 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final scheme = theme.colorScheme;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset("assets/images/background.png", fit: BoxFit.cover),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              scheme.primary.withValues(alpha: 0.32),
+              scheme.surface,
+            ],
           ),
-          Positioned.fill(
-            child: Container(color: scheme.scrim.withOpacity(0.20)),
+          image: const DecorationImage(
+            image: AssetImage("assets/images/background.png"),
+            fit: BoxFit.cover,
           ),
-          Center(
-            child: SingleChildScrollView(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                  child: Container(
-                    width: 340,
-                    padding: const EdgeInsets.all(30),
-                    decoration: BoxDecoration(
-                      color: scheme.surface.withOpacity(0.25),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: scheme.onSurface.withOpacity(0.22)),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.person_add_alt_1, color: scheme.primary, size: 55),
-                        const SizedBox(height: 15),
-                        Text(
-                          "Create Account",
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.bold,
-                            color: scheme.onSurface,
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.16),
+                      Colors.black.withValues(alpha: 0.42),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      width: 360,
+                      padding: const EdgeInsets.fromLTRB(24, 28, 24, 22),
+                      decoration: BoxDecoration(
+                        color: scheme.surface.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 24,
+                            offset: const Offset(0, 18),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextField(
-                          controller: displayNameController,
-                          style: TextStyle(color: scheme.onSurface),
-                          decoration: _inputDecoration(scheme, "Display Name", Icons.badge_outlined),
-                        ),
-                        const SizedBox(height: 15),
-                        TextField(
-                          controller: usernameController,
-                          style: TextStyle(color: scheme.onSurface),
-                          decoration: _inputDecoration(scheme, "Phone or Gmail", Icons.person_outline),
-                        ),
-                        const SizedBox(height: 15),
-                        TextField(
-                          controller: passwordController,
-                          obscureText: true,
-                          style: TextStyle(color: scheme.onSurface),
-                          decoration: _inputDecoration(scheme, "Password", Icons.lock),
-                        ),
-                        const SizedBox(height: 15),
-                        TextField(
-                          controller: confirmPasswordController,
-                          obscureText: true,
-                          style: TextStyle(color: scheme.onSurface),
-                          decoration: _inputDecoration(scheme, "Confirm Password", Icons.lock_outline),
-                        ),
-                        const SizedBox(height: 25),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 52,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: scheme.primary,
-                              foregroundColor: scheme.onPrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: scheme.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(22),
                             ),
-                            onPressed: _isLoading ? null : _handleSignUp,
-                            child: _isLoading
-                                ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                            )
-                                : const Text("Create Account", style: TextStyle(fontSize: 17)),
+                            child: Icon(Icons.person_add_alt_1_rounded, color: scheme.primary, size: 36),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        _buildLoginLink(scheme),
-                      ],
+                          const SizedBox(height: 14),
+                          Text(
+                            "Create Account",
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -0.5,
+                              color: scheme.onSurface,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            controller: displayNameController,
+                            style: TextStyle(color: scheme.onSurface),
+                            decoration: _inputDecoration(scheme, "Display Name", Icons.badge_outlined),
+                          ),
+                          const SizedBox(height: 14),
+                          TextField(
+                            controller: usernameController,
+                            style: TextStyle(color: scheme.onSurface),
+                            decoration: _inputDecoration(scheme, "Phone or Gmail", Icons.person_outline_rounded),
+                          ),
+                          const SizedBox(height: 14),
+                          TextField(
+                            controller: passwordController,
+                            obscureText: true,
+                            style: TextStyle(color: scheme.onSurface),
+                            decoration: _inputDecoration(scheme, "Password", Icons.lock_rounded),
+                          ),
+                          const SizedBox(height: 14),
+                          TextField(
+                            controller: confirmPasswordController,
+                            obscureText: true,
+                            style: TextStyle(color: scheme.onSurface),
+                            decoration: _inputDecoration(scheme, "Confirm Password", Icons.lock_outline_rounded),
+                          ),
+                          const SizedBox(height: 22),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 54,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: scheme.primary,
+                                foregroundColor: scheme.onPrimary,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                              ),
+                              onPressed: _isLoading ? null : _handleSignUp,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                    )
+                                  : const Text("Create Account", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildLoginLink(scheme),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -212,14 +254,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
   InputDecoration _inputDecoration(ColorScheme scheme, String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant.withOpacity(0.8)),
-      prefixIcon: Icon(icon, color: scheme.onSurfaceVariant),
+      hintStyle: TextStyle(fontSize: 13, color: scheme.onSurfaceVariant.withValues(alpha: 0.8)),
+      prefixIcon: Icon(icon, color: scheme.primary),
       filled: true,
-      fillColor: scheme.surface.withOpacity(0.78),
+      fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.35),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: scheme.primary, width: 1.3),
+      ),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16),
     );
   }
 
@@ -227,7 +278,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("Already have an account?", style: TextStyle(color: scheme.onSurface)),
+        Text("Already have an account?", style: TextStyle(color: scheme.onSurfaceVariant)),
         TextButton(
           onPressed: () => Navigator.push(
             context,
@@ -235,7 +286,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           child: Text(
             "Log In",
-            style: TextStyle(color: scheme.primary, fontWeight: FontWeight.bold),
+            style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w700),
           ),
         ),
       ],

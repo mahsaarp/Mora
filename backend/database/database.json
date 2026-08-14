@@ -72,14 +72,16 @@
         9,
         10,
         7,
-        13
+        13,
+        8
       ],
       "isBanned": false,
-      "isLoggedIn": true,
+      "isLoggedIn": false,
       "commentCount": 5,
       "rank": "COMMENTER",
       "enterType": "EMAIL",
-      "themeMode": "light"
+      "themeMode": "dark",
+      "themeColor": "green"
     },
     {
       "id": 5,
@@ -113,6 +115,27 @@
       "enterType": "EMAIL",
       "themeMode": "light",
       "themeColor": "green"
+    },
+    {
+      "id": 6,
+      "username": "Mahshid@gmail.com",
+      "password": "Welcome123",
+      "displayName": "Mahshid",
+      "avatarRoute": "uploads/avatars/user_6.jpg",
+      "photoIds": [],
+      "albumIds": [],
+      "likedPhotoIds": [
+        4,
+        11,
+        9,
+        12
+      ],
+      "isBanned": false,
+      "isLoggedIn": false,
+      "commentCount": 1,
+      "rank": "NEWBIE",
+      "enterType": "EMAIL",
+      "themeMode": "dark"
     }
   ],
   "albums": [
@@ -214,7 +237,8 @@
       ],
       "caption": "Rainy day companions",
       "userLikedIds": [
-        5
+        5,
+        6
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -306,7 +330,8 @@
       ],
       "caption": "Pure beauty in every petal",
       "userLikedIds": [
-        5
+        5,
+        4
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -331,7 +356,8 @@
       "userLikedIds": [
         4,
         5,
-        2
+        2,
+        6
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -375,7 +401,8 @@
       "caption": "Chasing snowy peaks with the best company",
       "userLikedIds": [
         5,
-        2
+        2,
+        6
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -399,12 +426,16 @@
         "Gallery"
       ],
       "caption": "Walking through stories preserve in time",
-      "userLikedIds": [],
+      "userLikedIds": [
+        6
+      ],
       "commentAllowed": true,
       "albumIds": [
         5
       ],
-      "commentIds": [],
+      "commentIds": [
+        9
+      ],
       "route": "photos/1785963225614_Museum.jpg"
     },
     {
@@ -488,6 +519,13 @@
       "photoId": 8,
       "date": "2026-08-06T01:25:04.8432804",
       "text": "So beautiful 🌸"
+    },
+    {
+      "id": 9,
+      "ownerId": 6,
+      "photoId": 12,
+      "date": "2026-08-14T14:45:04.5112275",
+      "text": "Wow!"
     }
   ]
 }
