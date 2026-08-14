@@ -252,5 +252,5 @@ The project covers:
 
 **Instructor:** Dr. Sadegh Aliakbari
 
-**Contributors:** Mahsadat Ahmadi, Sara Jafari
+**Contributors:** Mahsadat Ahmadi, Sara Jafari Arani
 
