@@ -1,6 +1,29 @@
 {
   "users": [
     {
+      "id": 1,
+      "username": "Ehsan@gmail.com",
+      "password": "Welcome123",
+      "displayName": "Ehsan",
+      "avatarRoute": "uploads/avatars/user_1.jpg",
+      "photoIds": [
+        14
+      ],
+      "albumIds": [],
+      "likedPhotoIds": [
+        9,
+        7,
+        11
+      ],
+      "isBanned": false,
+      "isLoggedIn": false,
+      "commentCount": 1,
+      "rank": "NEWBIE",
+      "enterType": "EMAIL",
+      "themeMode": "dark",
+      "themeColor": "blue"
+    },
+    {
       "id": 2,
       "username": "Sara@gmail.com",
       "password": "Sara12345",
@@ -20,9 +43,10 @@
       "likedPhotoIds": [
         11,
         9,
-        3
+        3,
+        2
       ],
-      "isBanned": false,
+      "isBanned": true,
       "isLoggedIn": false,
       "commentCount": 2,
       "rank": "PHOTOGRAPHER",
@@ -44,7 +68,9 @@
       "albumIds": [
         1
       ],
-      "likedPhotoIds": [],
+      "likedPhotoIds": [
+        11
+      ],
       "isBanned": false,
       "isLoggedIn": false,
       "commentCount": 0,
@@ -56,7 +82,7 @@
     {
       "id": 4,
       "username": "Amin@gmail.com",
-      "password": "Sina1234",
+      "password": "Amin1234",
       "displayName": "Amin",
       "avatarRoute": "uploads/avatars/user_4.jpg",
       "photoIds": [
@@ -94,7 +120,8 @@
         13
       ],
       "albumIds": [
-        5
+        5,
+        6
       ],
       "likedPhotoIds": [
         11,
@@ -108,7 +135,7 @@
         3,
         2
       ],
-      "isBanned": false,
+      "isBanned": true,
       "isLoggedIn": false,
       "commentCount": 1,
       "rank": "NEWBIE",
@@ -177,8 +204,17 @@
       "name": "Art",
       "date": "2026-08-06T00:23:57.1189399",
       "photoIds": [
-        12,
         13
+      ]
+    },
+    {
+      "id": 6,
+      "ownerId": 5,
+      "name": "Coffee",
+      "date": "2026-08-14T15:10:32.9796862",
+      "photoIds": [
+        13,
+        12
       ]
     }
   ],
@@ -198,7 +234,8 @@
       "caption": "Just a little fluff with a big attitude",
       "userLikedIds": [
         4,
-        5
+        5,
+        2
       ],
       "commentAllowed": true,
       "albumIds": [],
@@ -308,7 +345,8 @@
       "caption": "Gracefully floating in a moment of peace",
       "userLikedIds": [
         4,
-        5
+        5,
+        1
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -357,9 +395,10 @@
         4,
         5,
         2,
-        6
+        6,
+        1
       ],
-      "commentAllowed": true,
+      "commentAllowed": false,
       "albumIds": [
         1
       ],
@@ -402,7 +441,9 @@
       "userLikedIds": [
         5,
         2,
-        6
+        6,
+        1,
+        3
       ],
       "commentAllowed": true,
       "albumIds": [
@@ -411,7 +452,8 @@
       "commentIds": [
         3,
         4,
-        5
+        5,
+        10
       ],
       "route": "photos/1785962404521_Hiking Friends.jpg"
     },
@@ -431,7 +473,7 @@
       ],
       "commentAllowed": true,
       "albumIds": [
-        5
+        6
       ],
       "commentIds": [
         9
@@ -455,12 +497,30 @@
       ],
       "commentAllowed": true,
       "albumIds": [
-        5
+        5,
+        6
       ],
       "commentIds": [
         6
       ],
       "route": "photos/1785963360863_Sketch.jpg"
+    },
+    {
+      "id": 14,
+      "ownerId": 1,
+      "name": "Sea Otter",
+      "date": "2026-08-14T15:08:34.8442748",
+      "tags": [
+        "Otter",
+        "Water",
+        "Calm"
+      ],
+      "caption": "So refreshing!",
+      "userLikedIds": [],
+      "commentAllowed": false,
+      "albumIds": [],
+      "commentIds": [],
+      "route": "photos/1786707514780_Sea Otter.jpg"
     }
   ],
   "comments": [
@@ -526,6 +586,13 @@
       "photoId": 12,
       "date": "2026-08-14T14:45:04.5112275",
       "text": "Wow!"
+    },
+    {
+      "id": 10,
+      "ownerId": 1,
+      "photoId": 11,
+      "date": "2026-08-14T15:11:41.8258142",
+      "text": "wow!"
     }
   ]
 }
