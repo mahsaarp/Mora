@@ -1,7 +1,7 @@
 # MORA
 
 <p align="center">
-  <strong>Photo sharing, discovery, and organization — built for a seamless mobile experience.</strong>
+  <strong>A modern photo-sharing and album management application built with Flutter and Java.</strong>
 </p>
 
 <p align="center">
@@ -18,54 +18,57 @@
 
 ## About
 
-**MORA** is a photo-sharing and album management application developed for the **Advanced Programming** course.
+**MORA** is a full-featured photo-sharing application developed for the **Advanced Programming** course.
 
-Built with **Flutter** and **Java**, MORA combines photo management, album organization, search and discovery, social interactions, account customization, and administrative controls in a single mobile application.
-
-The client and server communicate through a custom **TCP Socket** layer using **JSON** for data exchange.
+The application combines a Flutter mobile client with a Java backend connected through a custom **TCP Socket** communication layer. MORA provides users with a unified space to upload, organize, discover, and share photos while managing profiles, albums, interactions, and application preferences.
 
 ---
 
-## Features
+## ✨ Features
 
 ### Authentication & Profiles
 
 * User registration and login
 * Profile and account management
 * Username and password editing
-* Profile picture selection from camera or gallery
+* Profile picture selection from the camera or gallery
 * Account logout and deletion
+* User photo and album overview
 
-### Photo Management
+### Photo Sharing & Management
 
-* Upload photos from gallery or camera
+* Select photos from the device gallery
+* Capture photos using the camera
 * Add titles, captions, and tags
 * Assign photos to albums
 * Edit published photos
-* Enable or disable comments
+* Enable or disable comments on individual posts
 * Like and comment on photos
-* Share photos
-* Save photos to the device gallery
+* Share photos with other applications
+* Save photos directly to the device gallery
 
-### Explore & Discovery
+### Explore, Search & Discovery
 
 * Browse photos, albums, and users
-* Search by photo name or tag
+* Search photos by name or tag
 * Sort available content
-* Explore user profiles and public albums
+* Explore user profiles
+* Browse public album collections
 
 ### Albums
 
 * Create custom albums
-* Add and remove photos
-* Organize photos across multiple collections
+* Add photos to albums
+* Organize photos into multiple collections
 * Browse album contents
+* View albums associated with user profiles
 
 ### Personalization
 
-* Light and dark modes
+* Light mode
+* Dark mode
 * Multiple color themes
-* Account and application settings
+* Account management settings
 
 ### Administration
 
@@ -76,7 +79,7 @@ The client and server communicate through a custom **TCP Socket** layer using **
 
 ---
 
-## Screenshots
+## 📱 Screenshots
 
 ### Authentication
 
@@ -86,30 +89,7 @@ The client and server communicate through a custom **TCP Socket** layer using **
   <img src="screenshots/sign_up.jpg" alt="Sign Up" width="220"/>
 </p>
 
-### Profile & Account Management
-
-<p align="center">
-  <img src="screenshots/profile_photos.jpg" alt="Profile" width="220"/>
-  <img src="screenshots/edit_profile.jpg" alt="Edit Profile" width="220"/>
-</p>
-
-### Photo Details & Interaction
-
-<p align="center">
-  <img src="screenshots/photo_detail.jpg" alt="Photo Details" width="220"/>
-  <img src="screenshots/save_to_gallery.jpg" alt="Save Photo to Gallery" width="220"/>
-  <img src="screenshots/comments_off.jpg" alt="Comments Disabled" width="220"/>
-</p>
-
-### Photo Publishing & Editing
-
-<p align="center">
-  <img src="screenshots/choose.jpg" alt="Choose Photo" width="220"/>
-  <img src="screenshots/post.jpg" alt="Create Post" width="220"/>
-  <img src="screenshots/edit_photo.jpg" alt="Edit Photo" width="220"/>
-</p>
-
-### Explore & Discovery
+### Explore
 
 <p align="center">
   <img src="screenshots/explore_photos.jpg" alt="Explore Photos" width="220"/>
@@ -117,23 +97,47 @@ The client and server communicate through a custom **TCP Socket** layer using **
   <img src="screenshots/explore_users.jpg" alt="Explore Users" width="220"/>
 </p>
 
-<p align="center">
-  <img src="screenshots/search.jpg" alt="Search" width="220"/>
-  <img src="screenshots/sort.jpg" alt="Sort Options" width="220"/>
-</p>
-
-### Albums
+### Profile & Account Management
 
 <p align="center">
-  <img src="screenshots/profile_albums.jpg" alt="Profile Albums" width="220"/>
+  <img src="screenshots/profile_photos.jpg" alt="Profile" width="220"/>
+  <img src="screenshots/edit_profile.jpg" alt="Edit Profile" width="220"/>
 </p>
 
 ### Personalization & Settings
 
 <p align="center">
-  <img src="screenshots/light_mode.jpg" alt="Light Mode" width="220"/>
+  <img src="screenshots/light_mode.jpg" alt="Light Mode and Theme Settings" width="220"/>
   <img src="screenshots/dark_mode.jpg" alt="Dark Mode" width="220"/>
-  <img src="screenshots/blue_theme.jpg" alt="Blue Theme" width="220"/>
+  <img src="screenshots/blue_theme.jpg" alt="Color Theme" width="220"/>
+</p>
+
+### Discovery
+
+<p align="center">
+  <img src="screenshots/search.jpg" alt="Search" width="220"/>
+  <img src="screenshots/sort.jpg" alt="Sort Options" width="220"/>
+</p>
+
+### Photo Details & Interaction
+
+<p align="center">
+  <img src="screenshots/photo_detail.jpg" alt="Photo Details" width="220"/>
+  <img src="screenshots/save_to_gallery.jpg" alt="Save Photo to Gallery" width="220"/>
+</p>
+
+### Photo Publishing
+
+<p align="center">
+  <img src="screenshots/choose.jpg" alt="Choose Photo from Gallery" width="220"/>
+  <img src="screenshots/post.jpg" alt="Create New Post" width="220"/>
+</p>
+
+### Photo Editing
+
+<p align="center">
+  <img src="screenshots/edit_photo.jpg" alt="Edit Photo" width="220"/>
+  <img src="screenshots/comments_off.jpg" alt="Comments Disabled" width="220"/>
 </p>
 
 ### Administration
@@ -144,31 +148,33 @@ The client and server communicate through a custom **TCP Socket** layer using **
 
 ---
 
-## Technology
+## 🛠️ Technology
 
 | Layer              | Technology |
 | ------------------ | ---------- |
 | Mobile Application | Flutter    |
-| Frontend           | Dart       |
-| Backend            | Java 17    |
+| Frontend Language  | Dart       |
+| Backend            | Java       |
 | Communication      | TCP Socket |
 | Data Exchange      | JSON       |
 | JSON Processing    | Gson       |
 
+MORA uses a custom socket-based communication layer between the Flutter client and Java backend rather than a conventional REST API.
+
 ---
 
-## Client–Server Communication
+## 🔗 Client–Server Communication
 
-MORA uses a custom TCP Socket communication layer between the Flutter client and Java backend.
+The Flutter client communicates directly with the Java server through a custom TCP Socket connection.
 
-Requests and responses are exchanged as JSON messages, allowing the application to handle authentication, photo management, albums, user operations, and other interactions through a unified communication channel.
+Requests and responses are exchanged as JSON messages, allowing the application to handle authentication, photo management, album operations, and user-related actions through a unified communication layer.
 
-The backend supports concurrent client connections and processes requests independently.
+The backend supports multiple client connections concurrently.
 
 ```text
 Flutter Application
         |
-        | JSON over TCP
+        |  JSON over TCP
         v
    Java Backend
         |
@@ -180,42 +186,42 @@ Data Logic  File Management
 
 ---
 
-## Requirements
+## ⚙️ Requirements
 
 * Flutter SDK
 * Dart SDK
-* Java Development Kit 17+
+* Java Development Kit (JDK 17 or newer)
 * Android Studio or Visual Studio Code
-* Android Emulator or physical Android device
+* Android Emulator or a physical Android device
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone <repository-url>
 cd MORA
 ```
 
-### 2. Start the backend
+### 2. Start the Backend
 
-Run the Java backend and make sure the server is active before launching the mobile application.
+Launch the Java backend and make sure the server is running before starting the mobile application.
 
-### 3. Configure the connection
+### 3. Configure the Connection
 
-Set the backend machine's local IP address in the Flutter socket configuration.
+Set the backend machine's local IP address in the Flutter application's socket configuration.
 
-For physical devices and emulators, ensure that the client can reach the machine running the backend.
+When using a physical device or an emulator, make sure it can communicate with the machine running the Java server.
 
-### 4. Install dependencies
+### 4. Install Flutter Dependencies
 
 ```bash
 flutter pub get
 ```
 
-### 5. Run the application
+### 5. Run the Application
 
 ```bash
 flutter run
@@ -223,9 +229,9 @@ flutter run
 
 ---
 
-## Academic Context
+## 🎓 Academic Context
 
-MORA was developed as part of the **Advanced Programming** course, with a focus on applying software engineering and object-oriented programming concepts to a complete client-server application.
+MORA was developed as part of the **Advanced Programming** course, with a focus on applying core programming and software engineering concepts to a complete client-server application.
 
 The project covers:
 
@@ -241,9 +247,10 @@ The project covers:
 
 ---
 
-## Credits
+## 👥 Credits
 
 **Course:** Advanced Programming
 **Instructor:** Dr. Sadegh Aliakbari
+**Contributors:** Mahsadat Ahmadi, Sara Jafari
 
-**Built with Flutter, Dart, Java, TCP Sockets, and JSON.**
+Built with **Flutter, Dart, Java, TCP Sockets, and JSON**.
