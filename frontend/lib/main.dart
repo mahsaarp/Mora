@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mora/screens/splash_screen.dart';
 
 ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.light,
       primaryColor: primaryColor,
       colorScheme: colorScheme,
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.light().textTheme),
       scaffoldBackgroundColor: colorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.primary,
@@ -97,6 +99,7 @@ class MyApp extends StatelessWidget {
       brightness: Brightness.dark,
       primaryColor: primaryColor,
       colorScheme: colorScheme,
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme),
       scaffoldBackgroundColor: colorScheme.surface,
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.primary,

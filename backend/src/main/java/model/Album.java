@@ -86,7 +86,6 @@ public class Album {
         return album;
     }
 
-    // Overload for AlbumController compatibility
     public static Album createAlbum(int ownerId, String name) {
         return createAlbum(ownerId, name, LocalDateTime.now());
     }
@@ -113,6 +112,15 @@ public class Album {
         }
 
         albums.remove(album.getId());
+    }
+
+    public static void loadAlbums(List<Album> loadedAlbums) {
+        albums.clear();
+        if (loadedAlbums != null) {
+            for (Album album : loadedAlbums) {
+                albums.put(album.getId(), album);
+            }
+        }
     }
 
     static void clearAlbumsForTest() {

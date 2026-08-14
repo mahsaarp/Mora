@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import '../model/comment.dart';
+import '../services/session_manager.dart';
 
 class ExplorePhoto {
   final String id;
@@ -8,16 +9,17 @@ class ExplorePhoto {
   int likes;
   int commentsCount;
   bool isSelected;
+  bool isLiked;
 
   String caption;
   List<String> tags;
   final String username;
   final String userAvatar;
   final bool isOwner;
-  
-  bool allowComments;
 
-  //constructor:
+  bool allowComments;
+  List<Comment> comments;
+
   ExplorePhoto({
     required this.id,
     required this.name,
@@ -32,159 +34,104 @@ class ExplorePhoto {
     required this.userAvatar,
     this.isOwner = false,
     this.allowComments = true,
+    this.isLiked = false,
+    this.comments = const [],
   });
 
   factory ExplorePhoto.fromJson(Map<String, dynamic> json) {
+    final currentUserId = SessionManager().userId;
+
+    final id = (json['id'] ?? json['photoId'] ?? json['photo_id'] ?? '').toString();
+
+    final userLikedIdsRaw = json['userLikedIds'] ?? json['liked_user_ids'] ?? [];
+    final List<dynamic> userLikedIds = userLikedIdsRaw is List ? userLikedIdsRaw : [];
+
+    int likesCount = 0;
+    if (json['likes'] != null) {
+      likesCount = int.tryParse(json['likes'].toString()) ?? 0;
+    } else if (json['likesCount'] != null) {
+      likesCount = int.tryParse(json['likesCount'].toString()) ?? 0;
+    } else if (json['likes_count'] != null) {
+      likesCount = int.tryParse(json['likes_count'].toString()) ?? 0;
+    } else {
+      likesCount = userLikedIds.length;
+    }
+
+    bool isLiked = false;
+    if (currentUserId != null) {
+      isLiked = userLikedIds.any((element) => element.toString() == currentUserId.toString());
+    }
+    if (!isLiked) {
+      isLiked = json['isLiked'] ?? json['is_liked'] ?? false;
+    }
+
+    int cCount = 0;
+    if (json['commentsCount'] != null) {
+      cCount = int.tryParse(json['commentsCount'].toString()) ?? 0;
+    } else if (json['comments_count'] != null) {
+      cCount = int.tryParse(json['comments_count'].toString()) ?? 0;
+    } else if (json['commentIds'] != null && json['commentIds'] is List) {
+      cCount = (json['commentIds'] as List).length;
+    } else if (json['comments'] != null && json['comments'] is List) {
+      cCount = (json['comments'] as List).length;
+    }
+
+    DateTime date = DateTime.now();
+    final dateStr = json['date'] ?? json['created_at'] ?? json['timestamp'];
+    if (dateStr != null) {
+      date = DateTime.tryParse(dateStr.toString()) ?? DateTime.now();
+    }
+
     return ExplorePhoto(
-      id: json['id']?.toString() ?? '',
-      name: json['name'] ?? 'Untitled',
-      imageUrl: json['route'] ?? '',
-      dateAdded: json['date'] != null 
-          ? DateTime.tryParse(json['date'].toString()) ?? DateTime.now()
-          : DateTime.now(),
-      likes: json['likes'] ?? 0,
-      commentsCount: json['comments_count'] ?? 0,
-      caption: json['caption'] ?? '',
-      tags: List<String>.from(json['tags'] ?? []),
-      username: json['owner_username'] ?? 'User',
+      id: id,
+      name: json['name'] ?? json['title'] ?? 'Untitled',
+      imageUrl: json['route'] ?? json['url'] ?? json['image_url'] ?? '',
+      dateAdded: date,
+      likes: likesCount,
+      commentsCount: cCount,
+      caption: json['caption'] ?? json['description'] ?? '',
+      tags: json['tags'] is List ? List<String>.from(json['tags']) : [],
+      username: json['owner_username'] ?? json['username'] ?? 'User',
       userAvatar: json['avatar_url'] ?? 'assets/images/default_avatar.png',
-      isOwner: json['is_owner'] ?? false,
-      allowComments: json['allow_comments'] ?? true,
+      isOwner: (json['ownerId'] != null && json['ownerId'].toString() == currentUserId?.toString()) || (json['is_owner'] == true),
+      allowComments: json['commentAllowed'] ?? json['allow_comments'] ?? true,
+      isLiked: isLiked,
+      comments: json['comments'] != null && json['comments'] is List
+          ? (json['comments'] as List).map((c) => Comment.fromJson(c)).toList()
+          : [],
     );
   }
 }
 
 class ExploreAlbum {
   final String id;
+  final String ownerId;
   final String title;
-  final List<String> imageUrl;
   final List<String> imageUrls;
   final int photoCount;
   final DateTime createdAt;
 
   ExploreAlbum({
     required this.id,
+    required this.ownerId,
     required this.title,
     required this.imageUrls,
     required this.photoCount,
     required this.createdAt,
-  }) : imageUrl = imageUrls;
+  });
 
   factory ExploreAlbum.fromJson(Map<String, dynamic> json) {
     return ExploreAlbum(
       id: json['id']?.toString() ?? '',
+      ownerId: json['ownerId']?.toString() ?? json['owner_id']?.toString() ?? '',
       title: json['name'] ?? 'Untitled',
       imageUrls: List<String>.from(json['image_urls'] ?? (json['route'] != null ? [json['route']] : [])),
-      photoCount: json['photo_count'] ?? 0,
+      photoCount: json['photoIds'] != null ? (json['photoIds'] as List).length : 0,
       createdAt: json['date'] != null
           ? DateTime.tryParse(json['date'].toString()) ?? DateTime.now()
-          : DateTime.now(),
+          : (json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now() : DateTime.now()),
     );
   }
 }
 
-List<ExplorePhoto> initialMockPhotos = [
-  ExplorePhoto(
-    id: '1',
-    name: 'Rose',
-    imageUrl: 'assets/images/rose.jpg',
-    dateAdded: DateTime.now().subtract(const Duration(days: 2)),
-    likes: 120,
-    commentsCount: 5,
-    username: 'mahsa_flower',
-    userAvatar: 'assets/images/rose.jpg',
-    isOwner: true,
-    caption: 'A beautiful rose from my garden! #nature',
-    tags: ['#nature', '#rose', '#red'],
-    allowComments: true,
-  ),
-  ExplorePhoto(
-    id: '2',
-    name: 'Lily',
-    imageUrl: 'assets/images/lily.jpg',
-    dateAdded: DateTime.now().subtract(const Duration(days: 5)),
-    likes: 85,
-    commentsCount: 2,
-    username: 'ali_art',
-    userAvatar: 'assets/images/lily.jpg',
-    isOwner: false,
-    caption: 'White lilies signify purity.',
-    tags: ['#lily', '#white', '#pure'],
-    allowComments: true,
-  ),
-  ExplorePhoto(
-    id: '3',
-    name: 'Tulip',
-    imageUrl: 'assets/images/tulip.jpg',
-    dateAdded: DateTime.now().subtract(const Duration(days: 1)),
-    likes: 250,
-    commentsCount: 12,
-    username: 'sara_garden',
-    userAvatar: 'assets/images/tulip.jpg',
-    isOwner: false,
-    caption: 'Spring is here with Tulips.',
-    tags: ['#spring', '#tulip'],
-    allowComments: true,
-  ),
-  ExplorePhoto(
-    id: '4',
-    name: 'Sunflower',
-    imageUrl: 'assets/images/sunflower.jpg',
-    dateAdded: DateTime.now().subtract(const Duration(days: 10)),
-    likes: 45,
-    username: 'john_doe',
-    userAvatar: 'assets/images/sunflower.jpg',
-    caption: 'Follow the sun.',
-    tags: ['#sun', '#yellow'],
-    allowComments: true,
-  ),
-  ExplorePhoto(
-    id: '5',
-    name: 'Daffodil',
-    imageUrl: 'assets/images/daffodil.jpg',
-    dateAdded: DateTime.now().subtract(const Duration(days: 3)),
-    likes: 310,
-    username: 'mahsa_flower',
-    userAvatar: 'assets/images/rose.jpg',
-    isOwner: true,
-    caption: 'Yellow brightens the day.',
-    tags: ['#yellow', '#daffodil'],
-    allowComments: true,
-  ),
-  ExplorePhoto(
-    id: '6',
-    name: 'Peony',
-    imageUrl: 'assets/images/peony.jpg',
-    dateAdded: DateTime.now().subtract(const Duration(days: 7)),
-    likes: 95,
-    username: 'art_lover',
-    userAvatar: 'assets/images/peony.jpg',
-    caption: 'Pink peonies are the best.',
-    tags: ['#pink', '#peony'],
-    allowComments: true,
-  ),
-];
-
-List<ExploreAlbum> mockAlbums = [
-  ExploreAlbum(
-    id: 'a1',
-    title: 'Trip to North',
-    imageUrls: [
-      'assets/images/rose.jpg',
-      'assets/images/lily.jpg',
-      'assets/images/tulip.jpg',
-    ],
-    photoCount: 3,
-    createdAt: DateTime.now().subtract(const Duration(days: 20)),
-  ),
-  ExploreAlbum(
-    id: 'a2',
-    title: 'Family Gatherings',
-    imageUrls: [
-      'assets/images/sunflower.jpg',
-      'assets/images/daffodil.jpg',
-    ],
-    photoCount: 2,
-    createdAt: DateTime.now().subtract(const Duration(days: 8)),
-  ),
-];
+List<ExploreAlbum> mockAlbums = [];

@@ -3,6 +3,7 @@ package database;
 import model.Album;
 import model.Photo;
 import model.User;
+import model.Comment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class DatabaseData {
     private List<User> users = new ArrayList<>();
     private List<Album> albums = new ArrayList<>();
     private List<Photo> photos = new ArrayList<>();
+    private List<Comment> comments = new ArrayList<>();
 
     public List<User> getUsers() {
         return users;
@@ -35,5 +37,13 @@ public class DatabaseData {
 
     public void setPhotos(List<Photo> photos) {
         this.photos = photos;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

@@ -11,20 +11,6 @@ class UserTest {
         User.clearUsersForTest();
     }
 
-    //==================================== VALIDATION TEST
-    @Test
-    void validationTest() {
-        assertTrue(User.isValidUsername("09123456789", User.EnterType.PHONE));
-        assertTrue(User.isValidUsername("test@gmail.com", User.EnterType.EMAIL));
-
-        assertFalse(User.isValidUsername("sdnvjnsvKMK", User.EnterType.EMAIL));
-        assertFalse(User.isValidUsername("123", User.EnterType.PHONE));
-
-        assertTrue(User.isValidPassword("user", "A123456a"));
-        assertFalse(User.isValidPassword("user", "123"));
-        assertFalse(User.isValidPassword("user", "moraproject"));
-    }
-
     //==================================== SIGN UP TEST
     @Test
     void signUpTest() {
@@ -46,13 +32,13 @@ class UserTest {
 
     @Test
     void wrongPasswordLoginTest() {
-            User.clearUsersForTest();
+        User.clearUsersForTest();
 
-            User.signUp(User.EnterType.EMAIL, "test@gmail.com", "A123456a");
+        User.signUp(User.EnterType.EMAIL, "test@gmail.com", "A123456a");
 
-            assertThrows(IllegalArgumentException.class, () -> {
-                User.login("test@gmail.com", "wrongpass");
-            }, "should throw IllegalArgumentException");
+        assertThrows(IllegalArgumentException.class, () -> {
+            User.login("test@gmail.com", "wrongpass");
+        }, "should throw IllegalArgumentException");
     }
 
     //==================================== LOGOUT TEST

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mora/pages/profile_page.dart';
 import 'package:mora/pages/publish_page.dart';
-import 'package:mora/pages/search_page.dart';
 import 'package:mora/pages/explore_page.dart';
 
 class MainScreen extends StatefulWidget {
@@ -19,8 +18,6 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const ExploreScreen(),
-    const SearchScreen(),
-    const SizedBox.shrink(),
     const ProfilePage(),
   ];
 
@@ -101,9 +98,8 @@ class _MainScreenState extends State<MainScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildNavItem(Icons.explore, "Explore", 0, scheme),
-                  _buildNavItem(Icons.search, "Search", 1, scheme),
-                  _buildNavItem(Icons.add_box_outlined, "Post", 2, scheme),
-                  _buildNavItem(Icons.person, "Profile", 3, scheme),
+                  _buildNavItem(Icons.add_box_outlined, "Post", 1, scheme),
+                  _buildNavItem(Icons.person, "Profile", 2, scheme),
                 ],
               ),
             ),
@@ -114,16 +110,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   Widget _buildNavItem(IconData icon, String label, int index, ColorScheme scheme) {
-    final bool isSelected = _currentIndex == index;
+    final bool isSelected = (index == 0 && _currentIndex == 0) || (index == 2 && _currentIndex == 1);
     final activeColor = scheme.primary;
     final inactiveColor = scheme.onSurfaceVariant;
 
     return GestureDetector(
       onTap: () {
-        if (index == 2) {
+        if (index == 1) {
           _showCreatePostBottomSheet();
-        } else {
-          setState(() => _currentIndex = index);
+        } else if (index == 0) {
+          setState(() => _currentIndex = 0);
+        } else if (index == 2) {
+          setState(() => _currentIndex = 1);
         }
       },
       child: Container(

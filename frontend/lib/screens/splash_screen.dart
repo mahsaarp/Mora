@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../services/session_manager.dart';
+import '../services/SocketService.dart';
 import 'entry_screen.dart';
+import 'main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -33,9 +36,20 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startSplashFlow() async {
     await _controller.forward();
     await Future.delayed(const Duration(milliseconds: 1400));
+
+    final isLoggedIn = await SessionManager().initSession();
+
     await _controller.reverse();
 
     if (!mounted) return;
+
+    Widget nextScreen;
+    if (isLoggedIn) {
+      SocketService.loggedInUsername = SessionManager().username;
+      nextScreen = const MainScreen();
+    } else {
+      nextScreen = const EntryScreen();
+    }
 
     Navigator.pushReplacement(
       context,
@@ -43,7 +57,7 @@ class _SplashScreenState extends State<SplashScreen>
         transitionDuration: const Duration(milliseconds: 500),
         pageBuilder: (_, animation, __) => FadeTransition(
           opacity: animation,
-          child: const EntryScreen(),
+          child: nextScreen,
         ),
       ),
     );

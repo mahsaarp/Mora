@@ -4,6 +4,7 @@ import '../services/SocketService.dart';
 import '../services/session_manager.dart';
 import 'main_screen.dart';
 import 'sign_up_screen.dart';
+import 'admin_dashboard_page.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -38,17 +39,31 @@ class _SignInScreenState extends State<SignInScreen> {
     try {
       final response = await SocketService.login(username, password);
 
-      // هماهنگی با ساختار جدید پاسخ (statusCode 200 یا success true)
       if (response['statusCode'] == 200 || response['success'] == true) {
-        // ذخیره اطلاعات کاربر در SessionManager
-        SessionManager().setUser(response['userId'], response['username']);
+        final data = response['data'] is Map<String, dynamic> ? response['data'] : response;
+
+        final int userId = data['userId'] ?? data['id'] ?? 0;
+        final String savedUsername = data['username'] ?? username;
+        final bool isAdmin = data['isAdmin'] == true || data['rank'] == 'ADMIN';
+
+        await SessionManager().setUser(userId, savedUsername);
+        SocketService.loggedInUsername = savedUsername;
 
         if (!mounted) return;
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => const MainScreen()),
-          (route) => false,
-        );
+
+        if (isAdmin) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminDashboardPage()),
+                (route) => false,
+          );
+        } else {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const MainScreen()),
+                (route) => false,
+          );
+        }
       } else {
         _showError(response['message'] ?? "Login failed");
       }

@@ -1,9 +1,7 @@
 package database;
 
 import com.google.gson.*;
-import model.Album;
-import model.Photo;
-import model.User;
+import model.*;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -67,26 +65,50 @@ public class DatabaseManager {
                 databaseData = new DatabaseData();
             }
 
+            int maxUserId = 0;
             if (databaseData.getUsers() != null) {
                 User.getUsers().clear();
                 for (User user : databaseData.getUsers()) {
                     User.getUsers().put(user.getId(), user);
+                    if (user.getId() > maxUserId) {
+                        maxUserId = user.getId();
+                    }
                 }
             }
+            IdGenerator.setUserId(maxUserId + 1);
 
+            int maxPhotoId = 0;
             if (databaseData.getPhotos() != null) {
-                Photo.getPhotos().clear();
+                Photo.loadPhotos(databaseData.getPhotos());
                 for (Photo photo : databaseData.getPhotos()) {
-                    Photo.getPhotos().put(photo.getId(), photo);
+                    if (photo.getId() > maxPhotoId) {
+                        maxPhotoId = photo.getId();
+                    }
                 }
             }
+            IdGenerator.setPhotoId(maxPhotoId + 1);
 
+            int maxAlbumId = 0;
             if (databaseData.getAlbums() != null) {
-                Album.getAlbums().clear();
+                Album.loadAlbums(databaseData.getAlbums());
                 for (Album album : databaseData.getAlbums()) {
-                    Album.getAlbums().put(album.getId(), album);
+                    if (album.getId() > maxAlbumId) {
+                        maxAlbumId = album.getId();
+                    }
                 }
             }
+            IdGenerator.setAlbumId(maxAlbumId + 1);
+
+            int maxCommentId = 0;
+            if (databaseData.getComments() != null) {
+                Comment.loadComments(databaseData.getComments());
+                for (Comment comment : databaseData.getComments()) {
+                    if (comment.getId() > maxCommentId) {
+                        maxCommentId = comment.getId();
+                    }
+                }
+            }
+            IdGenerator.setCommentId(maxCommentId + 1);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,16 +125,15 @@ public class DatabaseManager {
             databaseData.setUsers(new ArrayList<>(User.getUsers().values()));
             databaseData.setAlbums(new ArrayList<>(Album.getAlbums().values()));
             databaseData.setPhotos(new ArrayList<>(Photo.getPhotos().values()));
+            databaseData.setComments(new ArrayList<>(Comment.getComments().values()));
 
             File file = new File("database/database.json");
             System.out.println("Saving database to: " + file.getAbsolutePath());
 
             try (FileWriter writer = new FileWriter(file)) {
-                System.out.println("Users count to save: " + User.getUsers().size());
-                System.out.println("Photos count to save: " + Photo.getPhotos().size());
                 gson.toJson(databaseData, writer);
                 writer.flush();
-                System.out.println("Database saved successfully!");
+                System.out.println("Database saved successfully! Photos: " + Photo.getPhotos().size() + ", Comments: " + Comment.getComments().size());
             }
         } catch (Exception e) {
             System.err.println("ERROR saving database:");
@@ -121,9 +142,6 @@ public class DatabaseManager {
     }
 
     public synchronized void addUser(User user) {
-        if (databaseData == null) {
-            databaseData = new DatabaseData();
-        }
         User.getUsers().put(user.getId(), user);
         saveDatabase();
     }
@@ -137,9 +155,6 @@ public class DatabaseManager {
     }
 
     public synchronized void addAlbum(Album album) {
-        if (databaseData == null) {
-            databaseData = new DatabaseData();
-        }
         Album.getAlbums().put(album.getId(), album);
         saveDatabase();
     }
@@ -158,9 +173,6 @@ public class DatabaseManager {
     }
 
     public synchronized void addPhoto(Photo photo) {
-        if (databaseData == null) {
-            databaseData = new DatabaseData();
-        }
         Photo.getPhotos().put(photo.getId(), photo);
         saveDatabase();
     }

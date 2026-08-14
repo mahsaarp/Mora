@@ -1,10 +1,10 @@
 package model;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 public class User {
     public static void clearUsersForTest() {
@@ -37,9 +37,16 @@ public class User {
     private UserRank rank;
     private EnterType enterType;
 
+    private String themeMode;
+    private String themeColor;
+
+    private static final Pattern PHONE_REGEX = Pattern.compile("^09\\d{9}$");
+    private static final Pattern EMAIL_REGEX = Pattern.compile("^[a-zA-Z0-9_.+-]+@gmail\\.com$");
+    private static final Pattern PASSWORD_REGEX = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
+
     private static Map<Integer, User> users = new ConcurrentHashMap<>();
-    private static final int PHOTO_NUMBER = 100;
-    private static final int COMMENT_NUMBER = 200;
+    private static final int PHOTO_NUMBER = 5;
+    private static final int COMMENT_NUMBER = 5;
     //=============================================CONSTRUCTOR
     public User(int id, String username, String password, UserRank rank, EnterType enterType) {
         this.id = id;
@@ -96,6 +103,7 @@ public class User {
     }
 
     public UserRank getRank() {
+        updateRank();
         return rank;
     }
 
@@ -109,6 +117,14 @@ public class User {
 
     public static Map<Integer, User> getUsers() {
         return users;
+    }
+
+    public String getThemeMode() {
+        return themeMode;
+    }
+
+    public String getThemeColor() {
+        return themeColor;
     }
 
     //=============================================SETTERS
@@ -132,25 +148,44 @@ public class User {
         isLoggedIn = false;
     }
 
+    public void setThemeMode(String themeMode) {
+        this.themeMode = themeMode;
+    }
+
+    public void setThemeColor(String themeColor) {
+        this.themeColor = themeColor;
+    }
+
     public void changeUsername(String newUsername) {
-        if (!isValidUsername(newUsername, enterType)) {
-            throw new IllegalArgumentException("Invalid username");
+        if (!isValidUsername(newUsername)) {
+            throw new IllegalArgumentException("Username must be a valid mobile number (09xxxxxxxx) or Gmail (@gmail.com)");
         }
         if (usernameExists(newUsername) && !username.equals(newUsername)) {
             throw new IllegalArgumentException("Username already exists");
         }
-        username = newUsername;
+        this.username = newUsername;
+        this.enterType = detectEnterType(newUsername);
     }
 
     public void changePassword(String newPassword) {
-        if (isValidPassword(username, newPassword)) {
-            password = newPassword;
+        if (!isValidPassword(username, newPassword)) {
+            throw new IllegalArgumentException("Password must be at least 8 characters, include uppercase, lowercase, digits, and MUST NOT contain your username.");
         }
+        this.password = newPassword;
     }
 
     public void addPhoto(int photoId) {
-        photoIds.add(photoId);
-        updateRank();
+        if (!photoIds.contains(photoId)) {
+            photoIds.add(photoId);
+            updateRank();
+        }
+    }
+
+    public void addPhoto(Photo photo) {
+        if (photo != null && !photoIds.contains(photo.getId())) {
+            photoIds.add(photo.getId());
+            updateRank();
+        }
     }
 
     public void removePhoto(int photoId) {
@@ -159,7 +194,9 @@ public class User {
     }
 
     public void addAlbum(int albumId) {
-        albumIds.add(albumId);
+        if (!albumIds.contains(albumId)) {
+            albumIds.add(albumId);
+        }
     }
 
     public void removeAlbum(int albumId) {
@@ -167,11 +204,16 @@ public class User {
     }
 
     public void addFavoritePhoto(int photoId) {
-        likedPhotoIds.add(photoId);
+        if (!likedPhotoIds.contains(photoId)) {
+            likedPhotoIds.add(photoId);
+            updateRank();
+        }
     }
 
     public void removeFavoritePhoto(int photoId) {
-        likedPhotoIds.remove(Integer.valueOf(photoId));
+        if (likedPhotoIds.remove(Integer.valueOf(photoId))) {
+            updateRank();
+        }
     }
 
     public void incrementCommentCount() {
@@ -180,60 +222,48 @@ public class User {
     }
 
     //=============================================VALIDATIONS
-    public static boolean isValidUsername(String username, EnterType enterType) {
-        if (enterType == EnterType.EMAIL) {
-            return username.contains("@gmail.com");
-        }
+    public static boolean isValidUsername(String username) {
+        if (username == null || username.trim().isEmpty()) return false;
+        return PHONE_REGEX.matcher(username).matches() || EMAIL_REGEX.matcher(username).matches();
+    }
 
-        if (enterType == EnterType.PHONE) {
-            return username.length() == 11 && username.startsWith("09");
+    public static EnterType detectEnterType(String username) {
+        if (username == null) return null;
+        if (EMAIL_REGEX.matcher(username).matches()) {
+            return EnterType.EMAIL;
+        } else if (PHONE_REGEX.matcher(username).matches()) {
+            return EnterType.PHONE;
         }
-
-        return false;
+        return null;
     }
 
     public static boolean isValidPassword(String username, String password) {
-        if (password.length() < 8) {
+        if (password == null || username == null) {
             return false;
         }
-        if (password.contains(username)) {
+        if (password.toLowerCase().contains(username.toLowerCase())) {
             return false;
         }
-
-        boolean hasUpper = false;
-        boolean hasLower = false;
-        boolean hasDigit = false;
-
-        for (int i = 0; i < password.length(); i++) {
-            char c = password.charAt(i);
-            if (Character.isUpperCase(c)) {
-                hasUpper = true;
-            }
-            if (Character.isLowerCase(c)) {
-                hasLower = true;
-            }
-            if (Character.isDigit(c)) {
-                hasDigit = true;
-            }
-        }
-
-        return hasUpper && hasLower && hasDigit;
+        return PASSWORD_REGEX.matcher(password).matches();
     }
 
     //=============================================SIGNUP AND LOGIN
     public static User signUp(EnterType enterType, String username, String password) {
-        if (!isValidUsername(username, enterType)) {
-            throw new IllegalArgumentException("Invalid username");
+        if (!isValidUsername(username)) {
+            throw new IllegalArgumentException("Username must be a valid mobile number (09xxxxxxxx) or Gmail (@gmail.com)");
         }
 
         if (usernameExists(username)) {
             throw new IllegalArgumentException("Username already exists");
         }
+
         if (!isValidPassword(username, password)) {
-           throw new IllegalArgumentException("Invalid password");
+            throw new IllegalArgumentException("Password must be at least 8 characters, include uppercase, lowercase, digits, and MUST NOT contain your username.");
         }
 
-        User user = new User(IdGenerator.nextUserId(), username, password, UserRank.NEWBIE, enterType);
+        EnterType resolvedType = (enterType != null) ? enterType : detectEnterType(username);
+
+        User user = new User(IdGenerator.nextUserId(), username, password, UserRank.NEWBIE, resolvedType);
         users.put(user.getId(), user);
 
         return user;
@@ -253,12 +283,15 @@ public class User {
         }
 
         user.login();
+        user.updateRank();
         return user;
-        }
+    }
 
     //=============================================LOG OUT AND DELETE ACCOUNT
     public static void logout(User user) {
-        user.isLoggedIn = false;
+        if (user != null) {
+            user.isLoggedIn = false;
+        }
     }
 
     public static void deleteAccount(User user) {
@@ -281,6 +314,11 @@ public class User {
                 Comment.deleteComment(comment);
             }
         }
+
+        for (Photo photo : Photo.getPhotos().values()) {
+            photo.getUserLikedIds().remove(Integer.valueOf(user.getId()));
+        }
+
         users.remove(user.getId());
     }
     //============================================UPDATE RANK
@@ -332,10 +370,4 @@ public class User {
         }
     }
 
-    public void addPhoto(Photo photo) {
-        if (photo != null && !photoIds.contains(photo.getId())) {
-            photoIds.add(photo.getId());
-            updateRank();
-        }
-    }
 }

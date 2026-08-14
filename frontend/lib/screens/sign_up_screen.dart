@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/SocketService.dart';
+import '../services/session_manager.dart';
 import 'main_screen.dart';
 import 'log_in_screen.dart';
 
@@ -12,17 +13,17 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final nameController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
-  bool isEmail = true;
   bool _isLoading = false;
+
+  final RegExp _usernameRegex = RegExp(r'^09\d{9}$|^[a-zA-Z0-9_.+-]+@gmail\.com$');
+  final RegExp _passwordRegex = RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$');
 
   @override
   void dispose() {
-    nameController.dispose();
     usernameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -39,6 +40,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
+    if (!_usernameRegex.hasMatch(username)) {
+      _showError("Username must be a valid phone (09xxxxxxxx) or Gmail (@gmail.com)");
+      return;
+    }
+
+    if (!_passwordRegex.hasMatch(password)) {
+      _showError("Password must be 8+ chars and include uppercase, lowercase, and digits");
+      return;
+    }
+
+    if (password.toLowerCase().contains(username.toLowerCase())) {
+      _showError("Password MUST NOT contain your username");
+      return;
+    }
+
     if (password != confirmPassword) {
       _showError("Passwords do not match");
       return;
@@ -47,15 +63,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // Adjusted to match SocketService.signUp(username, password)
       final response = await SocketService.signUp(username, password);
 
       if (response['success'] == true || response['statusCode'] == 200) {
+        await SessionManager().setUser(
+          response['userId'] ?? response['id'] ?? 0,
+          username,
+        );
+
         if (!mounted) return;
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (_) => const MainScreen()),
-          (route) => false,
+              (route) => false,
         );
       } else {
         _showError(response['message'] ?? "Sign up failed");
@@ -69,7 +89,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.redAccent),
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+      ),
     );
   }
 
@@ -81,8 +105,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned.fill(child: Image.asset("assets/images/background.png", fit: BoxFit.cover)),
-          Positioned.fill(child: Container(color: scheme.scrim.withOpacity(0.20))),
+          Positioned.fill(
+            child: Image.asset("assets/images/background.png", fit: BoxFit.cover),
+          ),
+          Positioned.fill(
+            child: Container(color: scheme.scrim.withOpacity(0.20)),
+          ),
           Center(
             child: SingleChildScrollView(
               child: ClipRRect(
@@ -102,12 +130,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       children: [
                         Icon(Icons.person_add_alt_1, color: scheme.primary, size: 55),
                         const SizedBox(height: 15),
-                        Text("Create Account", style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: scheme.onSurface)),
+                        Text(
+                          "Create Account",
+                          style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: scheme.onSurface,
+                          ),
+                        ),
                         const SizedBox(height: 20),
                         TextField(
                           controller: usernameController,
                           style: TextStyle(color: scheme.onSurface),
-                          decoration: _inputDecoration(scheme, "Username/Email", Icons.person_outline),
+                          decoration: _inputDecoration(scheme, "Phone or Gmail", Icons.person_outline),
                         ),
                         const SizedBox(height: 15),
                         TextField(
@@ -131,11 +166,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: scheme.primary,
                               foregroundColor: scheme.onPrimary,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
                             ),
                             onPressed: _isLoading ? null : _handleSignUp,
                             child: _isLoading
-                                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                            )
                                 : const Text("Create Account", style: TextStyle(fontSize: 17)),
                           ),
                         ),
@@ -160,7 +201,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
       prefixIcon: Icon(icon, color: scheme.onSurfaceVariant),
       filled: true,
       fillColor: scheme.surface.withOpacity(0.78),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide.none),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide.none,
+      ),
     );
   }
 
@@ -170,8 +214,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       children: [
         Text("Already have an account?", style: TextStyle(color: scheme.onSurface)),
         TextButton(
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SignInScreen())),
-          child: Text("Log In", style: TextStyle(color: scheme.primary, fontWeight: FontWeight.bold)),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const SignInScreen()),
+          ),
+          child: Text(
+            "Log In",
+            style: TextStyle(color: scheme.primary, fontWeight: FontWeight.bold),
+          ),
         ),
       ],
     );

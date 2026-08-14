@@ -12,10 +12,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PhotoTest {
 
-    @BeforeEach
-    void start() {
-        Photo.clearPhotosForTest();
-    }
 
 
     @Test

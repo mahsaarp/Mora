@@ -1,19 +1,551 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": 2,
+      "username": "Sara@gmail.com",
+      "password": "Sara12345",
+      "avatarRoute": "uploads/avatars/user_2.jpg",
+      "photoIds": [
+        2,
+        4,
+        5,
+        6,
+        7,
+        10
+      ],
+      "albumIds": [
+        3
+      ],
+      "likedPhotoIds": [
+        11,
+        9,
+        3
+      ],
+      "isBanned": false,
+      "isLoggedIn": true,
+      "commentCount": 2,
+      "rank": "PHOTOGRAPHER",
+      "enterType": "EMAIL",
+      "themeMode": "light",
+      "themeColor": "green"
+    },
+    {
+      "id": 3,
       "username": "Mahsa@gmail.com",
-      "password": "Mahsa1386_",
-      "photoIds": [],
-      "albumIds": [],
+      "password": "Mahsa1234",
+      "avatarRoute": "uploads/avatars/user_3.jpg",
+      "photoIds": [
+        3,
+        8,
+        9
+      ],
+      "albumIds": [
+        1
+      ],
       "likedPhotoIds": [],
       "isBanned": false,
       "isLoggedIn": false,
       "commentCount": 0,
       "rank": "NEWBIE",
-      "enterType": "EMAIL"
+      "enterType": "EMAIL",
+      "themeMode": "dark",
+      "themeColor": "green"
+    },
+    {
+      "id": 4,
+      "username": "Amin@gmail.com",
+      "password": "Sina1234",
+      "avatarRoute": "uploads/avatars/user_4.jpg",
+      "photoIds": [
+        11
+      ],
+      "albumIds": [
+        4
+      ],
+      "likedPhotoIds": [
+        2,
+        3,
+        6,
+        9,
+        10,
+        7,
+        13
+      ],
+      "isBanned": true,
+      "isLoggedIn": false,
+      "commentCount": 5,
+      "rank": "COMMENTER",
+      "enterType": "EMAIL",
+      "themeMode": "light"
+    },
+    {
+      "id": 5,
+      "username": "Mohammad@gmail.com",
+      "password": "Mohammad12",
+      "avatarRoute": "uploads/avatars/user_5.jpg",
+      "photoIds": [
+        12,
+        13
+      ],
+      "albumIds": [
+        5
+      ],
+      "likedPhotoIds": [
+        11,
+        10,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2
+      ],
+      "isBanned": false,
+      "isLoggedIn": false,
+      "commentCount": 1,
+      "rank": "NEWBIE",
+      "enterType": "EMAIL",
+      "themeMode": "light",
+      "themeColor": "green"
+    },
+    {
+      "id": 7,
+      "username": "Ehsan@gmail.com",
+      "password": "Welcome123",
+      "avatarRoute": "uploads/avatars/user_7.jpg",
+      "photoIds": [
+        16
+      ],
+      "albumIds": [
+        7
+      ],
+      "likedPhotoIds": [
+        9,
+        11,
+        13,
+        8,
+        2
+      ],
+      "isBanned": false,
+      "isLoggedIn": false,
+      "commentCount": 1,
+      "rank": "NEWBIE",
+      "enterType": "EMAIL",
+      "themeMode": "dark",
+      "themeColor": "blue"
     }
   ],
-  "albums": [],
-  "photos": []
+  "albums": [
+    {
+      "id": 1,
+      "ownerId": 3,
+      "name": "Flowers",
+      "date": "2026-08-05T23:28:56.6274122",
+      "photoIds": [
+        3,
+        8,
+        9
+      ]
+    },
+    {
+      "id": 3,
+      "ownerId": 2,
+      "name": "Animals",
+      "date": "2026-08-05T23:34:35.0610223",
+      "photoIds": [
+        5,
+        6,
+        7,
+        4
+      ]
+    },
+    {
+      "id": 4,
+      "ownerId": 4,
+      "name": "Sport",
+      "date": "2026-08-06T00:10:19.4535894",
+      "photoIds": [
+        11
+      ]
+    },
+    {
+      "id": 5,
+      "ownerId": 5,
+      "name": "Art",
+      "date": "2026-08-06T00:23:57.1189399",
+      "photoIds": [
+        12,
+        13
+      ]
+    },
+    {
+      "id": 7,
+      "ownerId": 7,
+      "name": "Sea",
+      "date": "2026-08-07T10:19:19.4293012",
+      "photoIds": []
+    }
+  ],
+  "photos": [
+    {
+      "id": 2,
+      "ownerId": 2,
+      "name": "Cat",
+      "date": "2026-08-05T23:15:34.9858435",
+      "tags": [
+        "Cat",
+        "Pet",
+        "Kitten",
+        "Wildlife",
+        "Animal"
+      ],
+      "caption": "Just a little fluff with a big attitude",
+      "userLikedIds": [
+        4,
+        5,
+        7
+      ],
+      "commentAllowed": true,
+      "albumIds": [],
+      "commentIds": [],
+      "route": "photos/1785959134937_Cat.jpg"
+    },
+    {
+      "id": 3,
+      "ownerId": 3,
+      "name": "Flowers",
+      "date": "2026-08-05T23:17:33.9930215",
+      "tags": [],
+      "caption": "",
+      "userLikedIds": [
+        4,
+        5,
+        2
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        1
+      ],
+      "commentIds": [],
+      "route": "photos/1785959253993_Flowers.jpg"
+    },
+    {
+      "id": 4,
+      "ownerId": 2,
+      "name": "Birds",
+      "date": "2026-08-05T23:40:05.2791911",
+      "tags": [
+        "Bird",
+        "Wildlife",
+        "Animal",
+        "Pet"
+      ],
+      "caption": "Rainy day companions",
+      "userLikedIds": [
+        5
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        3
+      ],
+      "commentIds": [],
+      "route": "photos/1785960605275_Birds.jpg"
+    },
+    {
+      "id": 5,
+      "ownerId": 2,
+      "name": "Ladybugs",
+      "date": "2026-08-05T23:44:58.5112344",
+      "tags": [
+        "Ladybugs",
+        "Animal",
+        "Wildlife",
+        "Insects"
+      ],
+      "caption": "Little drops of luck resting in my hands",
+      "userLikedIds": [
+        5
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        3
+      ],
+      "commentIds": [],
+      "route": "photos/1785960898508_Ladybugs.jpg"
+    },
+    {
+      "id": 6,
+      "ownerId": 2,
+      "name": "Horse",
+      "date": "2026-08-05T23:47:02.1935753",
+      "tags": [
+        "Horse",
+        "Animal",
+        "Wildlife"
+      ],
+      "caption": "A quiet moment of grace and gentleness",
+      "userLikedIds": [
+        4,
+        5
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        3
+      ],
+      "commentIds": [
+        2
+      ],
+      "route": "photos/1785961022183_Horse.jpg"
+    },
+    {
+      "id": 7,
+      "ownerId": 2,
+      "name": "Swan",
+      "date": "2026-08-05T23:49:29.6865987",
+      "tags": [
+        "Swan",
+        "Water",
+        "Wildlife",
+        "Animal",
+        "Swim"
+      ],
+      "caption": "Gracefully floating in a moment of peace",
+      "userLikedIds": [
+        4,
+        5
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        3
+      ],
+      "commentIds": [],
+      "route": "photos/1785961169679_Swan.jpg"
+    },
+    {
+      "id": 8,
+      "ownerId": 3,
+      "name": "Lilies",
+      "date": "2026-08-05T23:53:25.0753628",
+      "tags": [
+        "Lily",
+        "Lilies",
+        "Flower",
+        "Bloom"
+      ],
+      "caption": "Pure beauty in every petal",
+      "userLikedIds": [
+        5,
+        7
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        1
+      ],
+      "commentIds": [
+        8
+      ],
+      "route": "photos/1785961405074_Lilies.jpg"
+    },
+    {
+      "id": 9,
+      "ownerId": 3,
+      "name": "Bouquet",
+      "date": "2026-08-06T00:00:58.7925111",
+      "tags": [
+        "Flower",
+        "Bouquet",
+        "Sun"
+      ],
+      "caption": "Under the golden sunlight",
+      "userLikedIds": [
+        4,
+        5,
+        2,
+        7
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        1
+      ],
+      "commentIds": [
+        1,
+        7
+      ],
+      "route": "photos/1785961858790_Bouquet.jpg"
+    },
+    {
+      "id": 10,
+      "ownerId": 2,
+      "name": "Ice Skates",
+      "date": "2026-08-06T00:03:27.2956829",
+      "tags": [
+        "IceSkates",
+        "Winter"
+      ],
+      "caption": "Ready to glide into a winter dream",
+      "userLikedIds": [
+        4,
+        5
+      ],
+      "commentAllowed": true,
+      "albumIds": [],
+      "commentIds": [],
+      "route": "photos/1785962007293_Ice Skates.jpg"
+    },
+    {
+      "id": 11,
+      "ownerId": 4,
+      "name": "Hiking Friends",
+      "date": "2026-08-06T00:10:04.5235803",
+      "tags": [
+        "Hiking",
+        "Snow",
+        "Winter"
+      ],
+      "caption": "Chasing snowy peaks with the best company",
+      "userLikedIds": [
+        5,
+        2,
+        7
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        4
+      ],
+      "commentIds": [
+        3,
+        4,
+        5
+      ],
+      "route": "photos/1785962404521_Hiking Friends.jpg"
+    },
+    {
+      "id": 12,
+      "ownerId": 5,
+      "name": "Museum",
+      "date": "2026-08-06T00:23:45.6407991",
+      "tags": [
+        "Museum",
+        "Art",
+        "Gallery"
+      ],
+      "caption": "Walking through stories preserve in time",
+      "userLikedIds": [],
+      "commentAllowed": true,
+      "albumIds": [
+        5
+      ],
+      "commentIds": [],
+      "route": "photos/1785963225614_Museum.jpg"
+    },
+    {
+      "id": 13,
+      "ownerId": 5,
+      "name": "Sketch",
+      "date": "2026-08-06T00:26:00.8655584",
+      "tags": [
+        "Sketch",
+        "Drawing",
+        "Coffee",
+        "Art"
+      ],
+      "caption": "One line and one sip at a time",
+      "userLikedIds": [
+        4,
+        7
+      ],
+      "commentAllowed": true,
+      "albumIds": [
+        5
+      ],
+      "commentIds": [
+        6,
+        11
+      ],
+      "route": "photos/1785963360863_Sketch.jpg"
+    },
+    {
+      "id": 16,
+      "ownerId": 7,
+      "name": "Sea Otter",
+      "date": "2026-08-07T10:18:30.8152745",
+      "tags": [
+        "Otter",
+        "Water"
+      ],
+      "caption": "Look at this! So cute",
+      "userLikedIds": [],
+      "commentAllowed": true,
+      "albumIds": [],
+      "commentIds": [],
+      "route": "photos/1786085310806_Sea Otter.jpg"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "ownerId": 4,
+      "photoId": 9,
+      "date": "2026-08-06T00:17:32.7118568",
+      "text": "wow"
+    },
+    {
+      "id": 2,
+      "ownerId": 4,
+      "photoId": 6,
+      "date": "2026-08-06T00:17:43.7747358",
+      "text": "So beautiful"
+    },
+    {
+      "id": 3,
+      "ownerId": 5,
+      "photoId": 11,
+      "date": "2026-08-06T00:19:10.0673376",
+      "text": "🤙🏻🤙🏻🤙🏻"
+    },
+    {
+      "id": 4,
+      "ownerId": 2,
+      "photoId": 11,
+      "date": "2026-08-06T01:02:19.7204535",
+      "text": "It was such a great day 🎿"
+    },
+    {
+      "id": 5,
+      "ownerId": 4,
+      "photoId": 11,
+      "date": "2026-08-06T01:05:39.6194622",
+      "text": "😃😃"
+    },
+    {
+      "id": 6,
+      "ownerId": 4,
+      "photoId": 13,
+      "date": "2026-08-06T01:06:18.9321965",
+      "text": "You\u0027re an artist! 🎨"
+    },
+    {
+      "id": 7,
+      "ownerId": 2,
+      "photoId": 9,
+      "date": "2026-08-06T01:14:45.8929794",
+      "text": "😍😍"
+    },
+    {
+      "id": 8,
+      "ownerId": 4,
+      "photoId": 8,
+      "date": "2026-08-06T01:25:04.8432804",
+      "text": "So beautiful 🌸"
+    },
+    {
+      "id": 11,
+      "ownerId": 7,
+      "photoId": 13,
+      "date": "2026-08-07T10:16:29.9576214",
+      "text": "Wow!"
+    }
+  ]
 }

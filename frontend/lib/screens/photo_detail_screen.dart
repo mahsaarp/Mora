@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gal/gal.dart';
@@ -5,6 +6,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import '../utils/explore_mock_data.dart';
+import '../services/SocketService.dart';
+import '../utils/shimmer_box.dart';
+import '../model/comment.dart';
 
 class PhotoDetailScreen extends StatefulWidget {
   final ExplorePhoto photo;
@@ -19,7 +23,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   final TextEditingController _commentCtrl = TextEditingController();
   final FocusNode _commentFocus = FocusNode();
 
-  late List<PhotoComment> _comments;
+  late List<Comment> _comments;
   late bool _allowComments;
   late bool _isLiked;
   late int _likes;
@@ -29,25 +33,9 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
   void initState() {
     super.initState();
     _allowComments = widget.photo.allowComments;
-    _isLiked = false;
+    _isLiked = widget.photo.isLiked;
     _likes = widget.photo.likes;
-
-    _comments = [
-      PhotoComment(
-        id: 'c1',
-        username: 'sara',
-        userAvatar: "assets/images/lily.jpg",
-        text: 'so pretty!',
-        createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
-      ),
-      PhotoComment(
-        id: 'c2',
-        username: 'ali',
-        userAvatar: "assets/images/rose.jpg",
-        text: 'beautiful!',
-        createdAt: DateTime.now().subtract(const Duration(minutes: 10)),
-      ),
-    ];
+    _comments = List.from(widget.photo.comments);
   }
 
   @override
@@ -57,71 +45,149 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     super.dispose();
   }
 
-  void _toggleLike() {
+  Future<void> _toggleLike() async {
+    final currentUsername = SocketService.loggedInUsername ?? "User";
+
     setState(() {
       _isLiked = !_isLiked;
       _likes += _isLiked ? 1 : -1;
       widget.photo.likes = _likes;
+      widget.photo.isLiked = _isLiked;
     });
+
+    try {
+      final photoIdInt = int.tryParse(widget.photo.id);
+      if (photoIdInt != null && photoIdInt > 0) {
+        await SocketService.likePhoto(currentUsername, photoIdInt);
+      } else {
+        debugPrint("Invalid photo ID for like: ${widget.photo.id}");
+      }
+    } catch (e) {
+      debugPrint("Error toggling like: $e");
+    }
   }
 
-  void _addComment() {
+  Future<void> _addComment() async {
     final text = _commentCtrl.text.trim();
     if (text.isEmpty) return;
 
+    final String username = SocketService.loggedInUsername ?? "User";
+
+    final newComment = Comment(
+      text: text,
+      date: DateTime.now().toIso8601String(),
+      username: username,
+    );
+
     setState(() {
-      _comments.insert(
-        0,
-        PhotoComment(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          username: 'mahsa',
-          userAvatar: "assets/images/rose.jpg",
-          text: text,
-          createdAt: DateTime.now(),
-        ),
-      );
-      widget.photo.commentsCount += 1;
+      _comments.insert(0, newComment);
+      widget.photo.comments = _comments;
+      widget.photo.commentsCount = _comments.length;
     });
 
     _commentCtrl.clear();
     _commentFocus.unfocus();
+
+    try {
+      final photoIdInt = int.tryParse(widget.photo.id);
+      if (photoIdInt != null && photoIdInt > 0) {
+        await SocketService.addComment(username, photoIdInt, text);
+      } else {
+        debugPrint("Invalid photo ID for comment: ${widget.photo.id}");
+      }
+    } catch (e) {
+      debugPrint("Error adding comment: $e");
+    }
+  }
+
+  Future<String?> _prepareFileForSharing() async {
+    try {
+      final tempDir = await getTemporaryDirectory();
+      final path = '${tempDir.path}/${widget.photo.name}_shared.jpg';
+
+      if (widget.photo.imageUrl.startsWith('http')) {
+        await Dio().download(widget.photo.imageUrl, path);
+        return path;
+      } else if (widget.photo.imageUrl.startsWith('assets/')) {
+        return null;
+      } else {
+        final response = await SocketService.downloadPhoto(int.tryParse(widget.photo.id) ?? 0);
+        if (response['statusCode'] == 200 || response['success'] == true) {
+          final String? base64Data = response['data']?['fileData']?.toString();
+          if (base64Data != null && base64Data.isNotEmpty) {
+            final bytes = base64Decode(base64Data);
+            final file = File(path);
+            await file.writeAsBytes(bytes);
+            return path;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint("Error preparing file for sharing: $e");
+    }
+    return null;
   }
 
   Future<void> _downloadImage() async {
     setState(() => _isDownloading = true);
     try {
-      String path;
-      if (widget.photo.imageUrl.startsWith('http')) {
-        final tempDir = await getTemporaryDirectory();
-        path = '${tempDir.path}/${widget.photo.name}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        await Dio().download(widget.photo.imageUrl, path);
-      } else {
+      final tempDir = await getTemporaryDirectory();
+      final path = '${tempDir.path}/${widget.photo.name}_${DateTime.now().millisecondsSinceEpoch}.jpg';
 
+      if (widget.photo.imageUrl.startsWith('http')) {
+        await Dio().download(widget.photo.imageUrl, path);
+      } else if (widget.photo.imageUrl.startsWith('assets/')) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Downloading assets is restricted in this demo. Try with a URL image.")),
+          const SnackBar(content: Text("Downloading assets is restricted.")),
         );
         setState(() => _isDownloading = false);
         return;
+      } else {
+        final response = await SocketService.downloadPhoto(int.tryParse(widget.photo.id) ?? 0);
+        if (response['statusCode'] == 200 || response['success'] == true) {
+          final String? base64Data = response['data']?['fileData']?.toString();
+          if (base64Data != null && base64Data.isNotEmpty) {
+            final bytes = base64Decode(base64Data);
+            await File(path).writeAsBytes(bytes);
+          } else {
+            throw Exception("No image data received");
+          }
+        } else {
+          throw Exception(response['message'] ?? "Failed to download");
+        }
       }
 
       await Gal.putImage(path);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Image saved to gallery!")),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error saving image: $e")),
       );
     } finally {
-      setState(() => _isDownloading = false);
+      if (mounted) {
+        setState(() => _isDownloading = false);
+      }
     }
   }
 
   Future<void> _shareImage() async {
-    if (widget.photo.imageUrl.startsWith('http')) {
-      await Share.share('${widget.photo.name}\n${widget.photo.imageUrl}');
+    final path = await _prepareFileForSharing();
+    if (path != null) {
+      await Share.shareXFiles(
+        [XFile(path)],
+        text: '${widget.photo.name}\n${widget.photo.caption}',
+      );
     } else {
-      await Share.share('Check out this photo: ${widget.photo.name} at Mora App!');
+      if (widget.photo.imageUrl.startsWith('http')) {
+        await Share.share('${widget.photo.name}\n${widget.photo.imageUrl}');
+      } else {
+        await Share.share('Check out this photo: ${widget.photo.name} at Mora App!');
+      }
     }
   }
 
@@ -139,7 +205,7 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       ),
     );
 
-    if (result == null) return;
+    if (result == null || !mounted) return;
 
     setState(() {
       widget.photo.name = result.name;
@@ -148,6 +214,18 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       _allowComments = result.allowComments;
       widget.photo.allowComments = result.allowComments;
     });
+
+    try {
+      await SocketService.updatePhoto(
+        photoId: int.tryParse(widget.photo.id) ?? 0,
+        name: result.name,
+        caption: result.caption,
+        tags: result.tags,
+        commentAllowed: result.allowComments,
+      );
+    } catch (e) {
+      debugPrint("Error updating photo in database: $e");
+    }
   }
 
   Widget _buildPhotoImage(String urlOrPath) {
@@ -157,30 +235,42 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
       return Image.network(
         urlOrPath,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
+        errorBuilder: (context, error, stackTrace) => Container(
           color: scheme.surfaceContainerHighest,
           alignment: Alignment.center,
-          child: Icon(
-            Icons.broken_image_outlined,
-            color: scheme.onSurfaceVariant,
-            size: 40,
-          ),
+          child: Icon(Icons.broken_image_outlined, color: scheme.onSurfaceVariant, size: 40),
+        ),
+      );
+    } else if (urlOrPath.startsWith('assets/')) {
+      return Image.asset(
+        urlOrPath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: scheme.surfaceContainerHighest,
+          alignment: Alignment.center,
+          child: Icon(Icons.broken_image_outlined, color: scheme.onSurfaceVariant, size: 40),
         ),
       );
     }
 
-    return Image.asset(
-      urlOrPath,
-      fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) => Container(
-        color: scheme.surfaceContainerHighest,
-        alignment: Alignment.center,
-        child: Icon(
-          Icons.broken_image_outlined,
-          color: scheme.onSurfaceVariant,
-          size: 40,
-        ),
-      ),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: SocketService.downloadPhoto(int.tryParse(widget.photo.id) ?? 0),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const ShimmerBox(width: double.infinity, height: double.infinity, borderRadius: 0);
+        }
+        if (snapshot.hasData && (snapshot.data!['statusCode'] == 200 || snapshot.data!['success'] == true)) {
+          final String? base64Data = snapshot.data!['data']?['fileData']?.toString();
+          if (base64Data != null && base64Data.isNotEmpty) {
+            return Image.memory(base64Decode(base64Data), fit: BoxFit.cover);
+          }
+        }
+        return Container(
+          color: scheme.surfaceContainerHighest,
+          alignment: Alignment.center,
+          child: Icon(Icons.broken_image_outlined, color: scheme.onSurfaceVariant, size: 40),
+        );
+      },
     );
   }
 
@@ -189,22 +279,23 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
     final p = widget.photo;
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final bool isMyPhoto = p.username == SocketService.loggedInUsername || p.isOwner;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(p.name),
         actions: [
           IconButton(
-            icon: _isDownloading 
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : const Icon(Icons.download),
+            icon: _isDownloading
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Icon(Icons.download),
             onPressed: _isDownloading ? null : _downloadImage,
           ),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: _shareImage,
           ),
-          if (p.isOwner)
+          if (isMyPhoto)
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: _openEditSheet,
@@ -243,35 +334,39 @@ class _PhotoDetailScreenState extends State<PhotoDetailScreen> {
                       ),
                     ),
                   ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      p.caption,
-                      style: TextStyle(color: scheme.onSurface),
+                if (p.caption.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        p.caption,
+                        style: TextStyle(color: scheme.onSurface),
+                      ),
                     ),
                   ),
-                ),
                 if (p.tags.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 4,
-                      children: p.tags
-                          .map(
-                            (t) => Chip(
-                          label: Text(t),
-                          visualDensity: VisualDensity.compact,
-                          backgroundColor: scheme.primary.withOpacity(0.12),
-                          side: BorderSide(
-                            color: scheme.primary.withOpacity(0.25),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: p.tags
+                            .map(
+                              (t) => Chip(
+                            label: Text(t.startsWith('#') ? t : '#$t'),
+                            visualDensity: VisualDensity.compact,
+                            backgroundColor: scheme.primary.withValues(alpha: 0.12),
+                            side: BorderSide(
+                              color: scheme.primary.withValues(alpha: 0.25),
+                            ),
+                            labelStyle: TextStyle(color: scheme.primary, fontSize: 12),
                           ),
-                          labelStyle: TextStyle(color: scheme.primary),
-                        ),
-                      )
-                          .toList(),
+                        )
+                            .toList(),
+                      ),
                     ),
                   ),
                 const Divider(height: 16),
@@ -332,7 +427,10 @@ class _PostHeaderInfo extends StatelessWidget {
     if (avatarPath.startsWith('http')) {
       return NetworkImage(avatarPath);
     }
-    return AssetImage(avatarPath);
+    if (avatarPath.startsWith('assets/')) {
+      return AssetImage(avatarPath);
+    }
+    return NetworkImage('${SocketService.baseUrl}/$avatarPath');
   }
 
   @override
@@ -402,15 +500,20 @@ class _PostHeaderInfo extends StatelessWidget {
 }
 
 class _CommentsList extends StatelessWidget {
-  final List<PhotoComment> comments;
+  final List<Comment> comments;
 
   const _CommentsList({required this.comments});
 
-  ImageProvider _buildAvatarProvider(String avatarPath) {
-    if (avatarPath.startsWith('http')) {
-      return NetworkImage(avatarPath);
+  ImageProvider _buildAvatarProvider(String? avatarPath) {
+    final path = avatarPath ?? '';
+    if (path.isEmpty) return const AssetImage('assets/images/default_avatar.png');
+    if (path.startsWith('http')) {
+      return NetworkImage(path);
     }
-    return AssetImage(avatarPath);
+    if (path.startsWith('assets/')) {
+      return AssetImage(path);
+    }
+    return NetworkImage('${SocketService.baseUrl}/$path');
   }
 
   @override
@@ -429,15 +532,16 @@ class _CommentsList extends StatelessWidget {
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       itemCount: comments.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final c = comments[index];
+        final commenterName = (c.username ?? '').isNotEmpty ? c.username! : 'User';
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
               radius: 16,
-              backgroundImage: _buildAvatarProvider(c.userAvatar),
+              backgroundImage: _buildAvatarProvider(null),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -448,7 +552,7 @@ class _CommentsList extends StatelessWidget {
                   ),
                   children: [
                     TextSpan(
-                      text: '${c.username} ',
+                      text: '$commenterName ',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     TextSpan(text: c.text),
@@ -490,14 +594,14 @@ class _CommentComposer extends StatelessWidget {
                 style: TextStyle(color: scheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Add a comment...',
-                  hintStyle: TextStyle(color: scheme.onSurfaceVariant.withOpacity(0.7)),
+                  hintStyle: TextStyle(color: scheme.onSurfaceVariant.withValues(alpha: 0.7)),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
                     borderSide: BorderSide(color: scheme.outlineVariant),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: scheme.outlineVariant.withOpacity(0.5)),
+                    borderSide: BorderSide(color: scheme.outlineVariant.withValues(alpha: 0.5)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -574,7 +678,6 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
         .split(RegExp(r'[\s,]+'))
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
-        .map((e) => e.startsWith('#') ? e : '#$e')
         .toList();
   }
 
@@ -638,7 +741,7 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
             contentPadding: EdgeInsets.zero,
             title: Text('Allow Comments', style: TextStyle(color: scheme.onSurface)),
             subtitle: Text('Users can post comments on this photo', style: TextStyle(color: scheme.onSurfaceVariant)),
-            activeColor: scheme.primary,
+            activeTrackColor: scheme.primary,
             value: _allowComments,
             onChanged: (val) {
               setState(() {
@@ -693,20 +796,4 @@ class _EditPhotoSheetState extends State<_EditPhotoSheet> {
       ),
     );
   }
-}
-
-class PhotoComment {
-  final String id;
-  final String username;
-  final String userAvatar;
-  final String text;
-  final DateTime createdAt;
-
-  PhotoComment({
-    required this.id,
-    required this.username,
-    required this.userAvatar,
-    required this.text,
-    required this.createdAt,
-  });
 }

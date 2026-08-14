@@ -1,7 +1,7 @@
 package model;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,7 +31,6 @@ public class Comment {
         Comment comment = new Comment(id, ownerId, photoId, date, text);
 
         comments.put(id, comment);
-
         photo.addComment(comment);
 
         User owner = User.getUsers().get(ownerId);
@@ -56,6 +55,15 @@ public class Comment {
 
     public static Map<Integer, Comment> getComments() {
         return comments;
+    }
+
+    public static void loadComments(List<Comment> loadedComments) {
+        comments.clear();
+        if (loadedComments != null) {
+            for (Comment comment : loadedComments) {
+                comments.put(comment.getId(), comment);
+            }
+        }
     }
 
     public int getId() {

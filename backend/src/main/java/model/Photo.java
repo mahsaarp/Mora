@@ -2,7 +2,6 @@ package model;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Photo {
     private final int id;
@@ -46,6 +45,30 @@ public class Photo {
 
             if (!user.getLikedPhotoIds().contains(this.id)) {
                 user.addFavoritePhoto(this.id);
+            }
+
+            User owner = User.getUsers().get(this.ownerId);
+            if (owner != null) {
+                owner.updateRank();
+            }
+        }
+    }
+
+    public void unlike(User user) {
+        if (user == null) {
+            return;
+        }
+
+        if (userLikedIds.contains(user.getId())) {
+            userLikedIds.remove(Integer.valueOf(user.getId()));
+
+            if (user.getLikedPhotoIds().contains(this.id)) {
+                user.removeFavoritePhoto(this.id);
+            }
+
+            User owner = User.getUsers().get(this.ownerId);
+            if (owner != null) {
+                owner.updateRank();
             }
         }
     }
@@ -176,6 +199,10 @@ public class Photo {
             }
         }
 
+        for (User user : User.getUsers().values()) {
+            user.removeFavoritePhoto(photo.getId());
+        }
+
         photos.remove(photo.getId());
     }
 
@@ -189,6 +216,15 @@ public class Photo {
                 .map(id -> Comment.getComments().get(id))
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    public static void loadPhotos(List<Photo> loadedPhotos) {
+        photos.clear();
+        if (loadedPhotos != null) {
+            for (Photo photo : loadedPhotos) {
+                photos.put(photo.getId(), photo);
+            }
+        }
     }
 
     public int getId() {
@@ -264,7 +300,7 @@ public class Photo {
     }
 
     public static Map<Integer, Photo> getPhotos() {
-        return new LinkedHashMap<>(photos);
+        return photos;
     }
 
     public String getRoute() {

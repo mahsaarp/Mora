@@ -4,6 +4,7 @@ class Comment {
   int? photoId;
   String? date;
   String text;
+  String? username;
 
   Comment({
     this.id,
@@ -11,6 +12,7 @@ class Comment {
     this.photoId,
     this.date,
     required this.text,
+    this.username,
   });
 
   factory Comment.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Comment {
       photoId: json['photoId'],
       date: json['date']?.toString(),
       text: json['text'] ?? '',
+      username: json['username'] ?? json['owner_username'],
     );
   }
 
@@ -30,6 +33,7 @@ class Comment {
       if (photoId != null) 'photoId': photoId,
       if (date != null) 'date': date,
       'text': text,
+      if (username != null) 'username': username,
     };
   }
 }

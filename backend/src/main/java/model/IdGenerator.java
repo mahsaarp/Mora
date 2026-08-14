@@ -23,4 +23,20 @@ public class IdGenerator {
     public static int nextCommentId() {
         return commentId.getAndIncrement();
     }
+
+    public static void setUserId(int id) {
+        userId.set(id);
+    }
+
+    public static void setPhotoId(int id) {
+        photoId.set(id);
+    }
+
+    public static void setAlbumId(int id) {
+        albumId.set(id);
+    }
+
+    public static void setCommentId(int id) {
+        commentId.set(id);
+    }
 }
