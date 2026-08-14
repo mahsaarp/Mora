@@ -44,10 +44,11 @@
         11,
         9,
         3,
-        2
+        2,
+        14
       ],
-      "isBanned": true,
-      "isLoggedIn": false,
+      "isBanned": false,
+      "isLoggedIn": true,
       "commentCount": 2,
       "rank": "PHOTOGRAPHER",
       "enterType": "EMAIL",
@@ -516,7 +517,9 @@
         "Calm"
       ],
       "caption": "So refreshing!",
-      "userLikedIds": [],
+      "userLikedIds": [
+        2
+      ],
       "commentAllowed": false,
       "albumIds": [],
       "commentIds": [],
