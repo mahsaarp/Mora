@@ -41,9 +41,11 @@ public class UserController {
 
             String username = payload.get("username").getAsString();
             String password = payload.get("password").getAsString();
+            String displayName = payload.has("displayName") && !payload.get("displayName").isJsonNull()
+                    ? payload.get("displayName").getAsString() : null;
 
             User.EnterType enterType = User.detectEnterType(username);
-            User newUser = User.signUp(enterType, username, password);
+            User newUser = User.signUp(enterType, username, password, displayName);
 
             DatabaseManager.getInstance().addUser(newUser);
             DatabaseManager.getInstance().saveDatabase();
@@ -52,6 +54,7 @@ public class UserController {
             resp.addProperty("id", newUser.getId());
             resp.addProperty("userId", newUser.getId());
             resp.addProperty("username", newUser.getUsername());
+            resp.addProperty("displayName", newUser.getDisplayName());
             resp.addProperty("rank", newUser.getRank().name());
 
             return new Response(200, "Signup successful", resp);
@@ -86,6 +89,7 @@ public class UserController {
             resp.addProperty("id", user.getId());
             resp.addProperty("userId", user.getId());
             resp.addProperty("username", user.getUsername());
+            resp.addProperty("displayName", user.getDisplayName());
             resp.addProperty("avatarRoute", user.getAvatarRoute());
             resp.addProperty("rank", user.getRank().name());
             resp.addProperty("isAdmin", user.getRank() == User.UserRank.ADMIN);
@@ -151,6 +155,9 @@ public class UserController {
             if (payload.has("newUsername")) {
                 user.changeUsername(payload.get("newUsername").getAsString());
             }
+            if (payload.has("newDisplayName")) {
+                user.changeDisplayName(payload.get("newDisplayName").getAsString());
+            }
             if (payload.has("newPassword")) {
                 user.changePassword(payload.get("newPassword").getAsString());
             }
@@ -202,6 +209,7 @@ public class UserController {
         JsonObject resp = new JsonObject();
         resp.addProperty("id", user.getId());
         resp.addProperty("username", user.getUsername());
+        resp.addProperty("displayName", user.getDisplayName());
         resp.addProperty("avatarRoute", user.getAvatarRoute());
         resp.addProperty("rank", user.getRank().name());
         resp.addProperty("themeMode", user.getThemeMode());
@@ -233,6 +241,7 @@ public class UserController {
                 JsonObject obj = new JsonObject();
                 obj.addProperty("id", user.getId());
                 obj.addProperty("username", user.getUsername());
+                obj.addProperty("displayName", user.getDisplayName());
                 obj.addProperty("avatarRoute", user.getAvatarRoute());
                 obj.addProperty("rank", user.getRank().name());
                 obj.addProperty("isBanned", user.isBanned());

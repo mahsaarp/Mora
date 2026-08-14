@@ -1,6 +1,7 @@
 class User {
   int? id;
   String username;
+  String? displayName;
   String? password;
   List<int> photoIds;
   List<int> albumIds;
@@ -14,6 +15,7 @@ class User {
   User({
     this.id,
     required this.username,
+    this.displayName,
     this.password,
     List<int>? photoIds,
     List<int>? albumIds,
@@ -33,6 +35,7 @@ class User {
     return User(
       id: json['id'],
       username: json['username'] ?? '',
+      displayName: json['displayName'] ?? json['display_name'] ?? json['username'] ?? '',
       password: json['password'],
       photoIds: json['photoIds'] != null
           ? List<int>.from(json['photoIds'])
@@ -55,6 +58,7 @@ class User {
     return {
       if (id != null) 'id': id,
       'username': username,
+      if (displayName != null) 'displayName': displayName,
       if (password != null) 'password': password,
       'photoIds': photoIds,
       'albumIds': albumIds,

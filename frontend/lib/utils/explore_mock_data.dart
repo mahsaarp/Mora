@@ -14,6 +14,7 @@ class ExplorePhoto {
   String caption;
   List<String> tags;
   final String username;
+  final String displayName;
   final String userAvatar;
   final bool isOwner;
 
@@ -31,6 +32,7 @@ class ExplorePhoto {
     required this.caption,
     required this.tags,
     required this.username,
+    required this.displayName,
     required this.userAvatar,
     this.isOwner = false,
     this.allowComments = true,
@@ -84,6 +86,8 @@ class ExplorePhoto {
 
     final avatarValue = json['avatar_url'] ?? json['avatarUrl'] ?? json['avatarRoute'] ?? json['userAvatar'] ?? 'assets/images/default_avatar.png';
 
+    final displayName = json['displayName'] ?? json['display_name'] ?? json['owner_display_name'] ?? json['username'] ?? 'User';
+
     return ExplorePhoto(
       id: id,
       name: json['name'] ?? json['title'] ?? 'Untitled',
@@ -94,6 +98,7 @@ class ExplorePhoto {
       caption: json['caption'] ?? json['description'] ?? '',
       tags: json['tags'] is List ? List<String>.from(json['tags']) : [],
       username: json['owner_username'] ?? json['username'] ?? 'User',
+      displayName: displayName.toString(),
       userAvatar: avatarValue.toString(),
       isOwner: (json['ownerId'] != null && json['ownerId'].toString() == currentUserId?.toString()) || (json['is_owner'] == true),
       allowComments: json['commentAllowed'] ?? json['allow_comments'] ?? true,

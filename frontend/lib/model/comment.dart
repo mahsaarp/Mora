@@ -5,6 +5,7 @@ class Comment {
   String? date;
   String text;
   String? username;
+  String? displayName;
   String? avatarRoute;
 
   Comment({
@@ -14,6 +15,7 @@ class Comment {
     this.date,
     required this.text,
     this.username,
+    this.displayName,
     this.avatarRoute,
   });
 
@@ -25,6 +27,7 @@ class Comment {
       date: json['date']?.toString(),
       text: json['text'] ?? '',
       username: json['username'] ?? json['owner_username'],
+      displayName: json['displayName'] ?? json['display_name'] ?? json['username'] ?? json['owner_username'],
       avatarRoute: json['avatarRoute'] ?? json['avatar_route'] ?? json['avatar_url'],
     );
   }
@@ -37,6 +40,7 @@ class Comment {
       if (date != null) 'date': date,
       'text': text,
       if (username != null) 'username': username,
+      if (displayName != null) 'displayName': displayName,
       if (avatarRoute != null) 'avatarRoute': avatarRoute,
     };
   }

@@ -14,6 +14,7 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final usernameController = TextEditingController();
+  final displayNameController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
@@ -25,6 +26,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void dispose() {
     usernameController.dispose();
+    displayNameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
     super.dispose();
@@ -32,6 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Future<void> _handleSignUp() async {
     final username = usernameController.text.trim();
+    final displayName = displayNameController.text.trim();
     final password = passwordController.text.trim();
     final confirmPassword = confirmPasswordController.text.trim();
 
@@ -42,6 +45,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (!_usernameRegex.hasMatch(username)) {
       _showError("Username must be a valid phone (09xxxxxxxx) or Gmail (@gmail.com)");
+      return;
+    }
+
+    if (displayName.isEmpty) {
+      _showError("Please enter your display name");
       return;
     }
 
@@ -63,12 +71,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final response = await SocketService.signUp(username, password);
+      final response = await SocketService.signUp(username, password, displayName: displayName);
 
       if (response['success'] == true || response['statusCode'] == 200) {
         await SessionManager().setUser(
           response['userId'] ?? response['id'] ?? 0,
           username,
+          displayNameValue: response['data']?['displayName'] ?? response['displayName'] ?? displayName,
         );
 
         if (!mounted) return;
@@ -139,6 +148,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
+                        TextField(
+                          controller: displayNameController,
+                          style: TextStyle(color: scheme.onSurface),
+                          decoration: _inputDecoration(scheme, "Display Name", Icons.badge_outlined),
+                        ),
+                        const SizedBox(height: 15),
                         TextField(
                           controller: usernameController,
                           style: TextStyle(color: scheme.onSurface),

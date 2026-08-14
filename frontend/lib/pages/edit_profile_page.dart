@@ -13,6 +13,7 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final TextEditingController _displayNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   File? _selectedImage;
@@ -24,6 +25,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void initState() {
     super.initState();
     _usernameController.text = SocketService.loggedInUsername ?? "";
+    _displayNameController.text = SessionManager().displayName ?? "";
     _fetchCurrentProfile();
   }
 
@@ -33,6 +35,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
       if (response['success'] == true || response['statusCode'] == 200) {
         setState(() {
           _currentAvatar = response['data']?['avatarRoute'] ?? response['data']?['avatar'];
+          final data = response['data'] ?? {};
+          final incomingDisplayName = (data['displayName'] ?? data['display_name'] ?? '').toString();
+          if (incomingDisplayName.isNotEmpty) {
+            _displayNameController.text = incomingDisplayName;
+          }
         });
       }
     } catch (e) {
@@ -108,11 +115,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
       final oldUsername = SocketService.loggedInUsername ?? "";
       final newUsername = _usernameController.text.trim();
+      final newDisplayName = _displayNameController.text.trim();
       final newPassword = _passwordController.text.trim();
 
       final response = await SocketService.updateProfile(
         oldUsername: oldUsername,
         newUsername: newUsername.isNotEmpty && newUsername != oldUsername ? newUsername : null,
+        newDisplayName: newDisplayName.isNotEmpty ? newDisplayName : null,
         newPassword: newPassword.isNotEmpty ? newPassword : null,
         avatarData: avatarBase64,
       );
@@ -122,7 +131,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
           SocketService.loggedInUsername = newUsername;
           final userId = await SessionManager().userId;
           if (userId != null) {
-            await SessionManager().setUser(userId, newUsername);
+            await SessionManager().setUser(userId, newUsername, displayNameValue: newDisplayName);
+          }
+        } else if (newDisplayName.isNotEmpty) {
+          SessionManager().displayName = newDisplayName;
+          final userId = await SessionManager().userId;
+          if (userId != null) {
+            await SessionManager().setUser(userId, SocketService.loggedInUsername ?? oldUsername, displayNameValue: newDisplayName);
           }
         }
         if (!mounted) return;
@@ -198,6 +213,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ],
             ),
             const SizedBox(height: 35),
+            TextField(
+              controller: _displayNameController,
+              decoration: const InputDecoration(
+                labelText: "Display Name",
+                prefixIcon: Icon(Icons.badge_outlined),
+              ),
+            ),
+            const SizedBox(height: 20),
             TextField(
               controller: _usernameController,
               decoration: const InputDecoration(

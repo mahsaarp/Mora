@@ -20,6 +20,14 @@ class UserTest {
         assertEquals("test@gmail.com", user.getUsername());
     }
 
+    @Test
+    void signUpWithDisplayNameTest() {
+        User user = User.signUp(User.EnterType.EMAIL, "test@gmail.com", "A123456a", "Ali Reza");
+
+        assertNotNull(user);
+        assertEquals("Ali Reza", user.getDisplayName());
+    }
+
     //==================================== LOGIN TEST
     @Test
     void loginTest() {

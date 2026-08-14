@@ -28,6 +28,7 @@ class _ProfilePageState extends State<ProfilePage> {
   int selectedTabIndex = 0;
 
   String? _currentUsername;
+  String? _currentDisplayName;
   String? _currentAvatar;
   String? _currentRank;
 
@@ -70,11 +71,14 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           isAdmin = data['is_admin'] ?? false;
           _currentRank = data['rank'];
+          final incomingDisplayName = (data['displayName'] ?? data['display_name'] ?? '').toString();
           if (isOwnProfile) {
             _currentUsername = data['username'] ?? SocketService.loggedInUsername;
+            _currentDisplayName = incomingDisplayName.isNotEmpty ? incomingDisplayName : (_currentUsername ?? 'User');
             _currentAvatar = data['avatarRoute'] ?? data['avatar'];
           } else {
             _currentUsername = data['username'] ?? widget.viewUsername;
+            _currentDisplayName = incomingDisplayName.isNotEmpty ? incomingDisplayName : (_currentUsername ?? 'User');
             _currentAvatar = data['avatarRoute'] ?? data['avatar'] ?? widget.viewAvatar;
           }
 
@@ -284,7 +288,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     final String headerTitle = isOwnProfile ? "My Profile" : (_currentUsername ?? "User");
-    final String displayUsername = _currentUsername ?? (isOwnProfile ? "My Profile" : "User");
+    final String displayUsername = _currentDisplayName ?? _currentUsername ?? (isOwnProfile ? "My Profile" : "User");
 
     return Scaffold(
       appBar: _isSelectMode
@@ -328,6 +332,11 @@ class _ProfilePageState extends State<ProfilePage> {
               CircleAvatar(radius: 55, backgroundImage: _getAvatarProvider(_currentAvatar)),
               const SizedBox(height: 15),
               Text(displayUsername, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+              if (_currentUsername != null && _currentUsername != displayUsername)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(_currentUsername!, style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 14)),
+                ),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),

@@ -71,8 +71,12 @@ class SocketService {
     return resp;
   }
 
-  static Future<Map<String, dynamic>> signUp(String username, String password) async {
-    final resp = await sendRequest(action: 'signup', payload: {'username': username, 'password': password});
+  static Future<Map<String, dynamic>> signUp(String username, String password, {String? displayName}) async {
+    final resp = await sendRequest(action: 'signup', payload: {
+      'username': username,
+      'password': password,
+      if (displayName != null && displayName.trim().isNotEmpty) 'displayName': displayName.trim(),
+    });
     if (resp['statusCode'] == 200 || resp['success'] == true) {
       loggedInUsername = username;
       final data = resp['data'] ?? {};
@@ -105,12 +109,14 @@ class SocketService {
   static Future<Map<String, dynamic>> updateProfile({
     required String oldUsername,
     String? newUsername,
+    String? newDisplayName,
     String? newPassword,
     String? avatarData,
   }) async {
     return await sendRequest(action: 'updateProfile', payload: {
       'oldUsername': oldUsername,
       if (newUsername != null) 'newUsername': newUsername,
+      if (newDisplayName != null) 'newDisplayName': newDisplayName,
       if (newPassword != null) 'newPassword': newPassword,
       if (avatarData != null) 'avatarData': avatarData,
     });

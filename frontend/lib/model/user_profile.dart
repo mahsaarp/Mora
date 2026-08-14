@@ -2,6 +2,7 @@ import '../utils/explore_mock_data.dart';
 
 class UserProfile {
   final String username;
+  final String displayName;
   final String avatarUrl;
   final bool isAdmin;
   final List<ExplorePhoto> photos;
@@ -9,6 +10,7 @@ class UserProfile {
 
   UserProfile({
     required this.username,
+    required this.displayName,
     required this.avatarUrl,
     required this.isAdmin,
     required this.photos,
@@ -19,6 +21,7 @@ class UserProfile {
     final data = json;
     return UserProfile(
       username: data['username'] ?? '',
+      displayName: data['displayName'] ?? data['display_name'] ?? data['username'] ?? '',
       avatarUrl: data['avatar_url'] ?? '',
       isAdmin: data['is_admin'] ?? false,
       photos: (data['photos'] as List? ?? [])

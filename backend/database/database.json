@@ -4,6 +4,7 @@
       "id": 2,
       "username": "Sara@gmail.com",
       "password": "Sara12345",
+      "displayName": "Sara",
       "avatarRoute": "uploads/avatars/user_2.jpg",
       "photoIds": [
         2,
@@ -33,6 +34,7 @@
       "id": 3,
       "username": "Mahsa@gmail.com",
       "password": "Mahsa1234",
+      "displayName": "Mahsa",
       "avatarRoute": "uploads/avatars/user_3.jpg",
       "photoIds": [
         3,
@@ -55,6 +57,7 @@
       "id": 4,
       "username": "Amin@gmail.com",
       "password": "Sina1234",
+      "displayName": "Amin",
       "avatarRoute": "uploads/avatars/user_4.jpg",
       "photoIds": [
         11
@@ -71,8 +74,8 @@
         7,
         13
       ],
-      "isBanned": true,
-      "isLoggedIn": false,
+      "isBanned": false,
+      "isLoggedIn": true,
       "commentCount": 5,
       "rank": "COMMENTER",
       "enterType": "EMAIL",
@@ -82,6 +85,7 @@
       "id": 5,
       "username": "Mohammad@gmail.com",
       "password": "Mohammad12",
+      "displayName": "Mohammad",
       "avatarRoute": "uploads/avatars/user_5.jpg",
       "photoIds": [
         12,

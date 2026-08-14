@@ -447,12 +447,25 @@ class _PostHeaderInfo extends StatelessWidget {
                 backgroundImage: _buildAvatarProvider(photo.userAvatar),
               ),
               const SizedBox(width: 10),
-              Text(
-                photo.username,
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: scheme.onSurface,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (photo.displayName.isNotEmpty ? photo.displayName : photo.username),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                  if (photo.username.isNotEmpty && photo.username != photo.displayName)
+                    Text(
+                      '@${photo.username}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                ],
               ),
             ],
           ),
@@ -535,7 +548,7 @@ class _CommentsList extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final c = comments[index];
-        final commenterName = (c.username ?? '').isNotEmpty ? c.username! : 'User';
+        final commenterName = (c.displayName ?? c.username ?? '').isNotEmpty ? (c.displayName ?? c.username ?? 'User') : 'User';
         return Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

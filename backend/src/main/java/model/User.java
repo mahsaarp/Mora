@@ -27,6 +27,7 @@ public class User {
     private int id;
     private String username;
     private String password;
+    private String displayName;
     private String avatarRoute;
     private List<Integer> photoIds;
     private List<Integer> albumIds;
@@ -49,9 +50,14 @@ public class User {
     private static final int COMMENT_NUMBER = 5;
     //=============================================CONSTRUCTOR
     public User(int id, String username, String password, UserRank rank, EnterType enterType) {
+        this(id, username, password, username, rank, enterType);
+    }
+
+    public User(int id, String username, String password, String displayName, UserRank rank, EnterType enterType) {
         this.id = id;
         this.username = username;
         this.password = password;
+        this.displayName = (displayName == null || displayName.trim().isEmpty()) ? username : displayName.trim();
 
         this.rank = rank;
         this.enterType = enterType;
@@ -80,6 +86,10 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getDisplayName() {
+        return displayName != null && !displayName.trim().isEmpty() ? displayName : username;
     }
 
     public List<Integer> getPhotoIds() {
@@ -136,6 +146,10 @@ public class User {
         this.avatarRoute = avatarRoute;
     }
 
+    public void setDisplayName(String displayName) {
+        this.displayName = (displayName == null || displayName.trim().isEmpty()) ? username : displayName.trim();
+    }
+
     public void unban() {
         isBanned = false;
     }
@@ -172,6 +186,13 @@ public class User {
             throw new IllegalArgumentException("Password must be at least 8 characters, include uppercase, lowercase, digits, and MUST NOT contain your username.");
         }
         this.password = newPassword;
+    }
+
+    public void changeDisplayName(String newDisplayName) {
+        if (newDisplayName == null || newDisplayName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Display name is required");
+        }
+        this.displayName = newDisplayName.trim();
     }
 
     public void addPhoto(int photoId) {
@@ -249,6 +270,10 @@ public class User {
 
     //=============================================SIGNUP AND LOGIN
     public static User signUp(EnterType enterType, String username, String password) {
+        return signUp(enterType, username, password, null);
+    }
+
+    public static User signUp(EnterType enterType, String username, String password, String displayName) {
         if (!isValidUsername(username)) {
             throw new IllegalArgumentException("Username must be a valid mobile number (09xxxxxxxx) or Gmail (@gmail.com)");
         }
@@ -263,7 +288,7 @@ public class User {
 
         EnterType resolvedType = (enterType != null) ? enterType : detectEnterType(username);
 
-        User user = new User(IdGenerator.nextUserId(), username, password, UserRank.NEWBIE, resolvedType);
+        User user = new User(IdGenerator.nextUserId(), username, password, displayName, UserRank.NEWBIE, resolvedType);
         users.put(user.getId(), user);
 
         return user;
